@@ -1,0 +1,148 @@
+@baseUrl = http://localhost:3000
+@categoriaId = 1
+@produtoId = 1
+@estoqueId = 1
+@usuarioId = 1
+@pedidoId = 1
+@entregaId = 1
+
+### Verificar se o servidor está funcionando
+GET {{baseUrl}}/
+
+### Login do administrador - execute primeiro
+# @name loginAdmin
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+    "email": "admin@autoshopping.com",
+    "senha": "Admin@123"
+}
+
+### Listar categorias
+GET {{baseUrl}}/categorias
+
+### Consultar categoria por ID
+GET {{baseUrl}}/categoria/{{categoriaId}}
+
+### Cadastrar categoria - ADMIN
+POST {{baseUrl}}/categoria
+Content-Type: application/json
+Authorization: Bearer {{loginAdmin.response.body.token}}
+
+{
+    "nome": "Conversível",
+    "descricao": "Veículos com teto retrátil"
+}
+
+### Listar veículos
+GET {{baseUrl}}/produtos
+
+### Buscar veículos
+GET {{baseUrl}}/produtos?busca=Jeep&ativo=true
+
+### Consultar veículo por ID
+GET {{baseUrl}}/produto/{{produtoId}}
+
+### Cadastrar veículo com estoque - ADMIN
+POST {{baseUrl}}/produto
+Content-Type: application/json
+Authorization: Bearer {{loginAdmin.response.body.token}}
+
+{
+    "idCategoria": {{categoriaId}},
+    "nome": "Jeep Compass Limited",
+    "marca": "Jeep",
+    "modelo": "Compass",
+    "versao": "Limited T270",
+    "ano": 2025,
+    "preco": 189900.00,
+    "quilometragem": 15000,
+    "combustivel": "Flex",
+    "cambio": "Automático",
+    "cor": "Preto",
+    "descricao": "Veículo revisado e em excelente estado.",
+    "imagem": "https://exemplo.com/jeep-compass.jpg",
+    "ativo": true,
+    "quantidadeEstoque": 1
+}
+
+### Atualizar veículo - ADMIN
+PUT {{baseUrl}}/produto/{{produtoId}}
+Content-Type: application/json
+Authorization: Bearer {{loginAdmin.response.body.token}}
+
+{
+    "preco": 184900.00,
+    "cor": "Vermelho",
+    "ativo": true
+}
+
+### Consultar estoque do veículo
+GET {{baseUrl}}/estoque/produto/{{produtoId}}
+
+### Listar estoques - ADMIN
+GET {{baseUrl}}/estoques
+Authorization: Bearer {{loginAdmin.response.body.token}}
+
+### Atualizar estoque - ADMIN
+PUT {{baseUrl}}/estoque/{{estoqueId}}
+Content-Type: application/json
+Authorization: Bearer {{loginAdmin.response.body.token}}
+
+{
+    "quantidade": 2,
+    "quantidade_minima": 0
+}
+
+### Listar usuários - ADMIN
+GET {{baseUrl}}/usuarios
+Authorization: Bearer {{loginAdmin.response.body.token}}
+
+### Consultar usuário
+GET {{baseUrl}}/usuario/{{usuarioId}}
+Authorization: Bearer {{loginAdmin.response.body.token}}
+
+### Listar todos os pedidos - ADMIN
+GET {{baseUrl}}/pedidos
+Authorization: Bearer {{loginAdmin.response.body.token}}
+
+### Consultar pedido
+GET {{baseUrl}}/pedido/{{pedidoId}}
+Authorization: Bearer {{loginAdmin.response.body.token}}
+
+### Atualizar status do pedido - ADMIN
+PUT {{baseUrl}}/pedido/{{pedidoId}}
+Content-Type: application/json
+Authorization: Bearer {{loginAdmin.response.body.token}}
+
+{
+    "status": "PAGO"
+}
+
+### Listar entregas - ADMIN
+GET {{baseUrl}}/entregas
+Authorization: Bearer {{loginAdmin.response.body.token}}
+
+### Atualizar entrega - ADMIN
+PUT {{baseUrl}}/entrega/{{entregaId}}
+Content-Type: application/json
+Authorization: Bearer {{loginAdmin.response.body.token}}
+
+{
+    "status": "EM_TRANSITO",
+    "codigoRastreio": "AS123456BR",
+    "previsao": "2026-09-15"
+}
+
+### Relatório geral - ADMIN
+GET {{baseUrl}}/relatorio/resumo
+Authorization: Bearer {{loginAdmin.response.body.token}}
+
+### ATENÇÃO: excluir veículo definitivamente - ADMIN
+DELETE {{baseUrl}}/produto/{{produtoId}}
+Authorization: Bearer {{loginAdmin.response.body.token}}
+
+### ATENÇÃO: excluir categoria definitivamente - ADMIN
+DELETE {{baseUrl}}/categoria/{{categoriaId}}
+Authorization: Bearer {{loginAdmin.response.body.token}}
