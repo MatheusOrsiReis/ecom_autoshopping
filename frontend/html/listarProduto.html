@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Consulte os veículos disponíveis no AutoShopping.">
+    <title>Veículos | AutoShopping</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/prgListarProduto.js" defer></script>
+</head>
+<body>
+    <header class="navbar">
+        <div class="container navbar-conteudo">
+            <a class="logo" href="../index.html" aria-label="AutoShopping - Início">
+                <img src="../autoshopping_logo.png" alt="AutoShopping">
+            </a>
+
+            <nav class="menu" aria-label="Navegação principal">
+                <a href="../index.html">Início</a>
+                <a class="ativo" href="listarProduto.html">Veículos</a>
+                <a href="#categorias">Categorias</a>
+                <a href="admin.html" id="linkAdmin" hidden>Painel</a>
+                <a href="meusPedidos.html" id="linkPedidos" hidden>Pedidos</a>
+                <a href="carrinho.html">Carrinho <span id="contadorCarrinho" class="contador-carrinho">0</span></a>
+                <a id="linkConta" class="botao botao-contorno botao-menor" href="login.html">Entrar</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="topo-pagina">
+            <div class="container">
+                <span class="sobretitulo">Catálogo AutoShopping</span>
+                <h1>Veículos disponíveis</h1>
+                <p>Encontre o modelo que combina com sua rotina.</p>
+            </div>
+        </section>
+
+        <section class="secao catalogo">
+            <div class="container">
+                <div class="painel-filtros">
+                    <form id="formBusca" class="form-busca">
+                        <label for="campoBusca">O que você procura?</label>
+                        <div class="linha-busca">
+                            <input id="campoBusca" type="search" placeholder="Nome, marca ou modelo">
+                            <button class="botao botao-primario" type="submit">Buscar</button>
+                        </div>
+                    </form>
+
+                    <div id="categorias" class="grupo-categorias">
+                        <span class="titulo-filtro">Categoria</span>
+                        <div id="filtroCategorias" class="filtros-categoria" aria-label="Filtrar por categoria">
+                            <button class="filtro-categoria ativo" type="button" data-categoria="">Todos</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="barra-resultados">
+                    <h2>Resultados</h2>
+                    <span id="contadorResultados">Carregando...</span>
+                </div>
+
+                <div id="mensagemLista" class="mensagem carregando" role="status">Carregando veículos...</div>
+                <div id="listaProdutos" class="grade-veiculos" aria-live="polite"></div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="rodape">
+        <div class="container rodape-conteudo">
+            <img class="logo-rodape" src="../autoshopping_logo.png" alt="AutoShopping">
+            <p>Marketplace automotivo acadêmico.</p>
+        </div>
+    </footer>
+</body>
+</html>

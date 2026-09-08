@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar pedido | AutoShopping</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/prgCheckout.js" defer></script>
+</head>
+<body>
+    <header class="navbar">
+        <div class="container navbar-conteudo">
+            <a class="logo" href="../index.html"><img src="../autoshopping_logo.png" alt="AutoShopping"></a>
+            <nav class="menu" aria-label="Navegação principal">
+                <a href="../index.html">Início</a>
+                <a href="listarProduto.html">Veículos</a>
+                <a href="admin.html" id="linkAdmin" hidden>Painel</a>
+                <a href="meusPedidos.html">Pedidos</a>
+                <a href="carrinho.html">Carrinho <span id="contadorCarrinho" class="contador-carrinho">0</span></a>
+                <a id="linkConta" class="botao botao-contorno botao-menor" href="perfil.html">Minha conta</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="topo-pagina">
+            <div class="container">
+                <span class="sobretitulo">Etapa final</span>
+                <h1>Finalizar pedido</h1>
+                <p>Escolha como deseja receber seu veículo.</p>
+            </div>
+        </section>
+
+        <section class="secao">
+            <div id="conteudoCheckout" class="container checkout-layout">
+                <section class="cartao-formulario" aria-labelledby="tituloEntrega">
+                    <div class="cabecalho-formulario">
+                        <h2 id="tituloEntrega">Entrega ou retirada</h2>
+                        <p>Confira os dados antes de confirmar.</p>
+                    </div>
+
+                    <form id="formCheckout" class="formulario">
+                        <div class="campo campo-largo">
+                            <label for="tipoEntrega">Como deseja receber?</label>
+                            <select id="tipoEntrega" required>
+                                <option value="RETIRADA">Retirar na loja</option>
+                                <option value="ENTREGA">Receber no endereço</option>
+                            </select>
+                        </div>
+
+                        <div id="camposEndereco" class="subformulario campo-largo" hidden>
+                            <div class="campo">
+                                <label for="cep">CEP</label>
+                                <input id="cep" type="text" maxlength="9">
+                            </div>
+                            <div class="campo campo-expandido">
+                                <label for="logradouro">Rua</label>
+                                <input id="logradouro" type="text" maxlength="70">
+                            </div>
+                            <div class="campo">
+                                <label for="numero">Número</label>
+                                <input id="numero" type="text" maxlength="12">
+                            </div>
+                            <div class="campo">
+                                <label for="bairro">Bairro</label>
+                                <input id="bairro" type="text" maxlength="70">
+                            </div>
+                            <div class="campo campo-expandido">
+                                <label for="cidade">Cidade</label>
+                                <input id="cidade" type="text" maxlength="70">
+                            </div>
+                            <div class="campo">
+                                <label for="uf">UF</label>
+                                <input id="uf" type="text" maxlength="2">
+                            </div>
+                            <div class="campo campo-expandido">
+                                <label for="complemento">Complemento</label>
+                                <input id="complemento" type="text" maxlength="100">
+                            </div>
+                        </div>
+
+                        <p id="mensagemCheckout" class="mensagem-formulario campo-largo" role="status"></p>
+                        <button id="botaoConfirmarPedido" class="botao botao-primario botao-largo campo-largo" type="submit">Confirmar pedido</button>
+                    </form>
+                </section>
+
+                <aside class="resumo-compra resumo-checkout">
+                    <span class="sobretitulo">Resumo do pedido</span>
+                    <div id="itensCheckout" class="itens-checkout"></div>
+                    <div class="linha-resumo total"><span>Total</span><strong id="totalCheckout">R$ 0,00</strong></div>
+                </aside>
+            </div>
+
+            <section id="pedidoConcluido" class="container pedido-concluido" hidden>
+                <span class="icone-sucesso">✓</span>
+                <h2>Pedido realizado com sucesso!</h2>
+                <p id="numeroPedido"></p>
+                <a class="botao botao-primario" href="meusPedidos.html">Acompanhar meus pedidos</a>
+            </section>
+        </section>
+    </main>
+</body>
+</html>

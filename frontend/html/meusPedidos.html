@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus pedidos | AutoShopping</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/prgMeusPedidos.js" defer></script>
+</head>
+<body>
+    <header class="navbar">
+        <div class="container navbar-conteudo">
+            <a class="logo" href="../index.html"><img src="../autoshopping_logo.png" alt="AutoShopping"></a>
+            <nav class="menu" aria-label="Navegação principal">
+                <a href="../index.html">Início</a>
+                <a href="listarProduto.html">Veículos</a>
+                <a href="admin.html" id="linkAdmin" hidden>Painel</a>
+                <a class="ativo" href="meusPedidos.html">Pedidos</a>
+                <a href="carrinho.html">Carrinho <span id="contadorCarrinho" class="contador-carrinho">0</span></a>
+                <a class="botao botao-contorno botao-menor" href="perfil.html">Minha conta</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="topo-pagina">
+            <div class="container">
+                <span class="sobretitulo">Minha conta</span>
+                <h1>Meus pedidos</h1>
+                <p>Acompanhe suas compras e o status de entrega.</p>
+            </div>
+        </section>
+
+        <section class="secao">
+            <div class="container area-cliente-layout">
+                <nav class="menu-conta" aria-label="Menu da conta">
+                    <a href="perfil.html">Dados pessoais</a>
+                    <a class="ativo" href="meusPedidos.html">Meus pedidos</a>
+                    <a href="admin.html" id="linkAdminConta" hidden>Painel administrativo</a>
+                </nav>
+
+                <div>
+                    <div id="mensagemPedidos" class="mensagem carregando" role="status">Carregando pedidos...</div>
+                    <div id="listaPedidos" class="lista-pedidos"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

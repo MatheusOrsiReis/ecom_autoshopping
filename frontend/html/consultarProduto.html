@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Veja os detalhes do veículo no AutoShopping.">
+    <title>Detalhes do veículo | AutoShopping</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/prgConsultarProduto.js" defer></script>
+</head>
+<body>
+    <header class="navbar">
+        <div class="container navbar-conteudo">
+            <a class="logo" href="../index.html" aria-label="AutoShopping - Início">
+                <img src="../autoshopping_logo.png" alt="AutoShopping">
+            </a>
+
+            <nav class="menu" aria-label="Navegação principal">
+                <a href="../index.html">Início</a>
+                <a class="ativo" href="listarProduto.html">Veículos</a>
+                <a href="listarProduto.html#categorias">Categorias</a>
+                <a href="admin.html" id="linkAdmin" hidden>Painel</a>
+                <a href="meusPedidos.html" id="linkPedidos" hidden>Pedidos</a>
+                <a href="carrinho.html">Carrinho <span id="contadorCarrinho" class="contador-carrinho">0</span></a>
+                <a id="linkConta" class="botao botao-contorno botao-menor" href="login.html">Entrar</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="pagina-detalhes">
+        <div class="container">
+            <nav class="migalhas" aria-label="Navegação estrutural">
+                <a href="../index.html">Início</a>
+                <span>/</span>
+                <a href="listarProduto.html">Veículos</a>
+                <span>/</span>
+                <span>Detalhes</span>
+            </nav>
+
+            <div id="mensagemDetalhe" class="mensagem carregando" role="status">Carregando detalhes...</div>
+
+            <article id="detalheProduto" class="detalhe-produto" hidden>
+                <div id="imagemDetalhe" class="detalhe-imagem"></div>
+
+                <div class="detalhe-resumo">
+                    <div id="categoriaDetalhe" class="etiqueta"></div>
+                    <p id="marcaModeloDetalhe" class="detalhe-marca"></p>
+                    <h1 id="nomeDetalhe"></h1>
+                    <p id="precoDetalhe" class="detalhe-preco"></p>
+                    <div id="statusEstoque" class="status-estoque"></div>
+                    <button id="botaoAdicionarCarrinho" class="botao botao-primario botao-largo" type="button">Adicionar ao carrinho</button>
+                    <p id="mensagemCarrinhoDetalhe" class="mensagem-inline" role="status"></p>
+                    <a class="link-voltar" href="listarProduto.html">← Ver outros veículos</a>
+                </div>
+
+                <section class="detalhe-informacoes" aria-labelledby="tituloInformacoes">
+                    <div class="cabecalho-detalhe">
+                        <span class="sobretitulo">Ficha do veículo</span>
+                        <h2 id="tituloInformacoes">Informações principais</h2>
+                    </div>
+                    <dl id="listaInformacoes" class="grade-informacoes"></dl>
+                </section>
+
+                <section id="blocoDescricao" class="detalhe-descricao" aria-labelledby="tituloDescricao" hidden>
+                    <h2 id="tituloDescricao">Sobre este veículo</h2>
+                    <p id="descricaoDetalhe"></p>
+                </section>
+            </article>
+        </div>
+    </main>
+
+    <footer class="rodape">
+        <div class="container rodape-conteudo">
+            <img class="logo-rodape" src="../autoshopping_logo.png" alt="AutoShopping">
+            <p>Marketplace automotivo acadêmico.</p>
+        </div>
+    </footer>
+</body>
+</html>

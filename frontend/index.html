@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Encontre veículos seminovos no AutoShopping.">
+    <title>AutoShopping | Encontre seu próximo veículo</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/prgIndex.js" defer></script>
+</head>
+<body>
+    <header class="navbar">
+        <div class="container navbar-conteudo">
+            <a class="logo" href="index.html" aria-label="AutoShopping - Início">
+                <img src="autoshopping_logo.png" alt="AutoShopping">
+            </a>
+
+            <nav class="menu" aria-label="Navegação principal">
+                <a class="ativo" href="index.html">Início</a>
+                <a href="html/listarProduto.html">Veículos</a>
+                <a href="html/listarProduto.html#categorias">Categorias</a>
+                <a href="html/admin.html" id="linkAdmin" hidden>Painel</a>
+                <a href="html/meusPedidos.html" id="linkPedidos" hidden>Pedidos</a>
+                <a href="html/carrinho.html">Carrinho <span id="contadorCarrinho" class="contador-carrinho">0</span></a>
+                <a id="linkConta" class="botao botao-contorno botao-menor" href="html/login.html">Entrar</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="banner-home" aria-label="AutoShopping - sua próxima história começa aqui">
+            <img src="banner.png" alt="Banner AutoShopping com veículos e paisagem urbana">
+        </section>
+
+        <section class="busca-home-secao">
+            <div class="container busca-home-conteudo">
+                <div>
+                    <span class="etiqueta">Seu próximo carro está aqui</span>
+                    <h1>Encontre o veículo ideal para você</h1>
+                    <p>Compare modelos, preços e características em um só lugar.</p>
+                </div>
+                <form id="formBuscaHome" class="busca-destaque">
+                    <label class="apenas-leitor" for="buscaHome">Buscar veículo</label>
+                    <input id="buscaHome" name="busca" type="search" placeholder="Busque por marca, modelo ou nome">
+                    <button class="botao botao-primario" type="submit">Buscar veículos</button>
+                </form>
+            </div>
+        </section>
+
+        <section class="secao secao-veiculos" aria-labelledby="tituloDestaques">
+            <div class="container">
+                <div class="cabecalho-secao">
+                    <div>
+                        <span class="sobretitulo">Oportunidades</span>
+                        <h2 id="tituloDestaques">Veículos disponíveis</h2>
+                        <p>Confira alguns dos veículos cadastrados em nosso estoque.</p>
+                    </div>
+                    <a class="link-seta" href="html/listarProduto.html">Ver todos <span aria-hidden="true">→</span></a>
+                </div>
+
+                <div id="mensagemHome" class="mensagem carregando" role="status">Carregando veículos...</div>
+                <div id="listaDestaques" class="grade-veiculos" aria-live="polite"></div>
+            </div>
+        </section>
+
+        <section class="faixa-chamada">
+            <div class="container faixa-chamada-conteudo">
+                <div>
+                    <span class="sobretitulo sobretitulo-claro">Explore o catálogo</span>
+                    <h2>Pronto para encontrar seu próximo veículo?</h2>
+                </div>
+                <a class="botao botao-claro" href="html/listarProduto.html">Ver veículos</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="rodape">
+        <div class="container rodape-conteudo">
+            <img class="logo-rodape" src="autoshopping_logo.png" alt="AutoShopping">
+            <p>Marketplace automotivo acadêmico.</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar conta | AutoShopping</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/prgCadastroUsuario.js" defer></script>
+</head>
+<body>
+    <header class="navbar">
+        <div class="container navbar-conteudo">
+            <a class="logo" href="../index.html"><img src="../autoshopping_logo.png" alt="AutoShopping"></a>
+            <nav class="menu" aria-label="Navegação principal">
+                <a href="../index.html">Início</a>
+                <a href="listarProduto.html">Veículos</a>
+                <a href="carrinho.html">Carrinho <span id="contadorCarrinho" class="contador-carrinho">0</span></a>
+                <a class="botao botao-contorno botao-menor" href="login.html">Entrar</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="pagina-formulario">
+        <div class="container formulario-layout">
+            <aside class="formulario-apresentacao">
+                <span class="sobretitulo">Sua conta AutoShopping</span>
+                <h1>Crie sua conta e encontre seu próximo veículo</h1>
+                <p>Salve seu acesso, finalize pedidos e acompanhe cada etapa da compra.</p>
+                <ul>
+                    <li>Checkout simples e seguro</li>
+                    <li>Acompanhamento dos pedidos</li>
+                    <li>Dados protegidos por senha</li>
+                </ul>
+            </aside>
+
+            <section class="cartao-formulario" aria-labelledby="tituloCadastro">
+                <div class="cabecalho-formulario">
+                    <h2 id="tituloCadastro">Cadastro de cliente</h2>
+                    <p>Preencha seus dados para continuar.</p>
+                </div>
+
+                <form id="formCadastro" class="formulario">
+                    <div class="campo campo-largo">
+                        <label for="nome">Nome completo</label>
+                        <input id="nome" name="nome" type="text" maxlength="80" required autocomplete="name">
+                    </div>
+                    <div class="campo">
+                        <label for="cpf">CPF</label>
+                        <input id="cpf" name="cpf" type="text" maxlength="14" required placeholder="000.000.000-00">
+                    </div>
+                    <div class="campo">
+                        <label for="telefone">Telefone</label>
+                        <input id="telefone" name="telefone" type="tel" maxlength="20" required autocomplete="tel">
+                    </div>
+                    <div class="campo campo-largo">
+                        <label for="email">E-mail</label>
+                        <input id="email" name="email" type="email" maxlength="100" required autocomplete="email">
+                    </div>
+                    <div class="campo campo-largo">
+                        <label for="senha">Senha</label>
+                        <input id="senha" name="senha" type="password" minlength="6" required autocomplete="new-password">
+                    </div>
+                    <div class="campo">
+                        <label for="cep">CEP</label>
+                        <input id="cep" name="cep" type="text" maxlength="9" required autocomplete="postal-code">
+                    </div>
+                    <div class="campo">
+                        <label for="uf">UF</label>
+                        <input id="uf" name="uf" type="text" maxlength="2" required autocomplete="address-level1">
+                    </div>
+                    <div class="campo campo-largo">
+                        <label for="rua">Rua</label>
+                        <input id="rua" name="rua" type="text" maxlength="100" required autocomplete="street-address">
+                    </div>
+                    <div class="campo">
+                        <label for="numero">Número</label>
+                        <input id="numero" name="numero" type="text" maxlength="12" required>
+                    </div>
+                    <div class="campo">
+                        <label for="bairro">Bairro</label>
+                        <input id="bairro" name="bairro" type="text" maxlength="70" required>
+                    </div>
+                    <div class="campo campo-largo">
+                        <label for="cidade">Cidade</label>
+                        <input id="cidade" name="cidade" type="text" maxlength="70" required autocomplete="address-level2">
+                    </div>
+
+                    <p id="mensagemCadastro" class="mensagem-formulario" role="status"></p>
+                    <button id="botaoCadastrar" class="botao botao-primario botao-largo campo-largo" type="submit">Criar minha conta</button>
+                </form>
+
+                <p class="alternativa-formulario">Já possui uma conta? <a href="login.html">Entrar</a></p>
+            </section>
+        </div>
+    </main>
+</body>
+</html>

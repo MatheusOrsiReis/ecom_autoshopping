@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrinho | AutoShopping</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/prgCarrinho.js" defer></script>
+</head>
+<body>
+    <header class="navbar">
+        <div class="container navbar-conteudo">
+            <a class="logo" href="../index.html"><img src="../autoshopping_logo.png" alt="AutoShopping"></a>
+            <nav class="menu" aria-label="Navegação principal">
+                <a href="../index.html">Início</a>
+                <a href="listarProduto.html">Veículos</a>
+                <a href="admin.html" id="linkAdmin" hidden>Painel</a>
+                <a href="meusPedidos.html" id="linkPedidos" hidden>Pedidos</a>
+                <a class="ativo" href="carrinho.html">Carrinho <span id="contadorCarrinho" class="contador-carrinho">0</span></a>
+                <a id="linkConta" class="botao botao-contorno botao-menor" href="login.html">Entrar</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="topo-pagina">
+            <div class="container">
+                <span class="sobretitulo">Sua seleção</span>
+                <h1>Carrinho</h1>
+                <p>Revise os veículos antes de continuar.</p>
+            </div>
+        </section>
+
+        <section class="secao">
+            <div class="container carrinho-layout">
+                <div>
+                    <div id="mensagemCarrinho" class="mensagem carregando" role="status">Carregando carrinho...</div>
+                    <div id="itensCarrinho" class="lista-carrinho"></div>
+                </div>
+
+                <aside class="resumo-compra">
+                    <span class="sobretitulo">Resumo</span>
+                    <h2>Seu pedido</h2>
+                    <div class="linha-resumo"><span>Veículos</span><strong id="quantidadeResumo">0</strong></div>
+                    <div class="linha-resumo total"><span>Total</span><strong id="totalCarrinho">R$ 0,00</strong></div>
+                    <a id="botaoCheckout" class="botao botao-primario botao-largo desabilitado" href="checkout.html">Continuar para checkout</a>
+                    <button id="botaoLimparCarrinho" class="botao-texto" type="button">Limpar carrinho</button>
+                </aside>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

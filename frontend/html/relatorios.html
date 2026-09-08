@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios | AutoShopping</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/prgRelatorios.js" defer></script>
+</head>
+<body class="fundo-admin">
+    <header class="navbar">
+        <div class="container navbar-conteudo">
+            <a class="logo" href="../index.html" aria-label="AutoShopping - Início"><img src="../autoshopping_logo.png" alt="AutoShopping"></a>
+            <nav class="menu menu-admin" aria-label="Navegação administrativa">
+                <a href="../index.html">Ver loja</a>
+                <a href="admin.html">Painel</a>
+                <a class="ativo" href="relatorios.html">Relatórios</a>
+                <a href="perfil.html">Perfil</a>
+                <button id="botaoSair" class="botao botao-contorno botao-menor" type="button">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <main id="conteudoRelatorios" hidden>
+        <section class="topo-pagina topo-admin">
+            <div class="container topo-admin-conteudo">
+                <div><span class="sobretitulo">Indicadores</span><h1>Relatórios da loja</h1><p>Acompanhe vendas, estoque e movimentação do AutoShopping.</p></div>
+                <div class="acoes-topo"><button id="botaoAtualizarRelatorio" class="botao botao-secundario" type="button">Atualizar</button><button id="botaoImprimirRelatorio" class="botao botao-primario" type="button">Imprimir</button></div>
+            </div>
+        </section>
+
+        <section class="secao secao-relatorios">
+            <div class="container">
+                <p id="mensagemRelatorio" class="aviso-admin" role="status" hidden></p>
+                <div class="grade-indicadores">
+                    <article class="indicador-admin"><span>Usuários cadastrados</span><strong id="relTotalUsuarios">--</strong></article>
+                    <article class="indicador-admin"><span>Veículos cadastrados</span><strong id="relTotalProdutos">--</strong></article>
+                    <article class="indicador-admin"><span>Veículos disponíveis</span><strong id="relProdutosDisponiveis">--</strong></article>
+                    <article class="indicador-admin"><span>Pedidos realizados</span><strong id="relTotalPedidos">--</strong></article>
+                    <article class="indicador-admin indicador-destaque indicador-faturamento"><span>Faturamento sem cancelados</span><strong id="relFaturamento">--</strong></article>
+                </div>
+
+                <div class="grade-relatorios">
+                    <section class="cartao-admin cartao-relatorio">
+                        <div class="titulo-cartao-admin"><div><span class="sobretitulo">Vendas</span><h2>Pedidos por status</h2></div><strong id="totalGraficoPedidos">0</strong></div>
+                        <div id="graficoStatusPedidos" class="grafico-barras"><div class="mensagem carregando">Carregando dados...</div></div>
+                    </section>
+                    <section class="cartao-admin cartao-relatorio">
+                        <div class="titulo-cartao-admin"><div><span class="sobretitulo">Estoque</span><h2>Disponibilidade</h2></div></div>
+                        <div id="resumoEstoqueRelatorio" class="resumo-estoque-relatorio"><div class="mensagem carregando">Carregando estoque...</div></div>
+                    </section>
+                </div>
+
+                <section class="cartao-admin cartao-relatorio relatorio-pedidos-recentes">
+                    <div class="titulo-cartao-admin"><div><span class="sobretitulo">Movimentação</span><h2>Pedidos recentes</h2></div><a href="admin.html#pedidos" class="link-seta">Gerenciar pedidos</a></div>
+                    <div class="tabela-responsiva">
+                        <table class="tabela-admin">
+                            <thead><tr><th>Pedido</th><th>Cliente</th><th>Data</th><th>Status</th><th>Total</th></tr></thead>
+                            <tbody id="corpoPedidosRecentes"><tr><td colspan="5" class="estado-tabela">Carregando pedidos...</td></tr></tbody>
+                        </table>
+                    </div>
+                </section>
+                <p id="dataAtualizacaoRelatorio" class="data-atualizacao"></p>
+            </div>
+        </section>
+    </main>
+
+    <div id="bloqueioRelatorios" class="pagina-bloqueio"><div class="mensagem carregando">Carregando relatórios...</div></div>
+</body>
+</html>

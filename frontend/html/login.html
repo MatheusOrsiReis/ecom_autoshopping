@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrar | AutoShopping</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/prgLogin.js" defer></script>
+</head>
+<body class="fundo-autenticacao">
+    <header class="navbar">
+        <div class="container navbar-conteudo">
+            <a class="logo" href="../index.html"><img src="../autoshopping_logo.png" alt="AutoShopping"></a>
+            <nav class="menu" aria-label="Navegação principal">
+                <a href="../index.html">Início</a>
+                <a href="listarProduto.html">Veículos</a>
+                <a href="carrinho.html">Carrinho <span id="contadorCarrinho" class="contador-carrinho">0</span></a>
+                <a class="ativo" href="login.html">Entrar</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="pagina-login">
+        <section class="cartao-login" aria-labelledby="tituloLogin">
+            <span class="sobretitulo">Bem-vindo de volta</span>
+            <h1 id="tituloLogin">Entre na sua conta</h1>
+            <p>Acesse seu perfil, carrinho e pedidos.</p>
+
+            <form id="formLogin" class="formulario formulario-uma-coluna">
+                <div class="campo">
+                    <label for="email">E-mail</label>
+                    <input id="email" name="email" type="email" required autocomplete="email">
+                </div>
+                <div class="campo">
+                    <label for="senha">Senha</label>
+                    <input id="senha" name="senha" type="password" required autocomplete="current-password">
+                </div>
+                <p id="mensagemLogin" class="mensagem-formulario" role="status"></p>
+                <button id="botaoEntrar" class="botao botao-primario botao-largo" type="submit">Entrar</button>
+            </form>
+
+            <p class="alternativa-formulario">Ainda não possui conta? <a href="cadastroUsuario.html">Cadastre-se</a></p>
+        </section>
+    </main>
+</body>
+</html>

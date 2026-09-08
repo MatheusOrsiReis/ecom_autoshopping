@@ -1,0 +1,20 @@
+# CONFIGURAÇÃO DO BANCO DE DADOS (MySQL)
+DB_NAME=db_ecom
+DB_USER=root
+DB_PASS=senai
+DB_HOST=localhost
+DB_PORT=3306
+
+# CONFIGURAÇÃO DO SERVIDOR NODE
+PORT=3000
+
+# CONFIGURAÇÕES DE SEGURANÇA
+# Chave Secreta para Assinar o JSON Web Token (JWT)
+# Gere uma string longa e aleatória (Ex: 'chave_secreta_aqui')
+JWT_SECRET=minha_chave_super_secreta_do_sistema
+
+# Tempo de Expiração do Token (Ex: 1d, 8h, 30m)
+JWT_EXPIRES_IN=3h
+
+# Número de salt rounds para o bcrypt (Geralmente 10 a 12)
+BCRYPT_SALT_ROUNDS=10

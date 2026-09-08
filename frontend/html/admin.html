@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel administrativo | AutoShopping</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/prgAdmin.js" defer></script>
+</head>
+<body class="fundo-admin">
+    <header class="navbar">
+        <div class="container navbar-conteudo">
+            <a class="logo" href="../index.html" aria-label="AutoShopping - Início"><img src="../autoshopping_logo.png" alt="AutoShopping"></a>
+            <nav class="menu menu-admin" aria-label="Navegação administrativa">
+                <a href="../index.html">Ver loja</a>
+                <a class="ativo" href="admin.html">Painel</a>
+                <a href="relatorios.html">Relatórios</a>
+                <a href="perfil.html">Perfil</a>
+                <button id="botaoSair" class="botao botao-contorno botao-menor" type="button">Sair</button>
+            </nav>
+        </div>
+    </header>
+
+    <main id="conteudoAdmin" hidden>
+        <section class="topo-pagina topo-admin">
+            <div class="container topo-admin-conteudo">
+                <div>
+                    <span class="sobretitulo">Administração</span>
+                    <h1>Painel administrativo</h1>
+                    <p>Cadastre veículos e acompanhe toda a operação da loja.</p>
+                </div>
+                <a class="botao botao-primario" href="relatorios.html">Abrir relatórios</a>
+            </div>
+        </section>
+
+        <section class="secao secao-admin">
+            <div class="container">
+                <div class="grade-indicadores grade-indicadores-admin" aria-label="Resumo da loja">
+                    <article class="indicador-admin"><span>Veículos cadastrados</span><strong id="resumoProdutos">--</strong></article>
+                    <article class="indicador-admin"><span>Disponíveis</span><strong id="resumoDisponiveis">--</strong></article>
+                    <article class="indicador-admin"><span>Pedidos</span><strong id="resumoPedidos">--</strong></article>
+                    <article class="indicador-admin indicador-destaque"><span>Faturamento</span><strong id="resumoFaturamento">--</strong></article>
+                </div>
+
+                <p id="mensagemAdmin" class="aviso-admin" role="status" hidden></p>
+
+                <nav class="abas-admin" aria-label="Seções do painel">
+                    <button class="aba-admin ativo" type="button" data-secao="veiculos">Veículos</button>
+                    <button class="aba-admin" type="button" data-secao="categorias">Categorias</button>
+                    <button class="aba-admin" type="button" data-secao="pedidos">Pedidos</button>
+                    <button class="aba-admin" type="button" data-secao="entregas">Entregas</button>
+                    <button class="aba-admin" type="button" data-secao="usuarios">Usuários</button>
+                </nav>
+
+                <section id="secao-veiculos" class="conteudo-aba-admin">
+                    <div class="cabecalho-admin">
+                        <div><span class="sobretitulo">Catálogo</span><h2>Gerenciar veículos</h2></div>
+                        <button id="botaoNovoProduto" class="botao botao-primario" type="button">Cadastrar veículo</button>
+                    </div>
+
+                    <form id="formProduto" class="cartao-formulario formulario formulario-admin" hidden>
+                        <div class="cabecalho-formulario campo-largo">
+                            <h2 id="tituloFormProduto">Cadastrar veículo</h2>
+                            <p>Preencha os dados que serão exibidos no catálogo.</p>
+                        </div>
+                        <div class="campo"><label for="produtoCategoria">Categoria</label><select id="produtoCategoria" required><option value="">Selecione</option></select></div>
+                        <div class="campo"><label for="produtoNome">Nome do anúncio</label><input id="produtoNome" maxlength="100" required></div>
+                        <div class="campo"><label for="produtoMarca">Marca</label><input id="produtoMarca" maxlength="50" required></div>
+                        <div class="campo"><label for="produtoModelo">Modelo</label><input id="produtoModelo" maxlength="80" required></div>
+                        <div class="campo"><label for="produtoVersao">Versão</label><input id="produtoVersao" maxlength="80"></div>
+                        <div class="campo"><label for="produtoAno">Ano</label><input id="produtoAno" type="number" min="1900" max="2100" required></div>
+                        <div class="campo"><label for="produtoPreco">Preço (R$)</label><input id="produtoPreco" type="number" min="0.01" step="0.01" required></div>
+                        <div class="campo"><label for="produtoQuilometragem">Quilometragem</label><input id="produtoQuilometragem" type="number" min="0" step="1" value="0" required></div>
+                        <div class="campo"><label for="produtoCombustivel">Combustível</label><select id="produtoCombustivel" required><option value="">Selecione</option><option>Flex</option><option>Gasolina</option><option>Etanol</option><option>Diesel</option><option>Elétrico</option><option>Híbrido</option></select></div>
+                        <div class="campo"><label for="produtoCambio">Câmbio</label><select id="produtoCambio" required><option value="">Selecione</option><option>Automático</option><option>Manual</option><option>CVT</option><option>Automatizado</option></select></div>
+                        <div class="campo"><label for="produtoCor">Cor</label><input id="produtoCor" maxlength="30" required></div>
+                        <div class="campo"><label for="produtoEstoque">Quantidade em estoque</label><input id="produtoEstoque" type="number" min="0" step="1" value="1" required></div>
+                        <div class="campo campo-largo"><label for="produtoImagem">URL da imagem</label><input id="produtoImagem" type="url" maxlength="255" placeholder="https://exemplo.com/veiculo.jpg"></div>
+                        <div class="campo campo-largo"><label for="produtoDescricao">Descrição</label><textarea id="produtoDescricao" rows="4" maxlength="3000"></textarea></div>
+                        <label class="campo-checkbox campo-largo"><input id="produtoAtivo" type="checkbox" checked> Veículo ativo e visível na loja</label>
+                        <p id="mensagemProduto" class="mensagem-formulario campo-largo" role="status"></p>
+                        <div class="acoes-formulario campo-largo">
+                            <button id="botaoSalvarProduto" class="botao botao-primario" type="submit">Salvar veículo</button>
+                            <button id="botaoCancelarProduto" class="botao botao-secundario" type="button">Cancelar</button>
+                        </div>
+                    </form>
+
+                    <div class="tabela-responsiva cartao-admin">
+                        <table class="tabela-admin">
+                            <thead><tr><th>Veículo</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Status</th><th>Ações</th></tr></thead>
+                            <tbody id="corpoTabelaProdutos"><tr><td colspan="6" class="estado-tabela">Carregando veículos...</td></tr></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="secao-categorias" class="conteudo-aba-admin" hidden>
+                    <div class="cabecalho-admin"><div><span class="sobretitulo">Organização</span><h2>Gerenciar categorias</h2></div></div>
+                    <div class="grade-admin-dupla">
+                        <form id="formCategoria" class="cartao-formulario formulario formulario-uma-coluna">
+                            <div class="cabecalho-formulario"><h2 id="tituloFormCategoria">Nova categoria</h2><p>Crie grupos para organizar os veículos.</p></div>
+                            <div class="campo"><label for="categoriaNome">Nome</label><input id="categoriaNome" maxlength="60" required></div>
+                            <div class="campo"><label for="categoriaDescricao">Descrição</label><textarea id="categoriaDescricao" rows="4" maxlength="500"></textarea></div>
+                            <p id="mensagemCategoria" class="mensagem-formulario" role="status"></p>
+                            <div class="acoes-formulario"><button id="botaoSalvarCategoria" class="botao botao-primario" type="submit">Salvar categoria</button><button id="botaoCancelarCategoria" class="botao botao-secundario" type="button" hidden>Cancelar</button></div>
+                        </form>
+                        <div id="listaCategoriasAdmin" class="lista-admin"><div class="mensagem carregando">Carregando categorias...</div></div>
+                    </div>
+                </section>
+
+                <section id="secao-pedidos" class="conteudo-aba-admin" hidden>
+                    <div class="cabecalho-admin">
+                        <div><span class="sobretitulo">Vendas</span><h2>Gerenciar pedidos</h2></div>
+                        <select id="filtroStatusPedido" class="seletor-admin" aria-label="Filtrar pedidos"><option value="">Todos os status</option><option value="PENDENTE_PAGAMENTO">Pendente de pagamento</option><option value="PAGO">Pago</option><option value="ENVIADO">Enviado</option><option value="ENTREGUE">Entregue</option><option value="CANCELADO">Cancelado</option></select>
+                    </div>
+                    <div id="listaPedidosAdmin" class="lista-admin"><div class="mensagem carregando">Carregando pedidos...</div></div>
+                </section>
+
+                <section id="secao-entregas" class="conteudo-aba-admin" hidden>
+                    <div class="cabecalho-admin"><div><span class="sobretitulo">Logística</span><h2>Gerenciar entregas</h2></div></div>
+                    <div id="listaEntregasAdmin" class="lista-admin"><div class="mensagem carregando">Carregando entregas...</div></div>
+                </section>
+
+                <section id="secao-usuarios" class="conteudo-aba-admin" hidden>
+                    <div class="cabecalho-admin"><div><span class="sobretitulo">Cadastros</span><h2>Usuários da plataforma</h2></div></div>
+                    <div class="tabela-responsiva cartao-admin">
+                        <table class="tabela-admin">
+                            <thead><tr><th>Nome</th><th>Contato</th><th>CPF</th><th>Cidade</th><th>Tipo</th></tr></thead>
+                            <tbody id="corpoTabelaUsuarios"><tr><td colspan="5" class="estado-tabela">Carregando usuários...</td></tr></tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <div id="bloqueioAdmin" class="pagina-bloqueio">
+        <div class="mensagem carregando">Verificando acesso administrativo...</div>
+    </div>
+</body>
+</html>
