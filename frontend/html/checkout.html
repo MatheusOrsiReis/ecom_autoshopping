@@ -51,7 +51,8 @@
                         <div id="camposEndereco" class="subformulario campo-largo" hidden>
                             <div class="campo">
                                 <label for="cep">CEP</label>
-                                <input id="cep" type="text" maxlength="9">
+                                <input id="cep" type="text" maxlength="9" inputmode="numeric" placeholder="00000-000">
+                                <small id="mensagemCepCheckout" class="mensagem-campo" role="status"></small>
                             </div>
                             <div class="campo campo-expandido">
                                 <label for="logradouro">Rua</label>

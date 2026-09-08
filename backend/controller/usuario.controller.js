@@ -6,6 +6,31 @@ const camposObrigatorios = [
     'cep', 'rua', 'numero', 'bairro', 'cidade', 'uf'
 ]
 
+function somenteNumeros(valor) {
+    return String(valor || '').replace(/\D/g, '')
+}
+
+function cpfValido(valor) {
+    const cpf = somenteNumeros(valor)
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false
+
+    function calcularDigito(tamanho) {
+        let soma = 0
+        for (let indice = 0; indice < tamanho; indice++) {
+            soma += Number(cpf[indice]) * (tamanho + 1 - indice)
+        }
+        const resto = (soma * 10) % 11
+        return resto === 10 ? 0 : resto
+    }
+
+    return calcularDigito(9) === Number(cpf[9]) && calcularDigito(10) === Number(cpf[10])
+}
+
+function formatarCpf(valor) {
+    const cpf = somenteNumeros(valor)
+    return cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4')
+}
+
 function tratarErro(res, err) {
     if (err.name === 'SequelizeUniqueConstraintError') {
         return res.status(409).json({ message: 'E-mail ou CPF já cadastrado!' })
@@ -29,6 +54,10 @@ async function cadastrar(req, res) {
             })
         }
 
+        if (!cpfValido(req.body.cpf)) {
+            return res.status(400).json({ message: 'Informe um CPF válido!' })
+        }
+
         let tipo = 'CLIENTE'
 
         if (req.body.tipo === 'ADMIN') {
@@ -49,7 +78,7 @@ async function cadastrar(req, res) {
 
         const usuario = await Usuario.create({
             nome: req.body.nome,
-            cpf: req.body.cpf,
+            cpf: formatarCpf(req.body.cpf),
             email: req.body.email,
             senha,
             telefone: req.body.telefone,
@@ -120,6 +149,13 @@ async function atualizar(req, res) {
 
         if (!usuario) {
             return res.status(404).json({ message: 'Usuário não encontrado!' })
+        }
+
+        if (req.body.cpf !== undefined) {
+            if (!cpfValido(req.body.cpf)) {
+                return res.status(400).json({ message: 'Informe um CPF válido!' })
+            }
+            req.body.cpf = formatarCpf(req.body.cpf)
         }
 
         const camposPermitidos = [

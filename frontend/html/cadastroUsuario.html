@@ -46,7 +46,8 @@
                     </div>
                     <div class="campo">
                         <label for="cpf">CPF</label>
-                        <input id="cpf" name="cpf" type="text" maxlength="14" required placeholder="000.000.000-00">
+                        <input id="cpf" name="cpf" type="text" maxlength="14" inputmode="numeric" required placeholder="000.000.000-00">
+                        <small id="mensagemCpf" class="mensagem-campo" role="status"></small>
                     </div>
                     <div class="campo">
                         <label for="telefone">Telefone</label>
@@ -62,7 +63,8 @@
                     </div>
                     <div class="campo">
                         <label for="cep">CEP</label>
-                        <input id="cep" name="cep" type="text" maxlength="9" required autocomplete="postal-code">
+                        <input id="cep" name="cep" type="text" maxlength="9" inputmode="numeric" required autocomplete="postal-code" placeholder="00000-000">
+                        <small id="mensagemCep" class="mensagem-campo" role="status"></small>
                     </div>
                     <div class="campo">
                         <label for="uf">UF</label>

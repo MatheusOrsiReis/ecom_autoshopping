@@ -1013,6 +1013,32 @@ h3 {
     box-shadow: 0 0 0 3px rgba(241, 37, 43, 0.12);
 }
 
+.campo input.invalido {
+    border-color: var(--cor-erro);
+    box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.1);
+}
+
+.mensagem-campo {
+    display: block;
+    min-height: 18px;
+    margin-top: 5px;
+    color: var(--cor-texto-suave);
+    font-size: 0.74rem;
+    font-weight: 650;
+}
+
+.mensagem-campo.erro {
+    color: var(--cor-erro);
+}
+
+.mensagem-campo.sucesso {
+    color: var(--cor-sucesso);
+}
+
+.mensagem-campo.carregando {
+    color: #675200;
+}
+
 .campo input:disabled {
     color: #7a838a;
     background: #f0f2f3;

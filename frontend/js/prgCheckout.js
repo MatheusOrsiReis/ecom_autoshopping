@@ -2,6 +2,7 @@ const API_URL = 'http://localhost:3000'
 const token = localStorage.getItem('autoshopping_token')
 let usuario = null
 let produtosCheckout = []
+let ultimoCepConsultado = ''
 
 function lerUsuario() {
     try {
@@ -35,6 +36,75 @@ function mostrarMensagem(texto, tipo) {
     mensagem.textContent = texto
 }
 
+function somenteNumeros(valor) {
+    return valor.replace(/\D/g, '')
+}
+
+function formatarCep(valor) {
+    return somenteNumeros(valor).slice(0, 8).replace(/^(\d{5})(\d)/, '$1-$2')
+}
+
+function mostrarEstadoCep(texto, tipo) {
+    const input = document.getElementById('cep')
+    const mensagem = document.getElementById('mensagemCepCheckout')
+    mensagem.className = 'mensagem-campo ' + (tipo || '')
+    mensagem.textContent = texto || ''
+    input.classList.toggle('invalido', tipo === 'erro')
+}
+
+function limparEnderecoConsultado() {
+    ;['logradouro', 'bairro', 'cidade', 'uf'].forEach(function (id) {
+        document.getElementById(id).value = ''
+    })
+}
+
+async function consultarCep() {
+    const input = document.getElementById('cep')
+    const cep = somenteNumeros(input.value)
+    input.value = formatarCep(input.value)
+
+    if (cep.length !== 8) {
+        ultimoCepConsultado = ''
+        mostrarEstadoCep(cep ? 'O CEP deve possuir 8 dígitos.' : '', cep ? 'erro' : '')
+        input.setCustomValidity(cep ? 'Informe um CEP válido.' : '')
+        return false
+    }
+
+    if (cep === ultimoCepConsultado) return !input.classList.contains('invalido')
+    ultimoCepConsultado = cep
+    mostrarEstadoCep('Consultando CEP...', 'carregando')
+
+    try {
+        const resposta = await fetch('https://viacep.com.br/ws/' + cep + '/json/')
+        if (!resposta.ok) throw new Error('CONSULTA_INDISPONIVEL')
+        const endereco = await resposta.json()
+        if (endereco.erro) {
+            ultimoCepConsultado = ''
+            limparEnderecoConsultado()
+            mostrarEstadoCep('CEP não encontrado.', 'erro')
+            input.setCustomValidity('CEP não encontrado.')
+            return false
+        }
+
+        if (somenteNumeros(input.value) !== cep) return false
+        input.value = endereco.cep || formatarCep(cep)
+        document.getElementById('logradouro').value = endereco.logradouro || ''
+        document.getElementById('bairro').value = endereco.bairro || ''
+        document.getElementById('cidade').value = endereco.localidade || ''
+        document.getElementById('uf').value = endereco.uf || ''
+        if (endereco.complemento) document.getElementById('complemento').value = endereco.complemento
+        input.setCustomValidity('')
+        mostrarEstadoCep('Endereço preenchido automaticamente.', 'sucesso')
+        document.getElementById('numero').focus()
+        return true
+    } catch (erro) {
+        ultimoCepConsultado = ''
+        mostrarEstadoCep('Não foi possível consultar o CEP. Preencha o endereço manualmente.', 'erro')
+        input.setCustomValidity('')
+        return false
+    }
+}
+
 function configurarTipoEntrega() {
     const tipo = document.getElementById('tipoEntrega').value
     const campos = document.getElementById('camposEndereco')
@@ -48,7 +118,7 @@ function configurarTipoEntrega() {
 }
 
 function preencherEndereco(dados) {
-    document.getElementById('cep').value = dados.cep || ''
+    document.getElementById('cep').value = formatarCep(dados.cep || '')
     document.getElementById('logradouro').value = dados.rua || ''
     document.getElementById('numero').value = dados.numero || ''
     document.getElementById('bairro').value = dados.bairro || ''
@@ -153,6 +223,12 @@ function montarEntrega() {
 function confirmarPedido(evento) {
     evento.preventDefault()
 
+    if (document.getElementById('tipoEntrega').value === 'ENTREGA' && somenteNumeros(document.getElementById('cep').value).length !== 8) {
+        mostrarEstadoCep('Informe um CEP válido.', 'erro')
+        document.getElementById('cep').focus()
+        return
+    }
+
     const botao = document.getElementById('botaoConfirmarPedido')
     const corpo = {
         itens: produtosCheckout.map(function (produto) {
@@ -207,6 +283,13 @@ if (!token || !lerUsuario()) {
     usuario = lerUsuario()
     if (usuario.tipo === 'ADMIN') document.getElementById('linkAdmin').hidden = false
     document.getElementById('tipoEntrega').addEventListener('change', configurarTipoEntrega)
+    document.getElementById('cep').addEventListener('input', function (evento) {
+        evento.target.value = formatarCep(evento.target.value)
+        evento.target.setCustomValidity('')
+        if (somenteNumeros(evento.target.value).length === 8) consultarCep()
+        else mostrarEstadoCep('', '')
+    })
+    document.getElementById('cep').addEventListener('blur', consultarCep)
     document.getElementById('formCheckout').addEventListener('submit', confirmarPedido)
     configurarTipoEntrega()
 
