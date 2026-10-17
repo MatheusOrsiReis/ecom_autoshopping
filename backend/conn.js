@@ -1,34 +1,28 @@
 require('dotenv').config()
-const mysql = require('mysql2/promise')
+const mysql = require('mysql2')
 
-async function conectarBanco() {
-    let conexao
+const conexao = mysql.createConnection({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS
+})
 
-    try {
-        const nomeBanco = process.env.DB_NAME
+conexao.connect((err) => {
+    if (err) {
+        console.error('Erro ao conectar com o MySQL!', err.message)
+        return
+    }
 
-        if (!/^[a-zA-Z0-9_]+$/.test(nomeBanco)) {
-            throw new Error('O nome do banco de dados configurado no .env é inválido.')
+    console.log('Conexão com o MySQL realizada com sucesso!')
+
+    conexao.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME}`, (err) => {
+        if (err) {
+            console.error('Erro ao criar o banco de dados!', err.message)
+        } else {
+            console.log(`Banco de dados "${process.env.DB_NAME}" pronto para uso!`)
         }
 
-        conexao = await mysql.createConnection({
-            host: process.env.DB_HOST,
-            port: process.env.DB_PORT,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASS
-        })
-
-        await conexao.query(
-            `CREATE DATABASE IF NOT EXISTS \`${nomeBanco}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
-        )
-
-        console.log(`Conexão realizada! Banco de dados "${nomeBanco}" pronto para uso.`)
-    } catch (err) {
-        console.error('Erro ao conectar ou criar o banco de dados!', err.message)
-        process.exitCode = 1
-    } finally {
-        if (conexao) await conexao.end()
-    }
-}
-
-conectarBanco()
+        conexao.end()
+    })
+})

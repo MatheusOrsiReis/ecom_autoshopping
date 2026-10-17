@@ -1,173 +1,206 @@
-const { Op } = require('sequelize')
-const conn = require('../db/conn')
 const { Produto, Categoria, Estoque } = require('../models/rel')
 
-const camposProduto = [
-    'idCategoria', 'nome', 'marca', 'modelo', 'versao', 'ano',
-    'preco', 'quilometragem', 'combustivel', 'cambio', 'cor',
-    'descricao', 'imagem', 'ativo'
-]
-
-function tratarErro(res, err) {
-    if (err.name === 'SequelizeForeignKeyConstraintError') {
-        return res.status(400).json({ message: 'Categoria inválida ou produto vinculado a um pedido!' })
-    }
-
-    if (err.name === 'SequelizeValidationError') {
-        return res.status(400).json({ message: err.errors[0].message })
-    }
-
-    console.error(err)
-    return res.status(500).json({ message: 'Erro interno ao processar produto!' })
-}
-
-function incluirRelacionamentos() {
-    return [
-        { model: Categoria, as: 'categoriaProduto' },
-        { model: Estoque, as: 'estoqueProduto' }
-    ]
-}
-
-async function cadastrar(req, res) {
-    const transaction = await conn.transaction()
+const cadastrar = async (req, res) => {
+    const valores = req.body
 
     try {
-        const obrigatorios = [
-            'idCategoria', 'nome', 'marca', 'modelo', 'ano',
-            'preco', 'combustivel', 'cambio', 'cor'
-        ]
-        const ausentes = obrigatorios.filter((campo) => req.body[campo] === undefined || req.body[campo] === '')
-
-        if (ausentes.length > 0) {
-            await transaction.rollback()
-            return res.status(400).json({ message: `Campos obrigatórios ausentes: ${ausentes.join(', ')}` })
+        if (!valores.idCategoria || !valores.nome || !valores.marca ||
+            !valores.modelo || !valores.ano || !valores.preco ||
+            !valores.combustivel || !valores.cambio || !valores.cor) {
+            return res.status(400).json({ message: 'Preencha todos os campos obrigatórios!' })
         }
 
-        if (Number(req.body.preco) <= 0 || Number(req.body.quilometragem || 0) < 0) {
-            await transaction.rollback()
+        if (Number(valores.preco) <= 0 || Number(valores.quilometragem || 0) < 0) {
             return res.status(400).json({ message: 'Preço e quilometragem devem possuir valores válidos!' })
         }
 
-        const quantidadeEstoque = req.body.quantidadeEstoque === undefined
-            ? 1
-            : Number(req.body.quantidadeEstoque)
-        if (!Number.isInteger(quantidadeEstoque) || quantidadeEstoque < 0) {
-            await transaction.rollback()
+        const quantidade = valores.quantidadeEstoque === undefined ? 1 : Number(valores.quantidadeEstoque)
+        if (!Number.isInteger(quantidade) || quantidade < 0) {
             return res.status(400).json({ message: 'A quantidade em estoque deve ser um inteiro não negativo!' })
         }
 
-        const categoria = await Categoria.findByPk(req.body.idCategoria, { transaction })
+        const categoria = await Categoria.findOne({
+            where: { codCategoria: valores.idCategoria }
+        })
+
         if (!categoria) {
-            await transaction.rollback()
             return res.status(404).json({ message: 'Categoria não encontrada!' })
         }
 
-        const dados = {}
-        for (const campo of camposProduto) {
-            if (req.body[campo] !== undefined) dados[campo] = req.body[campo]
-        }
-
-        const produto = await Produto.create(dados, { transaction })
-        await Estoque.create({
-            idProduto: produto.codProduto,
-            quantidade: quantidadeEstoque
-        }, { transaction })
-
-        await transaction.commit()
-
-        const resposta = await Produto.findByPk(produto.codProduto, {
-            include: incluirRelacionamentos()
+        const produto = await Produto.create({
+            idCategoria: valores.idCategoria,
+            nome: valores.nome,
+            marca: valores.marca,
+            modelo: valores.modelo,
+            versao: valores.versao,
+            ano: valores.ano,
+            preco: valores.preco,
+            quilometragem: valores.quilometragem || 0,
+            combustivel: valores.combustivel,
+            cambio: valores.cambio,
+            cor: valores.cor,
+            descricao: valores.descricao,
+            imagem: valores.imagem,
+            ativo: valores.ativo === undefined ? true : valores.ativo
         })
+
+        const estoque = await Estoque.create({
+            idProduto: produto.codProduto,
+            quantidade: quantidade
+        })
+
+        const resposta = produto.toJSON()
+        resposta.categoriaProduto = categoria
+        resposta.estoqueProduto = estoque
+
         return res.status(201).json(resposta)
     } catch (err) {
-        if (!transaction.finished) await transaction.rollback()
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao cadastrar produto!' })
     }
 }
 
-async function listar(req, res) {
+const listar = async (req, res) => {
     try {
-        const where = {}
+        const produtos = await Produto.findAll()
+        const resposta = []
 
-        if (req.query.categoriaId) where.idCategoria = req.query.categoriaId
-        if (req.query.marca) where.marca = req.query.marca
-        if (req.query.ativo !== undefined) where.ativo = req.query.ativo === 'true'
-        if (req.query.busca) {
-            where[Op.or] = [
-                { nome: { [Op.like]: `%${req.query.busca}%` } },
-                { marca: { [Op.like]: `%${req.query.busca}%` } },
-                { modelo: { [Op.like]: `%${req.query.busca}%` } }
-            ]
+        for (const produto of produtos) {
+            if (req.query.categoriaId && produto.idCategoria != req.query.categoriaId) continue
+            if (req.query.marca && produto.marca !== req.query.marca) continue
+
+            if (req.query.ativo !== undefined) {
+                const ativo = req.query.ativo === 'true'
+                if (produto.ativo !== ativo) continue
+            }
+
+            if (req.query.busca) {
+                const busca = req.query.busca.toLowerCase()
+                const encontrado = produto.nome.toLowerCase().includes(busca) ||
+                    produto.marca.toLowerCase().includes(busca) ||
+                    produto.modelo.toLowerCase().includes(busca)
+
+                if (!encontrado) continue
+            }
+
+            const dados = produto.toJSON()
+            dados.categoriaProduto = await Categoria.findOne({
+                where: { codCategoria: produto.idCategoria }
+            })
+            dados.estoqueProduto = await Estoque.findOne({
+                where: { idProduto: produto.codProduto }
+            })
+            resposta.push(dados)
         }
 
-        const produtos = await Produto.findAll({
-            where,
-            include: incluirRelacionamentos(),
-            order: [['codProduto', 'DESC']]
-        })
-
-        return res.json(produtos)
+        return res.json(resposta)
     } catch (err) {
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao listar produtos!' })
     }
 }
 
-async function consultar(req, res) {
+const consultar = async (req, res) => {
     try {
-        const produto = await Produto.findByPk(req.params.id, {
-            include: incluirRelacionamentos()
-        })
+        const id = req.params.id
+        const produto = await Produto.findOne({ where: { codProduto: id } })
 
         if (!produto) {
             return res.status(404).json({ message: 'Produto não encontrado!' })
         }
 
-        return res.json(produto)
+        const resposta = produto.toJSON()
+        resposta.categoriaProduto = await Categoria.findOne({
+            where: { codCategoria: produto.idCategoria }
+        })
+        resposta.estoqueProduto = await Estoque.findOne({
+            where: { idProduto: produto.codProduto }
+        })
+
+        return res.json(resposta)
     } catch (err) {
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao consultar produto!' })
     }
 }
 
-async function atualizar(req, res) {
+const buscarPorNome = async (req, res) => {
     try {
-        const produto = await Produto.findByPk(req.params.id)
+        const nome = req.query.nome || req.query.busca
+
+        if (!nome) {
+            return res.status(400).json({ message: 'Informe o nome do veículo para a busca!' })
+        }
+
+        const produtos = await Produto.findAll()
+        const resposta = produtos.filter((produto) => {
+            return produto.nome.toLowerCase().includes(nome.toLowerCase())
+        })
+
+        return res.json(resposta)
+    } catch (err) {
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao buscar produto!' })
+    }
+}
+
+const atualizar = async (req, res) => {
+    const valores = req.body
+
+    try {
+        const id = req.params.id
+        const produto = await Produto.findOne({ where: { codProduto: id } })
 
         if (!produto) {
             return res.status(404).json({ message: 'Produto não encontrado!' })
         }
 
-        if (req.body.idCategoria !== undefined) {
-            const categoria = await Categoria.findByPk(req.body.idCategoria)
+        if (valores.idCategoria !== undefined) {
+            const categoria = await Categoria.findOne({
+                where: { codCategoria: valores.idCategoria }
+            })
+
             if (!categoria) {
                 return res.status(404).json({ message: 'Categoria não encontrada!' })
             }
+
+            produto.idCategoria = valores.idCategoria
         }
 
-        if (req.body.preco !== undefined && Number(req.body.preco) <= 0) {
+        if (valores.preco !== undefined && Number(valores.preco) <= 0) {
             return res.status(400).json({ message: 'O preço deve ser maior que zero!' })
         }
 
-        if (req.body.quilometragem !== undefined && Number(req.body.quilometragem) < 0) {
+        if (valores.quilometragem !== undefined && Number(valores.quilometragem) < 0) {
             return res.status(400).json({ message: 'A quilometragem não pode ser negativa!' })
         }
 
-        for (const campo of camposProduto) {
-            if (req.body[campo] !== undefined) produto[campo] = req.body[campo]
-        }
+        if (valores.nome !== undefined) produto.nome = valores.nome
+        if (valores.marca !== undefined) produto.marca = valores.marca
+        if (valores.modelo !== undefined) produto.modelo = valores.modelo
+        if (valores.versao !== undefined) produto.versao = valores.versao
+        if (valores.ano !== undefined) produto.ano = valores.ano
+        if (valores.preco !== undefined) produto.preco = valores.preco
+        if (valores.quilometragem !== undefined) produto.quilometragem = valores.quilometragem
+        if (valores.combustivel !== undefined) produto.combustivel = valores.combustivel
+        if (valores.cambio !== undefined) produto.cambio = valores.cambio
+        if (valores.cor !== undefined) produto.cor = valores.cor
+        if (valores.descricao !== undefined) produto.descricao = valores.descricao
+        if (valores.imagem !== undefined) produto.imagem = valores.imagem
+        if (valores.ativo !== undefined) produto.ativo = valores.ativo
 
         await produto.save()
-        const resposta = await Produto.findByPk(produto.codProduto, {
-            include: incluirRelacionamentos()
-        })
-        return res.json(resposta)
+        return res.json(produto)
     } catch (err) {
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao atualizar produto!' })
     }
 }
 
-async function apagar(req, res) {
+const apagar = async (req, res) => {
     try {
-        const produto = await Produto.findByPk(req.params.id)
+        const id = req.params.id
+        const produto = await Produto.findOne({ where: { codProduto: id } })
 
         if (!produto) {
             return res.status(404).json({ message: 'Produto não encontrado!' })
@@ -176,8 +209,9 @@ async function apagar(req, res) {
         await produto.destroy()
         return res.json({ message: 'Produto apagado com sucesso!' })
     } catch (err) {
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao apagar produto!' })
     }
 }
 
-module.exports = { cadastrar, listar, consultar, atualizar, apagar }
+module.exports = { cadastrar, listar, consultar, buscarPorNome, atualizar, apagar }

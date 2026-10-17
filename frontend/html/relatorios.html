@@ -6,6 +6,7 @@
     <link rel="icon" type="image/png" href="../imagens/favicon.png">
     <title>Relatórios | AutoShopping</title>
     <link rel="stylesheet" href="../css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
     <script src="../js/prgRelatorios.js" defer></script>
 </head>
 <body class="fundo-admin">
@@ -43,12 +44,12 @@
 
                 <div class="grade-relatorios">
                     <section class="cartao-admin cartao-relatorio">
-                        <div class="titulo-cartao-admin"><div><span class="sobretitulo">Vendas</span><h2>Pedidos por status</h2></div><strong id="totalGraficoPedidos">0</strong></div>
-                        <div id="graficoStatusPedidos" class="grafico-barras"><div class="mensagem carregando">Carregando dados...</div></div>
+                        <div class="titulo-cartao-admin"><div><span class="sobretitulo">Relatório de vendas</span><h2>Faturamento mensal</h2></div></div>
+                        <div class="area-grafico-chart"><canvas id="graficoFaturamentoMensal" role="img" aria-label="Gráfico de faturamento mensal"></canvas></div>
                     </section>
                     <section class="cartao-admin cartao-relatorio">
-                        <div class="titulo-cartao-admin"><div><span class="sobretitulo">Estoque</span><h2>Disponibilidade</h2></div></div>
-                        <div id="resumoEstoqueRelatorio" class="resumo-estoque-relatorio"><div class="mensagem carregando">Carregando estoque...</div></div>
+                        <div class="titulo-cartao-admin"><div><span class="sobretitulo">Relatório de estoque</span><h2>Unidades por categoria</h2></div></div>
+                        <div class="area-grafico-chart"><canvas id="graficoEstoqueCategoria" role="img" aria-label="Gráfico de estoque por categoria"></canvas></div>
                     </section>
                 </div>
 

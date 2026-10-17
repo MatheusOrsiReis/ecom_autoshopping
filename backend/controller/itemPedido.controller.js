@@ -1,65 +1,45 @@
-const conn = require('../db/conn')
 const { ItemPedido, Pedido, Produto, Estoque } = require('../models/rel')
 
-function tratarErro(res, err) {
-    if (err.name === 'SequelizeForeignKeyConstraintError') {
-        return res.status(400).json({ message: 'Pedido ou produto inválido!' })
-    }
-
-    console.error(err)
-    return res.status(500).json({ message: 'Erro interno ao processar item do pedido!' })
-}
-
-async function recalcularPedido(pedido, transaction) {
-    const subtotal = Number(await ItemPedido.sum('valorTotalItem', {
-        where: { idPedido: pedido.codPedido },
-        transaction
-    }) || 0)
-
-    pedido.valorSubtotal = subtotal
-    pedido.valorTotal = Math.max(0, subtotal + Number(pedido.valorFrete) - Number(pedido.desconto))
-    await pedido.save({ transaction })
-}
-
-async function cadastrar(req, res) {
-    const transaction = await conn.transaction()
+const cadastrar = async (req, res) => {
+    const valores = req.body
 
     try {
-        const quantidade = Number(req.body.quantidade)
-        if (!req.body.idPedido || !req.body.idProduto || !Number.isInteger(quantidade) || quantidade <= 0) {
-            await transaction.rollback()
+        const quantidade = Number(valores.quantidade)
+
+        if (!valores.idPedido || !valores.idProduto || !Number.isInteger(quantidade) || quantidade <= 0) {
             return res.status(400).json({ message: 'Pedido, produto e quantidade positiva são obrigatórios!' })
         }
 
-        const pedido = await Pedido.findByPk(req.body.idPedido, { transaction, lock: transaction.LOCK.UPDATE })
-        const produto = await Produto.findByPk(req.body.idProduto, { transaction })
+        const pedido = await Pedido.findOne({
+            where: { codPedido: valores.idPedido }
+        })
+        const produto = await Produto.findOne({
+            where: { codProduto: valores.idProduto }
+        })
         const estoque = await Estoque.findOne({
-            where: { idProduto: req.body.idProduto },
-            transaction,
-            lock: transaction.LOCK.UPDATE
+            where: { idProduto: valores.idProduto }
         })
 
         if (!pedido || !produto) {
-            await transaction.rollback()
             return res.status(404).json({ message: 'Pedido ou produto não encontrado!' })
         }
 
         if (pedido.status !== 'PENDENTE_PAGAMENTO') {
-            await transaction.rollback()
             return res.status(409).json({ message: 'Somente pedidos pendentes podem ter itens alterados!' })
         }
 
-        const existente = await ItemPedido.findOne({
-            where: { idPedido: pedido.codPedido, idProduto: produto.codProduto },
-            transaction
+        const itemCadastrado = await ItemPedido.findOne({
+            where: {
+                idPedido: pedido.codPedido,
+                idProduto: produto.codProduto
+            }
         })
-        if (existente) {
-            await transaction.rollback()
+
+        if (itemCadastrado) {
             return res.status(409).json({ message: 'Este produto já pertence ao pedido!' })
         }
 
         if (!estoque || estoque.quantidade < quantidade) {
-            await transaction.rollback()
             return res.status(409).json({ message: 'Estoque insuficiente!' })
         }
 
@@ -67,154 +47,188 @@ async function cadastrar(req, res) {
         const item = await ItemPedido.create({
             idPedido: pedido.codPedido,
             idProduto: produto.codProduto,
-            quantidade,
-            precoUnitario,
+            quantidade: quantidade,
+            precoUnitario: precoUnitario,
             valorTotalItem: precoUnitario * quantidade
-        }, { transaction })
+        })
 
         estoque.quantidade -= quantidade
-        await estoque.save({ transaction })
-        await recalcularPedido(pedido, transaction)
-        await transaction.commit()
+        await estoque.save()
+
+        const itens = await ItemPedido.findAll({ where: { idPedido: pedido.codPedido } })
+        let subtotal = 0
+
+        itens.forEach((itemPedido) => {
+            subtotal += Number(itemPedido.valorTotalItem)
+        })
+
+        let desconto = 0
+        if (subtotal >= 200000) desconto = subtotal * 0.05
+
+        pedido.valorSubtotal = subtotal
+        pedido.desconto = desconto
+        pedido.valorTotal = subtotal + Number(pedido.valorFrete) - desconto
+        await pedido.save()
 
         return res.status(201).json(item)
     } catch (err) {
-        if (!transaction.finished) await transaction.rollback()
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao cadastrar item do pedido!' })
     }
 }
 
-async function listar(req, res) {
+const listar = async (req, res) => {
     try {
-        const incluirPedido = { model: Pedido, as: 'pedidoItem' }
+        let itens = await ItemPedido.findAll()
+
         if (req.usuario.tipo !== 'ADMIN') {
-            incluirPedido.where = { idUsuario: req.usuario.id }
+            const pedidos = await Pedido.findAll({ where: { idUsuario: req.usuario.id } })
+
+            itens = itens.filter((item) => {
+                return pedidos.find((pedido) => pedido.codPedido === item.idPedido)
+            })
         }
 
-        const itens = await ItemPedido.findAll({
-            include: [
-                incluirPedido,
-                { model: Produto, as: 'produtoItem' }
-            ],
-            order: [['codItemPedido', 'ASC']]
-        })
         return res.json(itens)
     } catch (err) {
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao listar itens do pedido!' })
     }
 }
 
-async function consultar(req, res) {
+const consultar = async (req, res) => {
     try {
-        const item = await ItemPedido.findByPk(req.params.id, {
-            include: [
-                { model: Pedido, as: 'pedidoItem' },
-                { model: Produto, as: 'produtoItem' }
-            ]
-        })
+        const id = req.params.id
+        const item = await ItemPedido.findOne({ where: { codItemPedido: id } })
 
         if (!item) {
             return res.status(404).json({ message: 'Item do pedido não encontrado!' })
         }
 
-        if (req.usuario.tipo !== 'ADMIN' && item.pedidoItem.idUsuario !== req.usuario.id) {
+        const pedido = await Pedido.findOne({ where: { codPedido: item.idPedido } })
+
+        if (req.usuario.tipo !== 'ADMIN' && pedido.idUsuario !== req.usuario.id) {
             return res.status(403).json({ message: 'Você não pode consultar este item!' })
         }
 
         return res.json(item)
     } catch (err) {
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao consultar item do pedido!' })
     }
 }
 
-async function atualizar(req, res) {
-    const transaction = await conn.transaction()
+const atualizar = async (req, res) => {
+    const valores = req.body
 
     try {
-        const quantidade = Number(req.body.quantidade)
+        const quantidade = Number(valores.quantidade)
+
         if (!Number.isInteger(quantidade) || quantidade <= 0) {
-            await transaction.rollback()
             return res.status(400).json({ message: 'A quantidade deve ser um inteiro positivo!' })
         }
 
-        const item = await ItemPedido.findByPk(req.params.id, { transaction, lock: transaction.LOCK.UPDATE })
+        const id = req.params.id
+        const item = await ItemPedido.findOne({ where: { codItemPedido: id } })
+
         if (!item) {
-            await transaction.rollback()
             return res.status(404).json({ message: 'Item do pedido não encontrado!' })
         }
 
-        const pedido = await Pedido.findByPk(item.idPedido, { transaction, lock: transaction.LOCK.UPDATE })
+        const pedido = await Pedido.findOne({ where: { codPedido: item.idPedido } })
+
         if (pedido.status !== 'PENDENTE_PAGAMENTO') {
-            await transaction.rollback()
             return res.status(409).json({ message: 'Somente pedidos pendentes podem ter itens alterados!' })
         }
 
-        const estoque = await Estoque.findOne({
-            where: { idProduto: item.idProduto },
-            transaction,
-            lock: transaction.LOCK.UPDATE
-        })
+        const estoque = await Estoque.findOne({ where: { idProduto: item.idProduto } })
         const diferenca = quantidade - item.quantidade
 
         if (diferenca > 0 && (!estoque || estoque.quantidade < diferenca)) {
-            await transaction.rollback()
             return res.status(409).json({ message: 'Estoque insuficiente!' })
         }
 
         if (estoque) {
             estoque.quantidade -= diferenca
-            await estoque.save({ transaction })
+            await estoque.save()
         }
 
         item.quantidade = quantidade
         item.valorTotalItem = Number(item.precoUnitario) * quantidade
-        await item.save({ transaction })
-        await recalcularPedido(pedido, transaction)
-        await transaction.commit()
+        await item.save()
+
+        const itens = await ItemPedido.findAll({ where: { idPedido: pedido.codPedido } })
+        let subtotal = 0
+
+        itens.forEach((itemPedido) => {
+            subtotal += Number(itemPedido.valorTotalItem)
+        })
+
+        let desconto = 0
+        if (subtotal >= 200000) desconto = subtotal * 0.05
+
+        pedido.valorSubtotal = subtotal
+        pedido.desconto = desconto
+        pedido.valorTotal = subtotal + Number(pedido.valorFrete) - desconto
+        await pedido.save()
 
         return res.json(item)
     } catch (err) {
-        if (!transaction.finished) await transaction.rollback()
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao atualizar item do pedido!' })
     }
 }
 
-async function apagar(req, res) {
-    const transaction = await conn.transaction()
-
+const apagar = async (req, res) => {
     try {
-        const item = await ItemPedido.findByPk(req.params.id, { transaction, lock: transaction.LOCK.UPDATE })
+        const id = req.params.id
+        const item = await ItemPedido.findOne({ where: { codItemPedido: id } })
+
         if (!item) {
-            await transaction.rollback()
             return res.status(404).json({ message: 'Item do pedido não encontrado!' })
         }
 
-        const pedido = await Pedido.findByPk(item.idPedido, { transaction, lock: transaction.LOCK.UPDATE })
+        const pedido = await Pedido.findOne({ where: { codPedido: item.idPedido } })
+
         if (pedido.status !== 'PENDENTE_PAGAMENTO') {
-            await transaction.rollback()
             return res.status(409).json({ message: 'Somente pedidos pendentes podem ter itens alterados!' })
         }
 
-        const quantidadeItens = await ItemPedido.count({ where: { idPedido: pedido.codPedido }, transaction })
-        if (quantidadeItens === 1) {
-            await transaction.rollback()
+        const itensPedido = await ItemPedido.findAll({ where: { idPedido: pedido.codPedido } })
+
+        if (itensPedido.length === 1) {
             return res.status(409).json({ message: 'O pedido deve manter pelo menos um item!' })
         }
 
-        await Estoque.increment(
-            { quantidade: item.quantidade },
-            { where: { idProduto: item.idProduto }, transaction }
-        )
-        await item.destroy({ transaction })
-        await recalcularPedido(pedido, transaction)
-        await transaction.commit()
+        const estoque = await Estoque.findOne({ where: { idProduto: item.idProduto } })
+
+        if (estoque) {
+            estoque.quantidade += item.quantidade
+            await estoque.save()
+        }
+
+        await item.destroy()
+
+        const itens = await ItemPedido.findAll({ where: { idPedido: pedido.codPedido } })
+        let subtotal = 0
+
+        itens.forEach((itemPedido) => {
+            subtotal += Number(itemPedido.valorTotalItem)
+        })
+
+        let desconto = 0
+        if (subtotal >= 200000) desconto = subtotal * 0.05
+
+        pedido.valorSubtotal = subtotal
+        pedido.desconto = desconto
+        pedido.valorTotal = subtotal + Number(pedido.valorFrete) - desconto
+        await pedido.save()
 
         return res.json({ message: 'Item removido e estoque restaurado com sucesso!' })
     } catch (err) {
-        if (!transaction.finished) await transaction.rollback()
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao apagar item do pedido!' })
     }
 }
 
 module.exports = { cadastrar, listar, consultar, atualizar, apagar }
-

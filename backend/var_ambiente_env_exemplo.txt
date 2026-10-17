@@ -1,7 +1,7 @@
 # CONFIGURAÇÃO DO BANCO DE DADOS (MySQL)
 DB_NAME=db_ecom
 DB_USER=root
-DB_PASS=senai
+DB_PASS=root
 DB_HOST=localhost
 DB_PORT=3306
 

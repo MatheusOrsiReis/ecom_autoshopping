@@ -2,17 +2,18 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { Usuario } = require('../models/rel')
 
-async function login(req, res) {
-    try {
-        const { email, senha } = req.body
+const login = async (req, res) => {
+    const valores = req.body
 
-        if (!email || !senha) {
+    try {
+        if (!valores.email || !valores.senha) {
             return res.status(400).json({ message: 'E-mail e senha são obrigatórios!' })
         }
 
-        const usuario = await Usuario.findOne({ where: { email } })
+        const emailFormatado = String(valores.email).trim().toLowerCase()
+        const usuario = await Usuario.findOne({ where: { email: emailFormatado } })
 
-        if (!usuario || !(await bcrypt.compare(senha, usuario.senha))) {
+        if (!usuario || !(await bcrypt.compare(valores.senha, usuario.senha))) {
             return res.status(401).json({ message: 'E-mail ou senha inválidos!' })
         }
 

@@ -46,11 +46,11 @@
                 <p id="mensagemAdmin" class="aviso-admin" role="status" hidden></p>
 
                 <nav id="abasAdmin" class="abas-admin" aria-label="Seções do painel">
-                    <button class="aba-admin ativo" type="button" data-secao="veiculos">Veículos</button>
-                    <button class="aba-admin" type="button" data-secao="categorias">Categorias</button>
-                    <button class="aba-admin" type="button" data-secao="pedidos">Pedidos</button>
-                    <button class="aba-admin" type="button" data-secao="entregas">Entregas</button>
-                    <button class="aba-admin" type="button" data-secao="usuarios">Usuários</button>
+                    <button id="abaVeiculos" class="aba-admin ativo" type="button">Veículos</button>
+                    <button id="abaCategorias" class="aba-admin" type="button">Categorias</button>
+                    <button id="abaPedidos" class="aba-admin" type="button">Pedidos</button>
+                    <button id="abaEntregas" class="aba-admin" type="button">Entregas</button>
+                    <button id="abaUsuarios" class="aba-admin" type="button">Usuários</button>
                 </nav>
 
                 <section id="secao-veiculos" class="conteudo-aba-admin">
@@ -58,6 +58,12 @@
                         <div><span class="sobretitulo">Catálogo</span><h2>Gerenciar veículos</h2></div>
                         <button id="botaoNovoProduto" class="botao botao-primario" type="button">Cadastrar veículo</button>
                     </div>
+
+                    <nav class="abas-admin" aria-label="Operações de veículos">
+                        <button id="abaCadastrarProduto" class="aba-admin" type="button">Cadastrar</button>
+                        <button id="abaListarProdutos" class="aba-admin ativo" type="button">Listar</button>
+                        <button id="abaConsultarProduto" class="aba-admin" type="button">Consultar</button>
+                    </nav>
 
                     <form id="formProduto" class="cartao-formulario formulario formulario-admin" hidden>
                         <div class="cabecalho-formulario campo-largo">
@@ -86,12 +92,27 @@
                         </div>
                     </form>
 
-                    <div class="tabela-responsiva cartao-admin">
+                    <div id="painelListarProdutos" class="tabela-responsiva cartao-admin">
                         <table class="tabela-admin">
                             <thead><tr><th>Veículo</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Status</th><th>Ações</th></tr></thead>
                             <tbody id="corpoTabelaProdutos"><tr><td colspan="6" class="estado-tabela">Carregando veículos...</td></tr></tbody>
                         </table>
                     </div>
+
+                    <section id="painelConsultarProduto" hidden>
+                        <form id="formConsultarProduto" class="cartao-formulario formulario formulario-uma-coluna">
+                            <div class="cabecalho-formulario">
+                                <h2>Consultar veículo</h2>
+                                <p>Digite o código do veículo.</p>
+                            </div>
+                            <div class="campo">
+                                <label for="codigoConsultaProduto">Código</label>
+                                <input id="codigoConsultaProduto" type="number" min="1" required>
+                            </div>
+                            <button class="botao botao-primario" type="submit">Consultar</button>
+                        </form>
+                        <div id="resultadoConsultaProduto" class="lista-admin"></div>
+                    </section>
                 </section>
 
                 <section id="secao-categorias" class="conteudo-aba-admin" hidden>

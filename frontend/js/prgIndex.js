@@ -1,177 +1,80 @@
 const API_URL = 'http://localhost:3000'
+
 let resposta = document.getElementById('mensagemHome')
 let listar = document.getElementById('listaDestaques')
 let formularioBusca = document.getElementById('formBuscaHome')
-let campoBusca = document.getElementById('buscaHome')
 
-function atualizarNavegacao() {
-    let carrinho = []
-    try {
-        carrinho = JSON.parse(localStorage.getItem('autoshopping_carrinho')) || []
-    } catch (erro) {
-        carrinho = []
-    }
-    document.getElementById('contadorCarrinho').textContent = carrinho.length
+let carrinho = JSON.parse(localStorage.getItem('autoshopping_carrinho') || '[]')
+let usuario = JSON.parse(localStorage.getItem('autoshopping_usuario') || 'null')
 
-    if (localStorage.getItem('autoshopping_usuario')) {
-        let usuario = null
-        try { usuario = JSON.parse(localStorage.getItem('autoshopping_usuario')) } catch (erro) { usuario = null }
-        document.getElementById('linkPedidos').hidden = false
-        document.getElementById('linkConta').textContent = 'Minha conta'
-        document.getElementById('linkConta').href = 'html/perfil.html'
-        if (usuario && usuario.tipo === 'ADMIN') document.getElementById('linkAdmin').hidden = false
+document.getElementById('contadorCarrinho').textContent = carrinho.length
+
+if (usuario) {
+    document.getElementById('linkPedidos').hidden = false
+    document.getElementById('linkConta').textContent = 'Minha conta'
+    document.getElementById('linkConta').href = 'html/perfil.html'
+
+    if (usuario.tipo === 'ADMIN') {
+        document.getElementById('linkAdmin').hidden = false
     }
 }
 
-function possuiValor(valor) {
-    return valor !== undefined && valor !== null && valor !== ''
+function criarCard(produto) {
+    let categoria = produto.categoriaProduto ? produto.categoriaProduto.nome : ''
+    let titulo = `${produto.marca || ''} ${produto.modelo || ''}`.trim() || produto.nome
+    let imagem = '<div class="imagem-placeholder">Imagem não disponível</div>'
+
+    if (produto.imagem) {
+        imagem = `<img src="${produto.imagem}" alt="${titulo}" loading="lazy">`
+    }
+
+    return `
+        <article class="card-veiculo">
+            <div class="card-imagem">${imagem}</div>
+            <div class="card-conteudo">
+                <span class="card-categoria">${categoria}</span>
+                <h3>${titulo}</h3>
+                <p class="card-nome">${produto.nome || ''}</p>
+                <div class="card-caracteristicas">
+                    <span>${produto.ano || ''}</span>
+                    <span>${produto.quilometragem || 0} km</span>
+                </div>
+                <div class="card-rodape">
+                    <strong class="card-preco">${Number(produto.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>
+                    <a class="botao botao-secundario botao-menor" href="html/consultarProduto.html?id=${produto.codProduto}">Ver detalhes</a>
+                </div>
+            </div>
+        </article>
+    `
 }
 
-function formatarPreco(valor) {
-    return Number(valor).toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
+fetch(`${API_URL}/produtos?ativo=true`)
+.then(function(res) {
+    return res.json()
+})
+.then(function(produtos) {
+    listar.innerHTML = ''
+    let quantidade = 0
+
+    produtos.forEach(function(produto) {
+        if (produto.estoqueProduto && produto.estoqueProduto.quantidade > 0 && quantidade < 4) {
+            listar.innerHTML += criarCard(produto)
+            quantidade++
+        }
     })
-}
 
-function formatarQuilometragem(valor) {
-    return Number(valor).toLocaleString('pt-BR') + ' km'
-}
-
-function criarPlaceholderImagem() {
-    const placeholder = document.createElement('div')
-    placeholder.className = 'imagem-placeholder'
-    placeholder.innerHTML = '<span class="placeholder-marca">A</span><small>Imagem não disponível</small>'
-    return placeholder
-}
-
-function criarCardProduto(produto) {
-    const card = document.createElement('article')
-    card.className = 'card-veiculo'
-
-    const areaImagem = document.createElement('div')
-    areaImagem.className = 'card-imagem'
-
-    if (possuiValor(produto.imagem)) {
-        const imagem = document.createElement('img')
-        imagem.src = produto.imagem
-        imagem.alt = produto.nome || 'Veículo AutoShopping'
-        imagem.loading = 'lazy'
-        imagem.addEventListener('error', function () {
-            areaImagem.innerHTML = ''
-            areaImagem.appendChild(criarPlaceholderImagem())
-        })
-        areaImagem.appendChild(imagem)
+    if (quantidade === 0) {
+        resposta.textContent = 'Nenhum veículo disponível no momento.'
     } else {
-        areaImagem.appendChild(criarPlaceholderImagem())
-    }
-
-    const conteudo = document.createElement('div')
-    conteudo.className = 'card-conteudo'
-
-    if (produto.categoriaProduto && possuiValor(produto.categoriaProduto.nome)) {
-        const categoria = document.createElement('span')
-        categoria.className = 'card-categoria'
-        categoria.textContent = produto.categoriaProduto.nome
-        conteudo.appendChild(categoria)
-    }
-
-    const titulo = document.createElement('h3')
-    titulo.textContent = [produto.marca, produto.modelo].filter(possuiValor).join(' ') || produto.nome
-    conteudo.appendChild(titulo)
-
-    if (possuiValor(produto.nome) && titulo.textContent !== produto.nome) {
-        const nome = document.createElement('p')
-        nome.className = 'card-nome'
-        nome.textContent = produto.nome
-        conteudo.appendChild(nome)
-    }
-
-    const caracteristicas = document.createElement('div')
-    caracteristicas.className = 'card-caracteristicas'
-
-    if (possuiValor(produto.ano)) {
-        const ano = document.createElement('span')
-        ano.textContent = produto.ano
-        caracteristicas.appendChild(ano)
-    }
-
-    if (possuiValor(produto.quilometragem)) {
-        const quilometragem = document.createElement('span')
-        quilometragem.textContent = formatarQuilometragem(produto.quilometragem)
-        caracteristicas.appendChild(quilometragem)
-    }
-
-    conteudo.appendChild(caracteristicas)
-
-    const rodape = document.createElement('div')
-    rodape.className = 'card-rodape'
-
-    const preco = document.createElement('strong')
-    preco.className = 'card-preco'
-    preco.textContent = formatarPreco(produto.preco)
-
-    const link = document.createElement('a')
-    link.className = 'botao botao-secundario botao-menor'
-    link.href = 'html/consultarProduto.html?id=' + produto.codProduto
-    link.textContent = 'Ver detalhes'
-
-    rodape.appendChild(preco)
-    rodape.appendChild(link)
-    conteudo.appendChild(rodape)
-    card.appendChild(areaImagem)
-    card.appendChild(conteudo)
-
-    return card
-}
-
-function carregarDestaques() {
-    fetch(API_URL + '/produtos?ativo=true')
-    .then((res) => {
-        if (!res.ok) {
-            throw new Error('Erro HTTP ' + res.status)
-        }
-        return res.json()
-    })
-    .then((produtos) => {
-        const disponiveis = produtos.filter(function (produto) {
-            return produto.estoqueProduto && Number(produto.estoqueProduto.quantidade) > 0
-        }).slice(0, 4)
-
-        listar.innerHTML = ''
-
-        if (disponiveis.length === 0) {
-            resposta.className = 'mensagem mensagem-vazia'
-            resposta.textContent = 'Nenhum veículo disponível no momento.'
-            return
-        }
-
         resposta.hidden = true
-        disponiveis.forEach(function (produto) {
-            listar.appendChild(criarCardProduto(produto))
-        })
-    })
-    .catch(() => {
-        resposta.hidden = false
-        resposta.className = 'mensagem mensagem-erro'
-        resposta.textContent = 'Não foi possível carregar os veículos. Verifique se o backend está ligado.'
-    })
-}
+    }
+})
+.catch(function() {
+    resposta.textContent = 'Não foi possível carregar os veículos. Verifique se o backend está ligado.'
+})
 
-function configurarBuscaHome() {
-    formularioBusca.addEventListener('submit', (evento) => {
-        evento.preventDefault()
-        const busca = campoBusca.value.trim()
-        let destino = 'html/listarProduto.html'
-
-        if (busca) {
-            destino += '?busca=' + encodeURIComponent(busca)
-        }
-
-        window.location.href = destino
-    })
-}
-
-carregarDestaques()
-configurarBuscaHome()
-atualizarNavegacao()
+formularioBusca.addEventListener('submit', function(e) {
+    e.preventDefault()
+    let busca = document.getElementById('buscaHome').value
+    window.location.href = `html/listarProduto.html?busca=${encodeURIComponent(busca)}`
+})

@@ -1,14 +1,20 @@
 const API_URL = 'http://localhost:3000'
-const token = localStorage.getItem('autoshopping_token')
+
+let token = localStorage.getItem('autoshopping_token')
+let usuario = JSON.parse(localStorage.getItem('autoshopping_usuario') || 'null')
 let resposta = document.getElementById('mensagemPedidos')
 let listar = document.getElementById('listaPedidos')
+let carrinho = JSON.parse(localStorage.getItem('autoshopping_carrinho') || '[]')
 
-function lerUsuario() {
-    try {
-        return JSON.parse(localStorage.getItem('autoshopping_usuario'))
-    } catch (erro) {
-        return null
-    }
+if (!token || !usuario) {
+    window.location.href = 'login.html?redirect=meusPedidos.html'
+}
+
+document.getElementById('contadorCarrinho').textContent = carrinho.length
+
+if (usuario && usuario.tipo === 'ADMIN') {
+    document.getElementById('linkAdmin').hidden = false
+    document.getElementById('linkAdminConta').hidden = false
 }
 
 function sair() {
@@ -17,185 +23,118 @@ function sair() {
     window.location.href = 'login.html?redirect=meusPedidos.html'
 }
 
-function atualizarContadorCarrinho() {
-    try {
-        const carrinho = JSON.parse(localStorage.getItem('autoshopping_carrinho')) || []
-        document.getElementById('contadorCarrinho').textContent = carrinho.length
-    } catch (erro) {
-        document.getElementById('contadorCarrinho').textContent = '0'
-    }
-}
-
-function atualizarNavegacaoAdmin() {
-    const usuario = lerUsuario()
-    if (usuario && usuario.tipo === 'ADMIN') {
-        document.getElementById('linkAdmin').hidden = false
-        document.getElementById('linkAdminConta').hidden = false
-    }
-}
-
-function formatarPreco(valor) {
-    return Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-}
-
-function formatarData(valor) {
-    return new Date(valor).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
-}
-
 function traduzirStatus(status) {
-    const textos = {
-        PENDENTE_PAGAMENTO: 'Pendente',
-        PAGO: 'Pago',
-        ENVIADO: 'Enviado',
-        ENTREGUE: 'Entregue',
-        CANCELADO: 'Cancelado',
-        AGUARDANDO: 'Aguardando',
-        EM_TRANSITO: 'Em trânsito',
-        SAIU_PARA_ENTREGA: 'Saiu para entrega',
-        EXTRAVIADO: 'Extraviado'
-    }
-    return textos[status] || status
+    let nome = status
+
+    if (status === 'PENDENTE_PAGAMENTO') nome = 'Pendente'
+    if (status === 'PAGO') nome = 'Pago'
+    if (status === 'ENVIADO') nome = 'Enviado'
+    if (status === 'ENTREGUE') nome = 'Entregue'
+    if (status === 'CANCELADO') nome = 'Cancelado'
+    if (status === 'AGUARDANDO') nome = 'Aguardando'
+    if (status === 'EM_TRANSITO') nome = 'Em trânsito'
+    if (status === 'SAIU_PARA_ENTREGA') nome = 'Saiu para entrega'
+    if (status === 'EXTRAVIADO') nome = 'Extraviado'
+
+    return nome
 }
 
-function cancelarPedido(idPedido, botao) {
-    if (!window.confirm('Deseja realmente cancelar este pedido?')) return
+function cancelarPedido(idPedido) {
+    if (!confirm('Deseja realmente cancelar este pedido?')) {
+        return
+    }
 
-    botao.disabled = true
-    botao.textContent = 'Cancelando...'
-
-    fetch(API_URL + '/pedido/' + idPedido, {
+    fetch(`${API_URL}/pedido/${idPedido}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ status: 'CANCELADO' })
     })
-    .then(function (resposta) {
-        if (resposta.status === 401) {
+    .then(function(res) {
+        if (res.status === 401) {
             sair()
-            throw new Error('SESSAO_EXPIRADA')
         }
-        return resposta.json().then(function (conteudo) {
-            if (!resposta.ok) throw new Error(conteudo.message || 'Não foi possível cancelar o pedido.')
-        })
+
+        return res.json()
     })
-    .then(carregarPedidos)
-    .catch(function (erro) {
-        if (erro.message !== 'SESSAO_EXPIRADA') {
-            window.alert(erro.message === 'Failed to fetch' ? 'Backend indisponível.' : erro.message)
-            botao.disabled = false
-            botao.textContent = 'Cancelar pedido'
-        }
+    .then(function() {
+        carregarPedidos()
     })
-}
-
-function criarItemPedido(item) {
-    const linha = document.createElement('div')
-    linha.className = 'produto-pedido'
-    const produto = item.produtoItem || {}
-    const nome = document.createElement('span')
-    nome.textContent = [produto.marca, produto.modelo].filter(Boolean).join(' ') || produto.nome || 'Veículo'
-    const valor = document.createElement('strong')
-    valor.textContent = formatarPreco(item.valorTotalItem)
-    linha.appendChild(nome)
-    linha.appendChild(valor)
-    return linha
-}
-
-function criarCardPedido(pedido) {
-    const card = document.createElement('article')
-    card.className = 'card-pedido'
-
-    const topo = document.createElement('div')
-    topo.className = 'pedido-topo'
-    const identificacao = document.createElement('div')
-    const numero = document.createElement('h2')
-    numero.textContent = 'Pedido #' + pedido.codPedido
-    const data = document.createElement('span')
-    data.textContent = formatarData(pedido.dataPedido)
-    identificacao.appendChild(numero)
-    identificacao.appendChild(data)
-    const status = document.createElement('span')
-    status.className = 'status-pedido status-' + pedido.status.toLowerCase()
-    status.textContent = traduzirStatus(pedido.status)
-    topo.appendChild(identificacao)
-    topo.appendChild(status)
-
-    const itens = document.createElement('div')
-    itens.className = 'produtos-pedido'
-    ;(pedido.itensPedido || []).forEach(function (item) {
-        itens.appendChild(criarItemPedido(item))
+    .catch(function() {
+        alert('Não foi possível cancelar o pedido!')
     })
-
-    const rodape = document.createElement('div')
-    rodape.className = 'pedido-rodape'
-    const entrega = document.createElement('div')
-    if (pedido.entregaPedido) {
-        entrega.textContent = (pedido.entregaPedido.tipo === 'RETIRADA' ? 'Retirada' : 'Entrega') +
-            ' • ' + traduzirStatus(pedido.entregaPedido.status)
-    }
-    const total = document.createElement('strong')
-    total.textContent = 'Total: ' + formatarPreco(pedido.valorTotal)
-    rodape.appendChild(entrega)
-    rodape.appendChild(total)
-
-    card.appendChild(topo)
-    card.appendChild(itens)
-    card.appendChild(rodape)
-
-    if (pedido.status === 'PENDENTE_PAGAMENTO') {
-        const botao = document.createElement('button')
-        botao.className = 'botao-texto perigo cancelar-pedido'
-        botao.type = 'button'
-        botao.textContent = 'Cancelar pedido'
-        botao.addEventListener('click', function () {
-            cancelarPedido(pedido.codPedido, botao)
-        })
-        card.appendChild(botao)
-    }
-
-    return card
 }
 
 function carregarPedidos() {
-    resposta.hidden = false
-    resposta.className = 'mensagem carregando'
-    resposta.textContent = 'Carregando pedidos...'
-    listar.innerHTML = ''
-
-    fetch(API_URL + '/pedidos', { headers: { Authorization: 'Bearer ' + token } })
-    .then((res) => {
+    fetch(`${API_URL}/pedidos`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(function(res) {
         if (res.status === 401) {
             sair()
-            throw new Error('SESSAO_EXPIRADA')
         }
-        if (!res.ok) throw new Error('Não foi possível carregar seus pedidos.')
+
         return res.json()
     })
-    .then((pedidos) => {
+    .then(function(pedidos) {
+        listar.innerHTML = ''
+
         if (pedidos.length === 0) {
-            resposta.className = 'mensagem mensagem-vazia'
             resposta.innerHTML = 'Você ainda não possui pedidos.<br><a class="link-destaque" href="listarProduto.html">Encontrar um veículo</a>'
             return
         }
 
         resposta.hidden = true
-        pedidos.forEach(function (pedido) {
-            listar.appendChild(criarCardPedido(pedido))
+
+        pedidos.forEach(function(pedido) {
+            let itens = ''
+
+            pedido.itensPedido.forEach(function(item) {
+                let produto = item.produtoItem || {}
+                let nome = `${produto.marca || ''} ${produto.modelo || ''}`.trim() || produto.nome || 'Veículo'
+
+                itens += `
+                    <div class="produto-pedido">
+                        <span>${nome}</span>
+                        <strong>${Number(item.valorTotalItem).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>
+                    </div>
+                `
+            })
+
+            let entrega = ''
+            if (pedido.entregaPedido) {
+                entrega = `${pedido.entregaPedido.tipo === 'RETIRADA' ? 'Retirada' : 'Entrega'} • ${traduzirStatus(pedido.entregaPedido.status)}`
+            }
+
+            let botaoCancelar = ''
+            if (pedido.status === 'PENDENTE_PAGAMENTO') {
+                botaoCancelar = `<button class="botao-texto perigo cancelar-pedido" type="button" onclick="cancelarPedido(${pedido.codPedido})">Cancelar pedido</button>`
+            }
+
+            listar.innerHTML += `
+                <article class="card-pedido">
+                    <div class="pedido-topo">
+                        <div>
+                            <h2>Pedido #${pedido.codPedido}</h2>
+                            <span>${new Date(pedido.dataPedido).toLocaleString('pt-BR')}</span>
+                        </div>
+                        <span class="status-pedido status-${pedido.status.toLowerCase()}">${traduzirStatus(pedido.status)}</span>
+                    </div>
+                    <div class="produtos-pedido">${itens}</div>
+                    <div class="pedido-rodape">
+                        <div>${entrega}</div>
+                        <strong>Total: ${Number(pedido.valorTotal).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>
+                    </div>
+                    ${botaoCancelar}
+                </article>
+            `
         })
     })
-    .catch((erro) => {
-        if (erro.message !== 'SESSAO_EXPIRADA') {
-            resposta.className = 'mensagem mensagem-erro'
-            resposta.textContent = erro.message === 'Failed to fetch'
-                ? 'Backend indisponível. Verifique se o servidor está ligado.'
-                : erro.message
-        }
+    .catch(function() {
+        resposta.textContent = 'Não foi possível carregar os pedidos. Verifique se o backend está ligado.'
     })
 }
 
-if (!token || !lerUsuario()) {
-    window.location.href = 'login.html?redirect=meusPedidos.html'
-} else {
-    atualizarContadorCarrinho()
-    atualizarNavegacaoAdmin()
-    carregarPedidos()
-}
+carregarPedidos()

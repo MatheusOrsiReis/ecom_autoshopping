@@ -1,59 +1,55 @@
 const { Estoque, Produto } = require('../models/rel')
 
-function tratarErro(res, err) {
-    if (err.name === 'SequelizeUniqueConstraintError') {
-        return res.status(409).json({ message: 'Este produto já possui estoque!' })
-    }
+const cadastrar = async (req, res) => {
+    const valores = req.body
 
-    if (err.name === 'SequelizeForeignKeyConstraintError') {
-        return res.status(400).json({ message: 'Produto inválido!' })
-    }
-
-    console.error(err)
-    return res.status(500).json({ message: 'Erro interno ao processar estoque!' })
-}
-
-async function cadastrar(req, res) {
     try {
-        const quantidade = Number(req.body.quantidade)
+        const quantidade = Number(valores.quantidade)
 
-        if (!req.body.idProduto || !Number.isInteger(quantidade) || quantidade < 0) {
+        if (!valores.idProduto || !Number.isInteger(quantidade) || quantidade < 0) {
             return res.status(400).json({ message: 'Produto e quantidade inteira não negativa são obrigatórios!' })
         }
 
-        const produto = await Produto.findByPk(req.body.idProduto)
+        const produto = await Produto.findOne({
+            where: { codProduto: valores.idProduto }
+        })
         if (!produto) {
             return res.status(404).json({ message: 'Produto não encontrado!' })
         }
 
+        const estoqueCadastrado = await Estoque.findOne({ where: { idProduto: valores.idProduto } })
+        if (estoqueCadastrado) {
+            return res.status(409).json({ message: 'Este produto já possui estoque!' })
+        }
+
         const estoque = await Estoque.create({
-            idProduto: req.body.idProduto,
+            idProduto: valores.idProduto,
             quantidade,
-            quantidade_minima: req.body.quantidade_minima || 0
+            quantidade_minima: valores.quantidade_minima || 0
         })
 
         return res.status(201).json(estoque)
     } catch (err) {
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao cadastrar estoque!' })
     }
 }
 
-async function listar(req, res) {
+const listar = async (req, res) => {
     try {
-        const estoques = await Estoque.findAll({
-            include: [{ model: Produto, as: 'produtoEstoque' }],
-            order: [['codEstoque', 'ASC']]
-        })
+        const estoques = await Estoque.findAll()
         return res.json(estoques)
     } catch (err) {
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao listar estoques!' })
     }
 }
 
-async function consultar(req, res) {
+const consultar = async (req, res) => {
     try {
-        const estoque = await Estoque.findByPk(req.params.id, {
-            include: [{ model: Produto, as: 'produtoEstoque' }]
+        const id = req.params.id
+        const estoque = await Estoque.findOne({
+            where: { codEstoque: id }
         })
 
         if (!estoque) {
@@ -62,15 +58,15 @@ async function consultar(req, res) {
 
         return res.json(estoque)
     } catch (err) {
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao consultar estoque!' })
     }
 }
 
-async function consultarPorProduto(req, res) {
+const consultarPorProduto = async (req, res) => {
     try {
         const estoque = await Estoque.findOne({
-            where: { idProduto: req.params.produtoId },
-            include: [{ model: Produto, as: 'produtoEstoque' }]
+            where: { idProduto: req.params.produtoId }
         })
 
         if (!estoque) {
@@ -79,28 +75,32 @@ async function consultarPorProduto(req, res) {
 
         return res.json(estoque)
     } catch (err) {
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao consultar estoque do produto!' })
     }
 }
 
-async function atualizar(req, res) {
+const atualizar = async (req, res) => {
+    const valores = req.body
+
     try {
-        const estoque = await Estoque.findByPk(req.params.id)
+        const id = req.params.id
+        const estoque = await Estoque.findOne({ where: { codEstoque: id } })
 
         if (!estoque) {
             return res.status(404).json({ message: 'Estoque não encontrado!' })
         }
 
-        if (req.body.quantidade !== undefined) {
-            const quantidade = Number(req.body.quantidade)
+        if (valores.quantidade !== undefined) {
+            const quantidade = Number(valores.quantidade)
             if (!Number.isInteger(quantidade) || quantidade < 0) {
                 return res.status(400).json({ message: 'A quantidade deve ser um inteiro não negativo!' })
             }
             estoque.quantidade = quantidade
         }
 
-        if (req.body.quantidade_minima !== undefined) {
-            const quantidadeMinima = Number(req.body.quantidade_minima)
+        if (valores.quantidade_minima !== undefined) {
+            const quantidadeMinima = Number(valores.quantidade_minima)
             if (!Number.isInteger(quantidadeMinima) || quantidadeMinima < 0) {
                 return res.status(400).json({ message: 'A quantidade mínima deve ser um inteiro não negativo!' })
             }
@@ -110,13 +110,15 @@ async function atualizar(req, res) {
         await estoque.save()
         return res.json(estoque)
     } catch (err) {
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao atualizar estoque!' })
     }
 }
 
-async function apagar(req, res) {
+const apagar = async (req, res) => {
     try {
-        const estoque = await Estoque.findByPk(req.params.id)
+        const id = req.params.id
+        const estoque = await Estoque.findOne({ where: { codEstoque: id } })
 
         if (!estoque) {
             return res.status(404).json({ message: 'Estoque não encontrado!' })
@@ -125,7 +127,8 @@ async function apagar(req, res) {
         await estoque.destroy()
         return res.json({ message: 'Estoque apagado com sucesso!' })
     } catch (err) {
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao apagar estoque!' })
     }
 }
 

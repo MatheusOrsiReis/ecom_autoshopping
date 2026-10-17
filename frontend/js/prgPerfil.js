@@ -1,26 +1,20 @@
 const API_URL = 'http://localhost:3000'
-const token = localStorage.getItem('autoshopping_token')
-let usuario = null
-let ultimoCepConsultado = ''
+
+let token = localStorage.getItem('autoshopping_token')
+let usuario = JSON.parse(localStorage.getItem('autoshopping_usuario') || 'null')
 let resposta = document.getElementById('mensagemPerfil')
 let atualizar = document.getElementById('botaoSalvarPerfil')
-let formularioPerfil = document.getElementById('formPerfil')
+let carrinho = JSON.parse(localStorage.getItem('autoshopping_carrinho') || '[]')
 
-function lerUsuario() {
-    try {
-        return JSON.parse(localStorage.getItem('autoshopping_usuario'))
-    } catch (erro) {
-        return null
-    }
+if (!token || !usuario) {
+    window.location.href = 'login.html?redirect=perfil.html'
 }
 
-function atualizarContadorCarrinho() {
-    try {
-        const carrinho = JSON.parse(localStorage.getItem('autoshopping_carrinho')) || []
-        document.getElementById('contadorCarrinho').textContent = carrinho.length
-    } catch (erro) {
-        document.getElementById('contadorCarrinho').textContent = '0'
-    }
+document.getElementById('contadorCarrinho').textContent = carrinho.length
+
+if (usuario && usuario.tipo === 'ADMIN') {
+    document.getElementById('linkAdmin').hidden = false
+    document.getElementById('linkAdminConta').hidden = false
 }
 
 function sair() {
@@ -29,233 +23,138 @@ function sair() {
     window.location.href = '../index.html'
 }
 
-function mostrarMensagem(texto, tipo) {
-    resposta.className = 'mensagem-formulario campo-largo ' + tipo
-    resposta.textContent = texto
-}
-
-function somenteNumeros(valor) {
-    return valor.replace(/\D/g, '')
-}
-
 function formatarCpf(valor) {
-    return somenteNumeros(valor).slice(0, 11)
+    return valor.replace(/\D/g, '').slice(0, 11)
         .replace(/^(\d{3})(\d)/, '$1.$2')
         .replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
         .replace(/\.(\d{3})(\d)/, '.$1-$2')
 }
 
 function formatarCep(valor) {
-    return somenteNumeros(valor).slice(0, 8).replace(/^(\d{5})(\d)/, '$1-$2')
+    return valor.replace(/\D/g, '').slice(0, 8).replace(/^(\d{5})(\d)/, '$1-$2')
 }
 
-function cpfValido(valor) {
-    const cpf = somenteNumeros(valor)
-    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false
-
-    function calcularDigito(tamanho) {
-        let soma = 0
-        for (let indice = 0; indice < tamanho; indice++) {
-            soma += Number(cpf[indice]) * (tamanho + 1 - indice)
-        }
-        const resto = (soma * 10) % 11
-        return resto === 10 ? 0 : resto
-    }
-
-    return calcularDigito(9) === Number(cpf[9]) && calcularDigito(10) === Number(cpf[10])
-}
-
-function mostrarEstadoCampo(idMensagem, input, texto, tipo) {
-    const mensagem = document.getElementById(idMensagem)
-    mensagem.className = 'mensagem-campo ' + (tipo || '')
-    mensagem.textContent = texto || ''
-    input.classList.toggle('invalido', tipo === 'erro')
-}
-
-function validarCampoCpf() {
-    const input = document.getElementById('cpf')
-    const valido = cpfValido(input.value)
-    mostrarEstadoCampo('mensagemCpf', input, valido ? 'CPF válido.' : 'Informe um CPF válido.', valido ? 'sucesso' : 'erro')
-    input.setCustomValidity(valido ? '' : 'Informe um CPF válido.')
-    return valido
-}
-
-function limparEndereco() {
-    ;['rua', 'bairro', 'cidade', 'uf'].forEach(function (id) {
-        document.getElementById(id).value = ''
-    })
-}
-
-async function consultarCep() {
-    const input = document.getElementById('cep')
-    const cep = somenteNumeros(input.value)
-    input.value = formatarCep(input.value)
+function consultarCep() {
+    let cep = document.getElementById('cep').value.replace(/\D/g, '')
 
     if (cep.length !== 8) {
-        ultimoCepConsultado = ''
-        mostrarEstadoCampo('mensagemCep', input, cep ? 'O CEP deve possuir 8 dígitos.' : '', cep ? 'erro' : '')
-        input.setCustomValidity(cep ? 'Informe um CEP válido.' : '')
-        return false
+        return
     }
 
-    if (cep === ultimoCepConsultado) return !input.classList.contains('invalido')
-    ultimoCepConsultado = cep
-    mostrarEstadoCampo('mensagemCep', input, 'Consultando CEP...', 'carregando')
+    document.getElementById('mensagemCep').textContent = 'Consultando CEP...'
 
-    try {
-        const resposta = await fetch('https://viacep.com.br/ws/' + cep + '/json/')
-        if (!resposta.ok) throw new Error('CONSULTA_INDISPONIVEL')
-        const endereco = await resposta.json()
+    fetch(`https://viacep.com.br/ws/${cep}/json/`)
+    .then(function(res) {
+        return res.json()
+    })
+    .then(function(endereco) {
         if (endereco.erro) {
-            ultimoCepConsultado = ''
-            limparEndereco()
-            mostrarEstadoCampo('mensagemCep', input, 'CEP não encontrado.', 'erro')
-            input.setCustomValidity('CEP não encontrado.')
-            return false
+            document.getElementById('mensagemCep').textContent = 'CEP não encontrado.'
+            return
         }
 
-        if (somenteNumeros(input.value) !== cep) return false
-        input.value = endereco.cep || formatarCep(cep)
         document.getElementById('rua').value = endereco.logradouro || ''
         document.getElementById('bairro').value = endereco.bairro || ''
         document.getElementById('cidade').value = endereco.localidade || ''
         document.getElementById('uf').value = endereco.uf || ''
-        input.setCustomValidity('')
-        mostrarEstadoCampo('mensagemCep', input, 'Endereço preenchido automaticamente.', 'sucesso')
+        document.getElementById('mensagemCep').textContent = 'Endereço preenchido automaticamente.'
         document.getElementById('numero').focus()
-        return true
-    } catch (erro) {
-        ultimoCepConsultado = ''
-        mostrarEstadoCampo('mensagemCep', input, 'Não foi possível consultar o CEP. Preencha o endereço manualmente.', 'erro')
-        input.setCustomValidity('')
-        return false
-    }
-}
-
-function tratarNaoAutorizado(resposta) {
-    if (resposta.status === 401) {
-        sair()
-        throw new Error('SESSAO_EXPIRADA')
-    }
-}
-
-function preencherPerfil(perfil) {
-    const campos = ['nome', 'cpf', 'telefone', 'email', 'cep', 'uf', 'rua', 'numero', 'bairro', 'cidade']
-    campos.forEach(function (campo) {
-        document.getElementById(campo).value = perfil[campo] || ''
     })
+    .catch(function() {
+        document.getElementById('mensagemCep').textContent = 'Não foi possível consultar o CEP.'
+    })
+}
+
+fetch(`${API_URL}/usuario/${usuario ? usuario.codUsuario : ''}`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+})
+.then(function(res) {
+    if (res.status === 401) sair()
+    return res.json()
+})
+.then(function(perfil) {
+    document.getElementById('nome').value = perfil.nome || ''
     document.getElementById('cpf').value = formatarCpf(perfil.cpf || '')
+    document.getElementById('telefone').value = perfil.telefone || ''
+    document.getElementById('email').value = perfil.email || ''
     document.getElementById('cep').value = formatarCep(perfil.cep || '')
+    document.getElementById('rua').value = perfil.rua || ''
+    document.getElementById('numero').value = perfil.numero || ''
+    document.getElementById('bairro').value = perfil.bairro || ''
+    document.getElementById('cidade').value = perfil.cidade || ''
+    document.getElementById('uf').value = perfil.uf || ''
     document.getElementById('carregandoPerfil').hidden = true
     document.getElementById('formPerfil').hidden = false
-}
+})
+.catch(function() {
+    document.getElementById('carregandoPerfil').textContent = 'Erro ao carregar o perfil!'
+})
 
-function carregarPerfil() {
-    fetch(API_URL + '/usuario/' + usuario.codUsuario, {
-        headers: { Authorization: 'Bearer ' + token }
-    })
-    .then(function (resposta) {
-        tratarNaoAutorizado(resposta)
-        if (!resposta.ok) throw new Error('Não foi possível carregar o perfil.')
-        return resposta.json()
-    })
-    .then(preencherPerfil)
-    .catch(function (erro) {
-        if (erro.message !== 'SESSAO_EXPIRADA') {
-            const carregando = document.getElementById('carregandoPerfil')
-            carregando.className = 'mensagem mensagem-erro'
-            carregando.textContent = erro.message === 'Failed to fetch'
-                ? 'Backend indisponível. Verifique se o servidor está ligado.'
-                : erro.message
-        }
-    })
-}
+document.getElementById('cpf').addEventListener('input', function(e) {
+    e.target.value = formatarCpf(e.target.value)
+})
 
-function salvarPerfil(evento) {
-    evento.preventDefault()
+document.getElementById('cep').addEventListener('input', function(e) {
+    e.target.value = formatarCep(e.target.value)
 
-    if (!validarCampoCpf()) {
-        document.getElementById('cpf').focus()
-        return
+    if (e.target.value.replace(/\D/g, '').length === 8) {
+        consultarCep()
+    }
+})
+
+document.getElementById('formPerfil').addEventListener('submit', function(e) {
+    e.preventDefault()
+
+    const valores = {
+        nome: document.getElementById('nome').value,
+        cpf: document.getElementById('cpf').value,
+        telefone: document.getElementById('telefone').value,
+        email: document.getElementById('email').value,
+        cep: document.getElementById('cep').value,
+        rua: document.getElementById('rua').value,
+        numero: document.getElementById('numero').value,
+        bairro: document.getElementById('bairro').value,
+        cidade: document.getElementById('cidade').value,
+        uf: document.getElementById('uf').value
     }
 
-    if (somenteNumeros(document.getElementById('cep').value).length !== 8) {
-        mostrarEstadoCampo('mensagemCep', document.getElementById('cep'), 'Informe um CEP válido.', 'erro')
-        document.getElementById('cep').focus()
-        return
+    if (document.getElementById('senha').value) {
+        valores.senha = document.getElementById('senha').value
     }
-    const dados = {}
-    const campos = ['nome', 'cpf', 'telefone', 'email', 'cep', 'rua', 'numero', 'bairro', 'cidade']
-
-    campos.forEach(function (campo) {
-        dados[campo] = document.getElementById(campo).value.trim()
-    })
-    dados.cpf = formatarCpf(dados.cpf)
-    dados.cep = formatarCep(dados.cep)
-    dados.uf = document.getElementById('uf').value.trim().toUpperCase()
-
-    const senha = document.getElementById('senha').value
-    if (senha) dados.senha = senha
 
     atualizar.disabled = true
     atualizar.textContent = 'Salvando...'
-    mostrarMensagem('', '')
 
-    fetch(API_URL + '/usuario/' + usuario.codUsuario, {
+    fetch(`${API_URL}/usuario/${usuario.codUsuario}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-        body: JSON.stringify(dados)
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(valores)
     })
-    .then((res) => {
-        tratarNaoAutorizado(res)
-        return res.json().then((conteudo) => {
-            if (!res.ok) throw new Error(conteudo.message || 'Não foi possível atualizar o perfil.')
-            return conteudo
-        })
+    .then(function(res) {
+        return res.json()
     })
-    .then((perfil) => {
-        usuario.nome = perfil.nome
-        usuario.email = perfil.email
-        localStorage.setItem('autoshopping_usuario', JSON.stringify(usuario))
-        document.getElementById('senha').value = ''
-        mostrarMensagem('Perfil atualizado com sucesso!', 'sucesso')
-    })
-    .catch((erro) => {
-        if (erro.message !== 'SESSAO_EXPIRADA') {
-            mostrarMensagem(erro.message === 'Failed to fetch'
-                ? 'Backend indisponível. Verifique se o servidor está ligado.'
-                : erro.message, 'erro')
+    .then(function(perfil) {
+        if (perfil.message && !perfil.codUsuario) {
+            resposta.textContent = perfil.message
+        } else {
+            usuario.nome = perfil.nome
+            usuario.email = perfil.email
+            localStorage.setItem('autoshopping_usuario', JSON.stringify(usuario))
+            document.getElementById('senha').value = ''
+            resposta.textContent = 'Perfil atualizado com sucesso!'
         }
-    })
-    .finally(() => {
+
         atualizar.disabled = false
         atualizar.textContent = 'Salvar alterações'
     })
-}
+    .catch(function() {
+        resposta.textContent = 'Erro ao atualizar o perfil!'
+        atualizar.disabled = false
+        atualizar.textContent = 'Salvar alterações'
+    })
+})
 
-if (!token || !lerUsuario()) {
-    window.location.href = 'login.html?redirect=perfil.html'
-} else {
-    usuario = lerUsuario()
-    if (usuario.tipo === 'ADMIN') {
-        document.getElementById('linkAdmin').hidden = false
-        document.getElementById('linkAdminConta').hidden = false
-    }
-    document.getElementById('botaoSair').addEventListener('click', sair)
-    document.getElementById('cpf').addEventListener('input', function (evento) {
-        evento.target.value = formatarCpf(evento.target.value)
-        evento.target.setCustomValidity('')
-        mostrarEstadoCampo('mensagemCpf', evento.target, '', '')
-    })
-    document.getElementById('cpf').addEventListener('blur', validarCampoCpf)
-    document.getElementById('cep').addEventListener('input', function (evento) {
-        evento.target.value = formatarCep(evento.target.value)
-        evento.target.setCustomValidity('')
-        if (somenteNumeros(evento.target.value).length === 8) consultarCep()
-        else mostrarEstadoCampo('mensagemCep', evento.target, '', '')
-    })
-    document.getElementById('cep').addEventListener('blur', consultarCep)
-    formularioPerfil.addEventListener('submit', salvarPerfil)
-    atualizarContadorCarrinho()
-    carregarPerfil()
-}
+document.getElementById('botaoSair').addEventListener('click', sair)

@@ -1,143 +1,142 @@
 const API_URL = 'http://localhost:3000'
-const tokenRelatorio = localStorage.getItem('autoshopping_token')
-let resposta = document.getElementById('mensagemRelatorio')
-let atualizar = document.getElementById('botaoAtualizarRelatorio')
-let imprimir = document.getElementById('botaoImprimirRelatorio')
 
-function lerUsuarioRelatorio() {
-    try { return JSON.parse(localStorage.getItem('autoshopping_usuario')) } catch (erro) { return null }
+let token = localStorage.getItem('autoshopping_token')
+let usuario = JSON.parse(localStorage.getItem('autoshopping_usuario') || 'null')
+let graficoFaturamento = null
+let graficoEstoque = null
+
+if (!token || !usuario) {
+    window.location.href = 'login.html?redirect=relatorios.html'
+} else if (usuario.tipo !== 'ADMIN') {
+    window.location.href = 'perfil.html'
+} else {
+    document.getElementById('bloqueioRelatorios').hidden = true
+    document.getElementById('conteudoRelatorios').hidden = false
 }
 
-function escapar(texto) {
-    return String(texto == null ? '' : texto).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;')
-}
-
-function formatarMoeda(valor) {
-    return Number(valor || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-}
-
-function formatarData(valor) {
-    return valor ? new Date(valor).toLocaleDateString('pt-BR') : '--'
-}
-
-function nomeStatus(status) {
-    const nomes = { PENDENTE_PAGAMENTO: 'Pendente de pagamento', PAGO: 'Pago', ENVIADO: 'Enviado', ENTREGUE: 'Entregue', CANCELADO: 'Cancelado' }
-    return nomes[status] || status
-}
-
-function sairRelatorio() {
+function sair() {
     localStorage.removeItem('autoshopping_token')
     localStorage.removeItem('autoshopping_usuario')
     window.location.href = 'login.html?redirect=relatorios.html'
 }
 
-async function requisicao(caminho) {
-    let resposta
-    try {
-        resposta = await fetch(API_URL + caminho, { headers: { Authorization: 'Bearer ' + tokenRelatorio } })
-    } catch (erro) {
-        throw new Error('Backend indisponível. Verifique se o servidor está ligado.')
-    }
-    if (resposta.status === 401) {
-        sairRelatorio()
-        throw new Error('Sua sessão expirou.')
-    }
-    const conteudo = await resposta.json().catch(function () { return {} })
-    if (!resposta.ok) throw new Error(conteudo.message || 'Não foi possível carregar o relatório.')
-    return conteudo
-}
+function carregarRelatorios() {
+    let resumo
+    let vendas
+    let estoque
+    let botao = document.getElementById('botaoAtualizarRelatorio')
+    let resposta = document.getElementById('mensagemRelatorio')
 
-function mostrarAviso(texto, tipo) {
-    resposta.hidden = !texto
-    resposta.className = 'aviso-admin ' + (tipo || '')
-    resposta.textContent = texto || ''
-}
+    botao.disabled = true
+    botao.textContent = 'Atualizando...'
+    resposta.hidden = true
 
-function renderizarIndicadores(resumo) {
-    document.getElementById('relTotalUsuarios').textContent = resumo.totalUsuarios
-    document.getElementById('relTotalProdutos').textContent = resumo.totalProdutos
-    document.getElementById('relProdutosDisponiveis').textContent = resumo.produtosDisponiveis
-    document.getElementById('relTotalPedidos').textContent = resumo.totalPedidos
-    document.getElementById('relFaturamento').textContent = formatarMoeda(resumo.faturamento)
-
-    const quantidades = {}
-    resumo.pedidosPorStatus.forEach(function (item) { quantidades[item.status] = Number(item.quantidade) })
-    const maior = Math.max(1, ...Object.values(quantidades))
-    const status = ['PENDENTE_PAGAMENTO', 'PAGO', 'ENVIADO', 'ENTREGUE', 'CANCELADO']
-    document.getElementById('totalGraficoPedidos').textContent = resumo.totalPedidos
-    document.getElementById('graficoStatusPedidos').innerHTML = status.map(function (item) {
-        const quantidade = quantidades[item] || 0
-        const largura = quantidade ? Math.max(6, quantidade / maior * 100) : 0
-        return '<div class="linha-grafico"><div class="rotulo-grafico"><span>' + nomeStatus(item) + '</span><strong>' + quantidade + '</strong></div><div class="trilho-grafico"><span class="barra-grafico status-grafico-' + item.toLowerCase().replaceAll('_', '-') + '" style="width:' + largura + '%"></span></div></div>'
-    }).join('')
-}
-
-function renderizarEstoque(produtos) {
-    let unidades = 0
-    let disponiveis = 0
-    let zerados = 0
-    let inativos = 0
-    produtos.forEach(function (produto) {
-        const quantidade = produto.estoqueProduto ? Number(produto.estoqueProduto.quantidade) : 0
-        unidades += quantidade
-        if (!produto.ativo) inativos++
-        else if (quantidade > 0) disponiveis++
-        else zerados++
+    fetch(`${API_URL}/relatorios/resumo`, {
+        headers: { 'Authorization': `Bearer ${token}` }
     })
-    document.getElementById('resumoEstoqueRelatorio').innerHTML =
-        '<div class="numero-estoque"><strong>' + unidades + '</strong><span>unidades no estoque</span></div>' +
-        '<dl class="lista-metricas"><div><dt>Veículos disponíveis</dt><dd>' + disponiveis + '</dd></div><div><dt>Sem estoque</dt><dd>' + zerados + '</dd></div><div><dt>Anúncios inativos</dt><dd>' + inativos + '</dd></div></dl>'
+    .then(function(res) {
+        return res.json()
+    })
+    .then(function(dados) {
+        resumo = dados
+        return fetch(`${API_URL}/relatorios/vendas`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+    })
+    .then(function(res) {
+        return res.json()
+    })
+    .then(function(dados) {
+        vendas = dados
+        return fetch(`${API_URL}/relatorios/estoque`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+    })
+    .then(function(res) {
+        return res.json()
+    })
+    .then(function(dados) {
+        estoque = dados
+        return fetch(`${API_URL}/pedidos`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
+    })
+    .then(function(res) {
+        return res.json()
+    })
+    .then(function(pedidos) {
+        document.getElementById('relTotalUsuarios').textContent = resumo.totalUsuarios
+        document.getElementById('relTotalProdutos').textContent = resumo.totalProdutos
+        document.getElementById('relProdutosDisponiveis').textContent = resumo.produtosDisponiveis
+        document.getElementById('relTotalPedidos').textContent = resumo.totalPedidos
+        document.getElementById('relFaturamento').textContent = Number(resumo.faturamento).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+
+        if (graficoFaturamento) graficoFaturamento.destroy()
+        if (graficoEstoque) graficoEstoque.destroy()
+
+        graficoFaturamento = new Chart(document.getElementById('graficoFaturamentoMensal'), {
+            type: 'line',
+            data: {
+                labels: vendas.faturamentoMensal.map(function(item) { return item.rotulo }),
+                datasets: [{
+                    label: 'Faturamento (R$)',
+                    data: vendas.faturamentoMensal.map(function(item) { return item.total }),
+                    borderColor: '#ff252c',
+                    backgroundColor: 'rgba(255, 37, 44, 0.18)',
+                    fill: true
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        })
+
+        graficoEstoque = new Chart(document.getElementById('graficoEstoqueCategoria'), {
+            type: 'bar',
+            data: {
+                labels: estoque.estoquePorCategoria.map(function(item) { return item.categoria }),
+                datasets: [{
+                    label: 'Unidades em estoque',
+                    data: estoque.estoquePorCategoria.map(function(item) { return item.unidades }),
+                    backgroundColor: '#ff252c'
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        })
+
+        document.getElementById('corpoPedidosRecentes').innerHTML = ''
+
+        pedidos.slice(0, 8).forEach(function(pedido) {
+            let cliente = pedido.usuarioPedido || {}
+            document.getElementById('corpoPedidosRecentes').innerHTML += `
+                <tr>
+                    <td data-label="Pedido"><strong>#${pedido.codPedido}</strong></td>
+                    <td data-label="Cliente">${cliente.nome || 'Cliente'}<small>${cliente.email || ''}</small></td>
+                    <td data-label="Data">${new Date(pedido.dataPedido).toLocaleDateString('pt-BR')}</td>
+                    <td data-label="Status">${pedido.status}</td>
+                    <td data-label="Total"><strong>${Number(pedido.valorTotal).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
+                </tr>
+            `
+        })
+
+        if (pedidos.length === 0) {
+            document.getElementById('corpoPedidosRecentes').innerHTML = '<tr><td colspan="5">Nenhum pedido realizado.</td></tr>'
+        }
+
+        document.getElementById('dataAtualizacaoRelatorio').textContent = `Atualizado em ${new Date().toLocaleString('pt-BR')}`
+        botao.disabled = false
+        botao.textContent = 'Atualizar'
+    })
+    .catch(function() {
+        resposta.hidden = false
+        resposta.textContent = 'Erro ao carregar os relatórios!'
+        botao.disabled = false
+        botao.textContent = 'Atualizar'
+    })
 }
 
-function renderizarPedidosRecentes(pedidos) {
-    const corpo = document.getElementById('corpoPedidosRecentes')
-    const recentes = pedidos.slice(0, 8)
-    if (!recentes.length) {
-        corpo.innerHTML = '<tr><td colspan="5" class="estado-tabela">Nenhum pedido realizado.</td></tr>'
-        return
-    }
-    corpo.innerHTML = recentes.map(function (pedido) {
-        const cliente = pedido.usuarioPedido || {}
-        return '<tr><td data-label="Pedido"><strong>#' + pedido.codPedido + '</strong></td><td data-label="Cliente">' + escapar(cliente.nome || 'Cliente') + '<small>' + escapar(cliente.email || '') + '</small></td>' +
-            '<td data-label="Data">' + formatarData(pedido.dataPedido) + '</td><td data-label="Status"><span class="status-pedido status-' + pedido.status.toLowerCase().replaceAll('_', '-') + '">' + nomeStatus(pedido.status) + '</span></td>' +
-            '<td data-label="Total"><strong>' + formatarMoeda(pedido.valorTotal) + '</strong></td></tr>'
-    }).join('')
-}
+document.getElementById('botaoSair').addEventListener('click', sair)
+document.getElementById('botaoAtualizarRelatorio').addEventListener('click', carregarRelatorios)
+document.getElementById('botaoImprimirRelatorio').addEventListener('click', function() {
+    window.print()
+})
 
-async function carregarRelatorios() {
-    atualizar.disabled = true
-    atualizar.textContent = 'Atualizando...'
-    mostrarAviso('', '')
-    try {
-        const dados = await Promise.all([requisicao('/relatorio/resumo'), requisicao('/produtos'), requisicao('/pedidos')])
-        renderizarIndicadores(dados[0])
-        renderizarEstoque(dados[1])
-        renderizarPedidosRecentes(dados[2])
-        document.getElementById('dataAtualizacaoRelatorio').textContent = 'Atualizado em ' + new Date().toLocaleString('pt-BR')
-    } catch (erro) {
-        mostrarAviso(erro.message, 'erro')
-    } finally {
-        atualizar.disabled = false
-        atualizar.textContent = 'Atualizar'
-    }
-}
-
-async function iniciarRelatorios() {
-    const usuario = lerUsuarioRelatorio()
-    if (!tokenRelatorio || !usuario) {
-        window.location.href = 'login.html?redirect=relatorios.html'
-        return
-    }
-    if (usuario.tipo !== 'ADMIN') {
-        window.location.href = 'perfil.html'
-        return
-    }
-    document.getElementById('botaoSair').addEventListener('click', sairRelatorio)
-    atualizar.addEventListener('click', carregarRelatorios)
-    imprimir.addEventListener('click', () => { window.print() })
-    document.getElementById('bloqueioRelatorios').hidden = true
-    document.getElementById('conteudoRelatorios').hidden = false
-    await carregarRelatorios()
-}
-
-iniciarRelatorios()
+carregarRelatorios()

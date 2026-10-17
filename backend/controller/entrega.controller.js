@@ -1,40 +1,21 @@
 const { Entrega, Pedido } = require('../models/rel')
 
-const camposEntrega = [
-    'tipo', 'endereco', 'cep', 'logradouro', 'complemento',
-    'bairro', 'localidade', 'uf', 'numero', 'previsao',
-    'codigoRastreio', 'status'
-]
-const statusPermitidos = ['AGUARDANDO', 'EM_TRANSITO', 'SAIU_PARA_ENTREGA', 'ENTREGUE', 'EXTRAVIADO']
+const cadastrar = async (req, res) => {
+    const valores = req.body
 
-function tratarErro(res, err) {
-    if (err.name === 'SequelizeUniqueConstraintError') {
-        return res.status(409).json({ message: 'O pedido já possui entrega ou o rastreio já está cadastrado!' })
-    }
-
-    if (err.name === 'SequelizeForeignKeyConstraintError') {
-        return res.status(400).json({ message: 'Pedido inválido!' })
-    }
-
-    console.error(err)
-    return res.status(500).json({ message: 'Erro interno ao processar entrega!' })
-}
-
-function podeAcessar(req, entrega) {
-    return req.usuario.tipo === 'ADMIN' || entrega.pedidoEntrega.idUsuario === req.usuario.id
-}
-
-async function cadastrar(req, res) {
     try {
-        if (!req.body.idPedido || !['ENTREGA', 'RETIRADA'].includes(req.body.tipo)) {
+        if (!valores.idPedido || !['ENTREGA', 'RETIRADA'].includes(valores.tipo)) {
             return res.status(400).json({ message: 'Pedido e tipo ENTREGA ou RETIRADA são obrigatórios!' })
         }
 
-        if (req.body.tipo === 'ENTREGA' && !req.body.endereco && !req.body.logradouro) {
+        if (valores.tipo === 'ENTREGA' && !valores.endereco && !valores.logradouro) {
             return res.status(400).json({ message: 'Informe o endereço para a entrega!' })
         }
 
-        const pedido = await Pedido.findByPk(req.body.idPedido)
+        const pedido = await Pedido.findOne({
+            where: { codPedido: valores.idPedido }
+        })
+
         if (!pedido) {
             return res.status(404).json({ message: 'Pedido não encontrado!' })
         }
@@ -43,94 +24,156 @@ async function cadastrar(req, res) {
             return res.status(403).json({ message: 'Você não pode criar a entrega deste pedido!' })
         }
 
-        const dados = { idPedido: req.body.idPedido, status: 'AGUARDANDO' }
-        for (const campo of camposEntrega) {
-            if (req.body[campo] !== undefined) dados[campo] = req.body[campo]
-        }
-        if (req.usuario.tipo !== 'ADMIN') dados.status = 'AGUARDANDO'
+        const entregaCadastrada = await Entrega.findOne({
+            where: { idPedido: valores.idPedido }
+        })
 
-        const entrega = await Entrega.create(dados)
+        if (entregaCadastrada) {
+            return res.status(409).json({ message: 'O pedido já possui entrega!' })
+        }
+
+        if (valores.codigoRastreio) {
+            const rastreioCadastrado = await Entrega.findOne({
+                where: { codigoRastreio: valores.codigoRastreio }
+            })
+
+            if (rastreioCadastrado) {
+                return res.status(409).json({ message: 'O código de rastreio já está cadastrado!' })
+            }
+        }
+
+        let status = 'AGUARDANDO'
+        if (req.usuario.tipo === 'ADMIN' && valores.status) status = valores.status
+
+        const entrega = await Entrega.create({
+            idPedido: valores.idPedido,
+            tipo: valores.tipo,
+            endereco: valores.endereco,
+            cep: valores.cep,
+            logradouro: valores.logradouro,
+            complemento: valores.complemento,
+            bairro: valores.bairro,
+            localidade: valores.localidade,
+            uf: valores.uf,
+            numero: valores.numero,
+            previsao: valores.previsao,
+            codigoRastreio: valores.codigoRastreio,
+            status: status
+        })
+
         return res.status(201).json(entrega)
     } catch (err) {
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao cadastrar entrega!' })
     }
 }
 
-async function listar(req, res) {
+const listar = async (req, res) => {
     try {
-        const incluirPedido = { model: Pedido, as: 'pedidoEntrega' }
-        if (req.usuario.tipo !== 'ADMIN') incluirPedido.where = { idUsuario: req.usuario.id }
+        let entregas = await Entrega.findAll()
 
-        const entregas = await Entrega.findAll({
-            include: [incluirPedido],
-            order: [['codEntrega', 'DESC']]
-        })
+        if (req.usuario.tipo !== 'ADMIN') {
+            const pedidos = await Pedido.findAll({ where: { idUsuario: req.usuario.id } })
+
+            entregas = entregas.filter((entrega) => {
+                return pedidos.find((pedido) => pedido.codPedido === entrega.idPedido)
+            })
+        }
+
         return res.json(entregas)
     } catch (err) {
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao listar entregas!' })
     }
 }
 
-async function consultar(req, res) {
+const consultar = async (req, res) => {
     try {
-        const entrega = await Entrega.findByPk(req.params.id, {
-            include: [{ model: Pedido, as: 'pedidoEntrega' }]
-        })
+        const id = req.params.id
+        const entrega = await Entrega.findOne({ where: { codEntrega: id } })
 
         if (!entrega) {
             return res.status(404).json({ message: 'Entrega não encontrada!' })
         }
 
-        if (!podeAcessar(req, entrega)) {
+        const pedido = await Pedido.findOne({ where: { codPedido: entrega.idPedido } })
+
+        if (req.usuario.tipo !== 'ADMIN' && pedido.idUsuario !== req.usuario.id) {
             return res.status(403).json({ message: 'Você não pode consultar esta entrega!' })
         }
 
         return res.json(entrega)
     } catch (err) {
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao consultar entrega!' })
     }
 }
 
-async function atualizar(req, res) {
+const atualizar = async (req, res) => {
+    const valores = req.body
+
     try {
-        const entrega = await Entrega.findByPk(req.params.id, {
-            include: [{ model: Pedido, as: 'pedidoEntrega' }]
-        })
+        const id = req.params.id
+        const entrega = await Entrega.findOne({ where: { codEntrega: id } })
 
         if (!entrega) {
             return res.status(404).json({ message: 'Entrega não encontrada!' })
         }
 
-        if (!podeAcessar(req, entrega)) {
+        const pedido = await Pedido.findOne({ where: { codPedido: entrega.idPedido } })
+
+        if (req.usuario.tipo !== 'ADMIN' && pedido.idUsuario !== req.usuario.id) {
             return res.status(403).json({ message: 'Você não pode atualizar esta entrega!' })
         }
 
-        if (req.body.tipo && !['ENTREGA', 'RETIRADA'].includes(req.body.tipo)) {
+        if (valores.tipo && !['ENTREGA', 'RETIRADA'].includes(valores.tipo)) {
             return res.status(400).json({ message: 'Tipo de entrega inválido!' })
         }
 
-        if (req.body.status && req.usuario.tipo !== 'ADMIN') {
+        if (valores.status && req.usuario.tipo !== 'ADMIN') {
             return res.status(403).json({ message: 'Somente administradores podem alterar o status da entrega!' })
         }
 
-        if (req.body.status && !statusPermitidos.includes(req.body.status)) {
+        if (valores.status && !['AGUARDANDO', 'EM_TRANSITO', 'SAIU_PARA_ENTREGA', 'ENTREGUE', 'EXTRAVIADO'].includes(valores.status)) {
             return res.status(400).json({ message: 'Status de entrega inválido!' })
         }
 
-        for (const campo of camposEntrega) {
-            if (req.body[campo] !== undefined) entrega[campo] = req.body[campo]
+        if (valores.codigoRastreio) {
+            const rastreioCadastrado = await Entrega.findOne({
+                where: { codigoRastreio: valores.codigoRastreio }
+            })
+
+            if (rastreioCadastrado && rastreioCadastrado.codEntrega !== entrega.codEntrega) {
+                return res.status(409).json({ message: 'O código de rastreio já está cadastrado!' })
+            }
         }
+
+        if (valores.tipo !== undefined) entrega.tipo = valores.tipo
+        if (valores.endereco !== undefined) entrega.endereco = valores.endereco
+        if (valores.cep !== undefined) entrega.cep = valores.cep
+        if (valores.logradouro !== undefined) entrega.logradouro = valores.logradouro
+        if (valores.complemento !== undefined) entrega.complemento = valores.complemento
+        if (valores.bairro !== undefined) entrega.bairro = valores.bairro
+        if (valores.localidade !== undefined) entrega.localidade = valores.localidade
+        if (valores.uf !== undefined) entrega.uf = valores.uf
+        if (valores.numero !== undefined) entrega.numero = valores.numero
+        if (valores.previsao !== undefined) entrega.previsao = valores.previsao
+        if (valores.codigoRastreio !== undefined) entrega.codigoRastreio = valores.codigoRastreio
+        if (valores.status !== undefined) entrega.status = valores.status
 
         await entrega.save()
         return res.json(entrega)
     } catch (err) {
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao atualizar entrega!' })
     }
 }
 
-async function apagar(req, res) {
+const apagar = async (req, res) => {
     try {
-        const entrega = await Entrega.findByPk(req.params.id)
+        const id = req.params.id
+        const entrega = await Entrega.findOne({ where: { codEntrega: id } })
+
         if (!entrega) {
             return res.status(404).json({ message: 'Entrega não encontrada!' })
         }
@@ -138,7 +181,8 @@ async function apagar(req, res) {
         await entrega.destroy()
         return res.json({ message: 'Entrega apagada com sucesso!' })
     } catch (err) {
-        return tratarErro(res, err)
+        console.error(err)
+        return res.status(500).json({ message: 'Erro ao apagar entrega!' })
     }
 }
 

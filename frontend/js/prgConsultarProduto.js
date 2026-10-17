@@ -1,205 +1,102 @@
 const API_URL = 'http://localhost:3000'
+
 let produtoAtual = null
 let resposta = document.getElementById('mensagemDetalhe')
-let adicionar = document.getElementById('botaoAdicionarCarrinho')
+let detalheProduto = document.getElementById('detalheProduto')
+let botaoAdicionar = document.getElementById('botaoAdicionarCarrinho')
 
-function atualizarNavegacao() {
-    let carrinho = []
-    try {
-        carrinho = JSON.parse(localStorage.getItem('autoshopping_carrinho')) || []
-    } catch (erro) {
-        carrinho = []
-    }
-    document.getElementById('contadorCarrinho').textContent = carrinho.length
+let carrinho = JSON.parse(localStorage.getItem('autoshopping_carrinho') || '[]')
+document.getElementById('contadorCarrinho').textContent = carrinho.length
 
-    if (localStorage.getItem('autoshopping_usuario')) {
-        let usuario = null
-        try { usuario = JSON.parse(localStorage.getItem('autoshopping_usuario')) } catch (erro) { usuario = null }
-        document.getElementById('linkPedidos').hidden = false
-        document.getElementById('linkConta').textContent = 'Minha conta'
-        document.getElementById('linkConta').href = 'perfil.html'
-        if (usuario && usuario.tipo === 'ADMIN') document.getElementById('linkAdmin').hidden = false
+let usuario = JSON.parse(localStorage.getItem('autoshopping_usuario') || 'null')
+
+if (usuario) {
+    document.getElementById('linkConta').textContent = 'Minha conta'
+    document.getElementById('linkConta').href = 'perfil.html'
+    document.getElementById('linkPedidos').hidden = false
+
+    if (usuario.tipo === 'ADMIN') {
+        document.getElementById('linkAdmin').hidden = false
     }
 }
 
-function adicionarAoCarrinho() {
-    if (!produtoAtual) return
+let idProduto = window.location.search.replace('?id=', '')
 
-    let carrinho = []
-    try {
-        carrinho = JSON.parse(localStorage.getItem('autoshopping_carrinho')) || []
-    } catch (erro) {
-        carrinho = []
-    }
-
-    const idProduto = Number(produtoAtual.codProduto)
-    const mensagem = document.getElementById('mensagemCarrinhoDetalhe')
-
-    if (carrinho.map(Number).includes(idProduto)) {
-        mensagem.className = 'mensagem-inline aviso'
-        mensagem.textContent = 'Este veículo já está no carrinho.'
+fetch(`${API_URL}/produto/${idProduto}`)
+.then(function(res) {
+    return res.json()
+})
+.then(function(produto) {
+    if (produto.message) {
+        detalheProduto.hidden = true
+        resposta.textContent = produto.message
         return
     }
 
-    carrinho.push(idProduto)
-    localStorage.setItem('autoshopping_carrinho', JSON.stringify(carrinho))
-    document.getElementById('contadorCarrinho').textContent = carrinho.length
-    mensagem.className = 'mensagem-inline sucesso'
-    mensagem.innerHTML = 'Veículo adicionado. <a href="carrinho.html">Ver carrinho</a>'
-}
+    produtoAtual = produto
 
-function possuiValor(valor) {
-    return valor !== undefined && valor !== null && valor !== ''
-}
+    let categoria = produto.categoriaProduto ? produto.categoriaProduto.nome : 'Sem categoria'
+    let quantidade = produto.estoqueProduto ? Number(produto.estoqueProduto.quantidade) : 0
+    let nomeVeiculo = `${produto.marca || ''} ${produto.modelo || ''}`.trim()
 
-function formatarPreco(valor) {
-    return Number(valor).toLocaleString('pt-BR', {
+    resposta.textContent = ''
+    detalheProduto.hidden = false
+
+    if (produto.imagem) {
+        document.getElementById('imagemDetalhe').innerHTML = `<img id="fotoProduto" src="${produto.imagem}" alt="${nomeVeiculo}">`
+
+        document.getElementById('fotoProduto').addEventListener('error', function() {
+            document.getElementById('imagemDetalhe').innerHTML = '<div class="imagem-placeholder">Sem imagem</div>'
+        })
+    } else {
+        document.getElementById('imagemDetalhe').innerHTML = '<div class="imagem-placeholder">Sem imagem</div>'
+    }
+
+    document.getElementById('categoriaDetalhe').textContent = categoria
+    document.getElementById('marcaModeloDetalhe').textContent = nomeVeiculo || produto.nome
+    document.getElementById('nomeDetalhe').textContent = produto.nome
+    document.getElementById('precoDetalhe').textContent = Number(produto.preco).toLocaleString('pt-BR', {
         style: 'currency',
         currency: 'BRL'
     })
-}
 
-function formatarQuilometragem(valor) {
-    return Number(valor).toLocaleString('pt-BR') + ' km'
-}
+    document.getElementById('listaInformacoes').innerHTML = `
+        <div class="item-informacao"><dt>Marca</dt><dd>${produto.marca || '-'}</dd></div>
+        <div class="item-informacao"><dt>Modelo</dt><dd>${produto.modelo || '-'}</dd></div>
+        <div class="item-informacao"><dt>Ano</dt><dd>${produto.ano || '-'}</dd></div>
+        <div class="item-informacao"><dt>Cor</dt><dd>${produto.cor || '-'}</dd></div>
+        <div class="item-informacao"><dt>Quilometragem</dt><dd>${produto.quilometragem || 0} km</dd></div>
+        <div class="item-informacao"><dt>Categoria</dt><dd>${categoria}</dd></div>
+    `
 
-function criarPlaceholderImagem() {
-    const placeholder = document.createElement('div')
-    placeholder.className = 'imagem-placeholder imagem-placeholder-grande'
-    placeholder.innerHTML = '<span class="placeholder-marca">A</span><small>Imagem não disponível</small>'
-    return placeholder
-}
-
-function adicionarInformacao(titulo, valor) {
-    if (!possuiValor(valor)) {
-        return
-    }
-
-    const lista = document.getElementById('listaInformacoes')
-    const grupo = document.createElement('div')
-    grupo.className = 'item-informacao'
-
-    const termo = document.createElement('dt')
-    termo.textContent = titulo
-
-    const descricao = document.createElement('dd')
-    descricao.textContent = valor
-
-    grupo.appendChild(termo)
-    grupo.appendChild(descricao)
-    lista.appendChild(grupo)
-}
-
-function renderizarImagem(produto) {
-    const areaImagem = document.getElementById('imagemDetalhe')
-    areaImagem.innerHTML = ''
-
-    if (!possuiValor(produto.imagem)) {
-        areaImagem.appendChild(criarPlaceholderImagem())
-        return
-    }
-
-    const imagem = document.createElement('img')
-    imagem.src = produto.imagem
-    imagem.alt = produto.nome || 'Veículo AutoShopping'
-    imagem.addEventListener('error', function () {
-        areaImagem.innerHTML = ''
-        areaImagem.appendChild(criarPlaceholderImagem())
-    })
-    areaImagem.appendChild(imagem)
-}
-
-function renderizarProduto(produto) {
-    produtoAtual = produto
-    const detalhe = document.getElementById('detalheProduto')
-    const categoria = document.getElementById('categoriaDetalhe')
-    const marcaModelo = [produto.marca, produto.modelo].filter(possuiValor).join(' ')
-
-    renderizarImagem(produto)
-
-    if (produto.categoriaProduto && possuiValor(produto.categoriaProduto.nome)) {
-        categoria.textContent = produto.categoriaProduto.nome
-    } else {
-        categoria.hidden = true
-    }
-
-    document.getElementById('marcaModeloDetalhe').textContent = marcaModelo
-    document.getElementById('marcaModeloDetalhe').hidden = !marcaModelo
-    document.getElementById('nomeDetalhe').textContent = produto.nome || marcaModelo || 'Veículo'
-
-    const preco = document.getElementById('precoDetalhe')
-    if (possuiValor(produto.preco)) {
-        preco.textContent = formatarPreco(produto.preco)
-    } else {
-        preco.hidden = true
-    }
-
-    const status = document.getElementById('statusEstoque')
-    const disponivel = produto.estoqueProduto && Number(produto.estoqueProduto.quantidade) > 0
-    status.className = disponivel ? 'status-estoque disponivel' : 'status-estoque indisponivel'
-    status.textContent = disponivel ? 'Veículo disponível' : 'Veículo indisponível'
-    adicionar.disabled = !disponivel
-    adicionar.textContent = disponivel
-        ? 'Adicionar ao carrinho'
-        : 'Veículo indisponível'
-
-    adicionarInformacao('Marca', produto.marca)
-    adicionarInformacao('Modelo', produto.modelo)
-    adicionarInformacao('Versão', produto.versao)
-    adicionarInformacao('Ano', produto.ano)
-    adicionarInformacao('Quilometragem', possuiValor(produto.quilometragem) ? formatarQuilometragem(produto.quilometragem) : null)
-    adicionarInformacao('Combustível', produto.combustivel)
-    adicionarInformacao('Câmbio', produto.cambio)
-    adicionarInformacao('Cor', produto.cor)
-    adicionarInformacao('Categoria', produto.categoriaProduto ? produto.categoriaProduto.nome : null)
-
-    if (possuiValor(produto.descricao)) {
-        document.getElementById('descricaoDetalhe').textContent = produto.descricao
+    if (produto.descricao) {
         document.getElementById('blocoDescricao').hidden = false
+        document.getElementById('descricaoDetalhe').textContent = produto.descricao
     }
 
-    document.title = (produto.nome || marcaModelo || 'Veículo') + ' | AutoShopping'
-    resposta.hidden = true
-    detalhe.hidden = false
-}
+    if (produto.ativo && quantidade > 0) {
+        document.getElementById('statusEstoque').textContent = `${quantidade} unidade(s) disponível(is)`
+        botaoAdicionar.disabled = false
+    } else {
+        document.getElementById('statusEstoque').textContent = 'Veículo indisponível'
+        botaoAdicionar.disabled = true
+    }
+})
+.catch(function() {
+    detalheProduto.hidden = true
+    resposta.textContent = 'Erro ao consultar o veículo!'
+})
 
-function mostrarErro(mensagemTexto) {
-    resposta.hidden = false
-    resposta.className = 'mensagem mensagem-erro'
-    resposta.textContent = mensagemTexto
-}
+botaoAdicionar.addEventListener('click', function() {
+    let carrinho = JSON.parse(localStorage.getItem('autoshopping_carrinho') || '[]')
 
-function consultarProduto() {
-    const parametros = new URLSearchParams(window.location.search)
-    const idProduto = parametros.get('id')
-
-    if (!idProduto || !/^\d+$/.test(idProduto)) {
-        mostrarErro('Produto inválido. Volte para a listagem e selecione um veículo.')
+    if (carrinho.includes(produtoAtual.codProduto)) {
+        document.getElementById('mensagemCarrinhoDetalhe').textContent = 'Esse veículo já está no carrinho!'
         return
     }
 
-    fetch(API_URL + '/produto/' + encodeURIComponent(idProduto))
-    .then((res) => {
-        if (res.status === 404) {
-            throw new Error('PRODUTO_NAO_ENCONTRADO')
-        }
-        if (!res.ok) {
-            throw new Error('ERRO_HTTP')
-        }
-        return res.json()
-    })
-    .then((produto) => {
-        renderizarProduto(produto)
-    })
-    .catch((erro) => {
-        if (erro.message === 'PRODUTO_NAO_ENCONTRADO') {
-            mostrarErro('Veículo não encontrado.')
-        } else {
-            mostrarErro('Não foi possível carregar o veículo. Verifique se o backend está ligado.')
-        }
-    })
-}
-
-consultarProduto()
-atualizarNavegacao()
-adicionar.addEventListener('click', adicionarAoCarrinho)
+    carrinho.push(produtoAtual.codProduto)
+    localStorage.setItem('autoshopping_carrinho', JSON.stringify(carrinho))
+    document.getElementById('contadorCarrinho').textContent = carrinho.length
+    document.getElementById('mensagemCarrinhoDetalhe').textContent = 'Veículo adicionado ao carrinho!'
+})

@@ -5,7 +5,8 @@ let produtosAdmin = []
 let categoriasAdmin = []
 let produtoEmEdicao = null
 let categoriaEmEdicao = null
-const secoesCarregadas = new Set()
+let categoriasCarregadas = false
+let usuariosCarregados = false
 let resposta = document.getElementById('mensagemAdmin')
 let cadastrar = document.getElementById('botaoNovoProduto')
 let formularioProduto = document.getElementById('formProduto')
@@ -56,26 +57,26 @@ function sairAdmin() {
     window.location.href = 'login.html?redirect=admin.html'
 }
 
-async function requisicao(caminho, opcoes) {
+function requisicao(caminho, opcoes) {
     const configuracao = opcoes || {}
-    configuracao.headers = Object.assign({}, configuracao.headers, { Authorization: 'Bearer ' + tokenAdmin })
+    if (!configuracao.headers) configuracao.headers = {}
+    configuracao.headers.Authorization = 'Bearer ' + tokenAdmin
     if (configuracao.body) configuracao.headers['Content-Type'] = 'application/json'
 
-    let resposta
-    try {
-        resposta = await fetch(API_URL + caminho, configuracao)
-    } catch (erro) {
-        throw new Error('Backend indisponível. Verifique se o servidor está ligado.')
-    }
+    return fetch(API_URL + caminho, configuracao)
+    .then(function (respostaHttp) {
+        if (respostaHttp.status === 401) {
+            sairAdmin()
+            throw new Error('Sua sessão expirou.')
+        }
 
-    if (resposta.status === 401) {
-        sairAdmin()
-        throw new Error('Sua sessão expirou.')
-    }
-
-    const conteudo = await resposta.json().catch(function () { return {} })
-    if (!resposta.ok) throw new Error(conteudo.message || 'Não foi possível concluir a operação.')
-    return conteudo
+        return respostaHttp.json().then(function (conteudo) {
+            if (!respostaHttp.ok) {
+                throw new Error(conteudo.message || 'Não foi possível concluir a operação.')
+            }
+            return conteudo
+        })
+    })
 }
 
 function mostrarAviso(texto, tipo) {
@@ -90,12 +91,13 @@ function mostrarMensagemFormulario(id, texto, tipo) {
     elemento.textContent = texto || ''
 }
 
-async function carregarResumo() {
-    const resumo = await requisicao('/relatorio/resumo')
-    document.getElementById('resumoProdutos').textContent = resumo.totalProdutos
-    document.getElementById('resumoDisponiveis').textContent = resumo.produtosDisponiveis
-    document.getElementById('resumoPedidos').textContent = resumo.totalPedidos
-    document.getElementById('resumoFaturamento').textContent = formatarMoeda(resumo.faturamento)
+function carregarResumo() {
+    return requisicao('/relatorio/resumo').then(function (resumo) {
+        document.getElementById('resumoProdutos').textContent = resumo.totalProdutos
+        document.getElementById('resumoDisponiveis').textContent = resumo.produtosDisponiveis
+        document.getElementById('resumoPedidos').textContent = resumo.totalPedidos
+        document.getElementById('resumoFaturamento').textContent = formatarMoeda(resumo.faturamento)
+    })
 }
 
 function preencherSelectCategorias() {
@@ -119,16 +121,18 @@ function renderizarCategorias() {
     lista.innerHTML = categoriasAdmin.map(function (categoria) {
         return '<article class="item-lista-admin">' +
             '<div><strong>' + escapar(categoria.nome) + '</strong><p>' + escapar(categoria.descricao || 'Sem descrição') + '</p></div>' +
-            '<div class="acoes-linha"><button class="botao-texto editar-categoria" data-id="' + categoria.codCategoria + '" type="button">Editar</button>' +
-            '<button class="botao-texto perigo excluir-categoria" data-id="' + categoria.codCategoria + '" type="button">Excluir</button></div></article>'
+            '<div class="acoes-linha"><button class="botao-texto" onclick="editarCategoria(' + categoria.codCategoria + ')" type="button">Editar</button>' +
+            '<button class="botao-texto perigo" onclick="excluirCategoria(' + categoria.codCategoria + ')" type="button">Excluir</button></div></article>'
     }).join('')
 }
 
-async function carregarCategorias() {
-    categoriasAdmin = await requisicao('/categorias')
-    preencherSelectCategorias()
-    renderizarCategorias()
-    secoesCarregadas.add('categorias')
+function carregarCategorias() {
+    return requisicao('/categorias').then(function (categorias) {
+        categoriasAdmin = categorias
+        preencherSelectCategorias()
+        renderizarCategorias()
+        categoriasCarregadas = true
+    })
 }
 
 function renderizarProdutos() {
@@ -145,16 +149,86 @@ function renderizarProdutos() {
             '<td data-label="Categoria">' + escapar(categoria) + '</td><td data-label="Preço"><strong>' + formatarMoeda(produto.preco) + '</strong></td>' +
             '<td data-label="Estoque"><span class="selo-estoque ' + (estoque > 0 ? 'disponivel' : 'zerado') + '">' + estoque + '</span></td>' +
             '<td data-label="Status"><span class="selo-status ' + (produto.ativo ? 'ativo' : 'inativo') + '">' + (produto.ativo ? 'Ativo' : 'Inativo') + '</span></td>' +
-            '<td data-label="Ações"><div class="acoes-tabela"><button class="botao-texto editar-produto" data-id="' + produto.codProduto + '" type="button">Editar</button>' +
-            '<button class="botao-texto alternar-produto" data-id="' + produto.codProduto + '" type="button">' + (produto.ativo ? 'Desativar' : 'Ativar') + '</button>' +
-            '<button class="botao-texto perigo excluir-produto" data-id="' + produto.codProduto + '" type="button">Excluir</button></div></td></tr>'
+            '<td data-label="Ações"><div class="acoes-tabela"><button class="botao-texto" onclick="editarProduto(' + produto.codProduto + ')" type="button">Atualizar</button>' +
+            '<button class="botao-texto" onclick="alternarProduto(' + produto.codProduto + ')" type="button">' + (produto.ativo ? 'Desativar' : 'Ativar') + '</button>' +
+            '<button class="botao-texto perigo" onclick="excluirProduto(' + produto.codProduto + ')" type="button">Apagar</button></div></td></tr>'
     }).join('')
 }
 
-async function carregarProdutos() {
-    produtosAdmin = await requisicao('/produtos')
-    renderizarProdutos()
-    secoesCarregadas.add('veiculos')
+function carregarProdutos() {
+    return requisicao('/produtos').then(function (produtos) {
+        produtosAdmin = produtos
+        renderizarProdutos()
+    })
+}
+
+function trocarOperacaoProduto(operacao) {
+    document.getElementById('abaCadastrarProduto').classList.remove('ativo')
+    document.getElementById('abaListarProdutos').classList.remove('ativo')
+    document.getElementById('abaConsultarProduto').classList.remove('ativo')
+
+    document.getElementById('formProduto').hidden = true
+    document.getElementById('painelListarProdutos').hidden = true
+    document.getElementById('painelConsultarProduto').hidden = true
+
+    if (operacao === 'cadastrar') {
+        document.getElementById('abaCadastrarProduto').classList.add('ativo')
+        document.getElementById('formProduto').hidden = false
+    }
+
+    if (operacao === 'listar') {
+        document.getElementById('abaListarProdutos').classList.add('ativo')
+        document.getElementById('painelListarProdutos').hidden = false
+    }
+
+    if (operacao === 'consultar') {
+        document.getElementById('abaConsultarProduto').classList.add('ativo')
+        document.getElementById('painelConsultarProduto').hidden = false
+    }
+}
+
+function consultarProduto(evento) {
+    evento.preventDefault()
+
+    const id = document.getElementById('codigoConsultaProduto').value
+    const resultado = document.getElementById('resultadoConsultaProduto')
+    resultado.innerHTML = '<div class="mensagem carregando">Consultando veículo...</div>'
+
+    fetch(API_URL + '/produto/' + id)
+    .then(function (res) {
+        return res.json()
+    })
+    .then(function (produto) {
+        if (produto.message) {
+            resultado.innerHTML = '<div class="mensagem mensagem-erro">' + produto.message + '</div>'
+            return
+        }
+
+        const categoria = produto.categoriaProduto ? produto.categoriaProduto.nome : 'Sem categoria'
+        const estoque = produto.estoqueProduto ? produto.estoqueProduto.quantidade : 0
+
+        resultado.innerHTML = `
+            <article class="card-gestao-admin">
+                <div class="gestao-admin-topo">
+                    <div>
+                        <span class="sobretitulo">Veículo #${produto.codProduto}</span>
+                        <h3>${produto.marca} ${produto.modelo}</h3>
+                        <p>${produto.nome}</p>
+                    </div>
+                    <strong>${formatarMoeda(produto.preco)}</strong>
+                </div>
+                <p>Categoria: ${categoria}</p>
+                <p>Ano: ${produto.ano} | Cor: ${produto.cor} | Estoque: ${estoque}</p>
+                <div class="acoes-linha">
+                    <button class="botao botao-primario botao-menor" onclick="editarProduto(${produto.codProduto})" type="button">Atualizar</button>
+                    <button class="botao-texto perigo" onclick="excluirProduto(${produto.codProduto})" type="button">Apagar</button>
+                </div>
+            </article>
+        `
+    })
+    .catch(function () {
+        resultado.innerHTML = '<div class="mensagem mensagem-erro">Erro ao consultar o veículo!</div>'
+    })
 }
 
 function abrirFormularioProduto(produto) {
@@ -165,6 +239,7 @@ function abrirFormularioProduto(produto) {
         return
     }
     produtoEmEdicao = produto || null
+    trocarOperacaoProduto('cadastrar')
     const form = document.getElementById('formProduto')
     form.reset()
     document.getElementById('produtoAtivo').checked = true
@@ -199,8 +274,8 @@ function abrirFormularioProduto(produto) {
 
 function fecharFormularioProduto() {
     produtoEmEdicao = null
-    document.getElementById('formProduto').hidden = true
     document.getElementById('formProduto').reset()
+    trocarOperacaoProduto('listar')
 }
 
 function dadosFormularioProduto() {
@@ -223,7 +298,7 @@ function dadosFormularioProduto() {
     }
 }
 
-async function salvarProduto(evento) {
+function salvarProduto(evento) {
     evento.preventDefault()
     const botao = document.getElementById('botaoSalvarProduto')
     const dados = dadosFormularioProduto()
@@ -231,52 +306,81 @@ async function salvarProduto(evento) {
     botao.textContent = 'Salvando...'
     mostrarMensagemFormulario('mensagemProduto', '', '')
 
-    try {
-        if (produtoEmEdicao) {
-            const quantidade = dados.quantidadeEstoque
-            delete dados.quantidadeEstoque
-            await requisicao('/produto/' + produtoEmEdicao.codProduto, { method: 'PUT', body: JSON.stringify(dados) })
+    let operacao
+
+    if (produtoEmEdicao) {
+        const quantidade = dados.quantidadeEstoque
+        delete dados.quantidadeEstoque
+        operacao = requisicao('/produto/' + produtoEmEdicao.codProduto, {
+            method: 'PUT', body: JSON.stringify(dados)
+        })
+        .then(function () {
             if (produtoEmEdicao.estoqueProduto) {
-                await requisicao('/estoque/' + produtoEmEdicao.estoqueProduto.codEstoque, { method: 'PUT', body: JSON.stringify({ quantidade: quantidade }) })
-            } else {
-                await requisicao('/estoque', { method: 'POST', body: JSON.stringify({ idProduto: produtoEmEdicao.codProduto, quantidade: quantidade }) })
+                return requisicao('/estoque/' + produtoEmEdicao.estoqueProduto.codEstoque, {
+                    method: 'PUT', body: JSON.stringify({ quantidade: quantidade })
+                })
             }
-            mostrarAviso('Veículo atualizado com sucesso!', 'sucesso')
-        } else {
-            await requisicao('/produto', { method: 'POST', body: JSON.stringify(dados) })
-            mostrarAviso('Veículo cadastrado com sucesso!', 'sucesso')
-        }
+            return requisicao('/estoque', {
+                method: 'POST',
+                body: JSON.stringify({ idProduto: produtoEmEdicao.codProduto, quantidade: quantidade })
+            })
+        })
+    } else {
+        operacao = requisicao('/produto', { method: 'POST', body: JSON.stringify(dados) })
+    }
+
+    operacao.then(function () {
+        mostrarAviso(produtoEmEdicao ? 'Veículo atualizado com sucesso!' : 'Veículo cadastrado com sucesso!', 'sucesso')
         fecharFormularioProduto()
-        await Promise.all([carregarProdutos(), carregarResumo()])
-    } catch (erro) {
-        mostrarMensagemFormulario('mensagemProduto', erro.message, 'erro')
-    } finally {
+        carregarProdutos()
+        carregarResumo()
         botao.disabled = false
         botao.textContent = 'Salvar veículo'
-    }
+    })
+    .catch(function (erro) {
+        mostrarMensagemFormulario('mensagemProduto', erro.message, 'erro')
+        botao.disabled = false
+        botao.textContent = 'Salvar veículo'
+    })
 }
 
-async function acaoTabelaProdutos(evento) {
-    const botao = evento.target.closest('button[data-id]')
-    if (!botao) return
-    const produto = produtosAdmin.find(function (item) { return item.codProduto === Number(botao.dataset.id) })
+function editarProduto(id) {
+    const produto = produtosAdmin.find(function (item) { return item.codProduto === id })
     if (!produto) return
+    abrirFormularioProduto(produto)
+}
 
-    if (botao.classList.contains('editar-produto')) return abrirFormularioProduto(produto)
-
-    try {
-        if (botao.classList.contains('alternar-produto')) {
-            await requisicao('/produto/' + produto.codProduto, { method: 'PUT', body: JSON.stringify({ ativo: !produto.ativo }) })
-            mostrarAviso('Status do veículo atualizado.', 'sucesso')
-        } else if (botao.classList.contains('excluir-produto')) {
-            if (!confirm('Excluir definitivamente o veículo "' + produto.nome + '"?')) return
-            await requisicao('/produto/' + produto.codProduto, { method: 'DELETE' })
-            mostrarAviso('Veículo excluído com sucesso.', 'sucesso')
-        }
-        await Promise.all([carregarProdutos(), carregarResumo()])
-    } catch (erro) {
+function alternarProduto(id) {
+    const produto = produtosAdmin.find(function (item) { return item.codProduto === id })
+    if (!produto) return
+    requisicao('/produto/' + id, {
+        method: 'PUT', body: JSON.stringify({ ativo: !produto.ativo })
+    })
+    .then(function () {
+        mostrarAviso('Status do veículo atualizado.', 'sucesso')
+        carregarProdutos()
+        carregarResumo()
+    })
+    .catch(function (erro) {
         mostrarAviso(erro.message, 'erro')
-    }
+    })
+}
+
+function excluirProduto(id) {
+    const produto = produtosAdmin.find(function (item) { return item.codProduto === id })
+    if (!produto || !confirm('Excluir definitivamente o veículo "' + produto.nome + '"?')) return
+
+    requisicao('/produto/' + id, { method: 'DELETE' })
+    .then(function () {
+        mostrarAviso('Veículo excluído com sucesso.', 'sucesso')
+        document.getElementById('resultadoConsultaProduto').innerHTML = ''
+        trocarOperacaoProduto('listar')
+        carregarProdutos()
+        carregarResumo()
+    })
+    .catch(function (erro) {
+        mostrarAviso(erro.message, 'erro')
+    })
 }
 
 function limparFormularioCategoria() {
@@ -287,48 +391,50 @@ function limparFormularioCategoria() {
     mostrarMensagemFormulario('mensagemCategoria', '', '')
 }
 
-async function salvarCategoria(evento) {
+function salvarCategoria(evento) {
     evento.preventDefault()
     const botao = document.getElementById('botaoSalvarCategoria')
     const dados = { nome: document.getElementById('categoriaNome').value.trim(), descricao: document.getElementById('categoriaDescricao').value.trim() || null }
     botao.disabled = true
-    try {
-        const caminho = categoriaEmEdicao ? '/categoria/' + categoriaEmEdicao.codCategoria : '/categoria'
-        await requisicao(caminho, { method: categoriaEmEdicao ? 'PUT' : 'POST', body: JSON.stringify(dados) })
+    const editando = categoriaEmEdicao !== null
+    const caminho = editando ? '/categoria/' + categoriaEmEdicao.codCategoria : '/categoria'
+
+    requisicao(caminho, { method: editando ? 'PUT' : 'POST', body: JSON.stringify(dados) })
+    .then(function () {
         mostrarAviso(categoriaEmEdicao ? 'Categoria atualizada com sucesso!' : 'Categoria cadastrada com sucesso!', 'sucesso')
         limparFormularioCategoria()
-        await carregarCategorias()
-    } catch (erro) {
-        mostrarMensagemFormulario('mensagemCategoria', erro.message, 'erro')
-    } finally {
+        carregarCategorias()
         botao.disabled = false
-    }
+    })
+    .catch(function (erro) {
+        mostrarMensagemFormulario('mensagemCategoria', erro.message, 'erro')
+        botao.disabled = false
+    })
 }
 
-async function acaoListaCategorias(evento) {
-    const botao = evento.target.closest('button[data-id]')
-    if (!botao) return
-    const categoria = categoriasAdmin.find(function (item) { return item.codCategoria === Number(botao.dataset.id) })
+function editarCategoria(id) {
+    const categoria = categoriasAdmin.find(function (item) { return item.codCategoria === id })
     if (!categoria) return
 
-    if (botao.classList.contains('editar-categoria')) {
-        categoriaEmEdicao = categoria
-        document.getElementById('tituloFormCategoria').textContent = 'Editar categoria'
-        document.getElementById('categoriaNome').value = categoria.nome
-        document.getElementById('categoriaDescricao').value = categoria.descricao || ''
-        document.getElementById('botaoCancelarCategoria').hidden = false
-        document.getElementById('formCategoria').scrollIntoView({ behavior: 'smooth' })
-        return
-    }
+    categoriaEmEdicao = categoria
+    document.getElementById('tituloFormCategoria').textContent = 'Editar categoria'
+    document.getElementById('categoriaNome').value = categoria.nome
+    document.getElementById('categoriaDescricao').value = categoria.descricao || ''
+    document.getElementById('botaoCancelarCategoria').hidden = false
+    document.getElementById('formCategoria').scrollIntoView()
+}
 
-    if (botao.classList.contains('excluir-categoria') && confirm('Excluir a categoria "' + categoria.nome + '"?')) {
-        try {
-            await requisicao('/categoria/' + categoria.codCategoria, { method: 'DELETE' })
+function excluirCategoria(id) {
+    const categoria = categoriasAdmin.find(function (item) { return item.codCategoria === id })
+    if (categoria && confirm('Excluir a categoria "' + categoria.nome + '"?')) {
+        requisicao('/categoria/' + categoria.codCategoria, { method: 'DELETE' })
+        .then(function () {
             mostrarAviso('Categoria excluída com sucesso.', 'sucesso')
-            await carregarCategorias()
-        } catch (erro) {
+            carregarCategorias()
+        })
+        .catch(function (erro) {
             mostrarAviso(erro.message, 'erro')
-        }
+        })
     }
 }
 
@@ -352,36 +458,45 @@ function renderizarPedidos(pedidos) {
         }).join('')
         return '<article class="card-gestao-admin"><div class="gestao-admin-topo"><div><span class="sobretitulo">Pedido #' + pedido.codPedido + '</span><h3>' + escapar(cliente.nome || 'Cliente não identificado') + '</h3><p>' + escapar(cliente.email || '') + ' · ' + formatarData(pedido.dataPedido) + '</p></div><strong>' + formatarMoeda(pedido.valorTotal) + '</strong></div>' +
             '<div class="resumo-itens-admin">' + (itens || '<span>Sem itens</span>') + '</div>' +
-            '<div class="gestao-admin-acoes"><label>Status<select class="status-pedido-admin">' + opcoesStatusPedido(pedido.status) + '</select></label>' +
-            '<button class="botao botao-primario botao-menor salvar-status-pedido" data-id="' + pedido.codPedido + '" type="button">Atualizar status</button>' +
-            '<button class="botao-texto perigo excluir-pedido" data-id="' + pedido.codPedido + '" type="button">Excluir pedido</button></div></article>'
+            '<div class="gestao-admin-acoes"><label>Status<select id="statusPedido' + pedido.codPedido + '" class="status-pedido-admin">' + opcoesStatusPedido(pedido.status) + '</select></label>' +
+            '<button class="botao botao-primario botao-menor" onclick="atualizarStatusPedido(' + pedido.codPedido + ')" type="button">Atualizar status</button>' +
+            '<button class="botao-texto perigo" onclick="excluirPedido(' + pedido.codPedido + ')" type="button">Excluir pedido</button></div></article>'
     }).join('')
 }
 
-async function carregarPedidos() {
+function carregarPedidos() {
     const status = document.getElementById('filtroStatusPedido').value
-    const pedidos = await requisicao('/pedidos' + (status ? '?status=' + encodeURIComponent(status) : ''))
-    renderizarPedidos(pedidos)
-    secoesCarregadas.add('pedidos')
+    return requisicao('/pedidos' + (status ? '?status=' + status : ''))
+    .then(function (pedidos) {
+        renderizarPedidos(pedidos)
+    })
 }
 
-async function acaoListaPedidos(evento) {
-    const botao = evento.target.closest('button[data-id]')
-    if (!botao) return
-    try {
-        if (botao.classList.contains('salvar-status-pedido')) {
-            const status = botao.closest('.gestao-admin-acoes').querySelector('.status-pedido-admin').value
-            await requisicao('/pedido/' + botao.dataset.id, { method: 'PUT', body: JSON.stringify({ status: status }) })
-            mostrarAviso('Status do pedido atualizado com sucesso.', 'sucesso')
-        } else if (botao.classList.contains('excluir-pedido')) {
-            if (!confirm('Excluir definitivamente este pedido? O estoque será restaurado quando necessário.')) return
-            await requisicao('/pedido/' + botao.dataset.id, { method: 'DELETE' })
-            mostrarAviso('Pedido excluído com sucesso.', 'sucesso')
-        }
-        await Promise.all([carregarPedidos(), carregarResumo()])
-    } catch (erro) {
+function atualizarStatusPedido(id) {
+    const status = document.getElementById('statusPedido' + id).value
+    requisicao('/pedido/' + id, { method: 'PUT', body: JSON.stringify({ status: status }) })
+    .then(function () {
+        mostrarAviso('Status do pedido atualizado com sucesso.', 'sucesso')
+        carregarPedidos()
+        carregarResumo()
+    })
+    .catch(function (erro) {
         mostrarAviso(erro.message, 'erro')
-    }
+    })
+}
+
+function excluirPedido(id) {
+    if (!confirm('Excluir definitivamente este pedido? O estoque será restaurado quando necessário.')) return
+
+    requisicao('/pedido/' + id, { method: 'DELETE' })
+    .then(function () {
+        mostrarAviso('Pedido excluído com sucesso.', 'sucesso')
+        carregarPedidos()
+        carregarResumo()
+    })
+    .catch(function (erro) {
+        mostrarAviso(erro.message, 'erro')
+    })
 }
 
 function opcoesStatusEntrega(atual) {
@@ -399,35 +514,33 @@ function renderizarEntregas(entregas) {
     lista.innerHTML = entregas.map(function (entrega) {
         const endereco = entrega.tipo === 'RETIRADA' ? 'Retirada na loja' : [entrega.logradouro || entrega.endereco, entrega.numero, entrega.bairro, entrega.localidade, entrega.uf].filter(Boolean).join(', ')
         return '<article class="card-gestao-admin"><div class="gestao-admin-topo"><div><span class="sobretitulo">Entrega #' + entrega.codEntrega + ' · Pedido #' + entrega.idPedido + '</span><h3>' + escapar(entrega.tipo === 'RETIRADA' ? 'Retirada' : 'Entrega') + '</h3><p>' + escapar(endereco || 'Endereço não informado') + '</p></div><span class="' + classeStatus(entrega.status) + '">' + nomeStatus(entrega.status) + '</span></div>' +
-            '<div class="form-entrega-admin"><label>Status<select class="status-entrega-admin">' + opcoesStatusEntrega(entrega.status) + '</select></label>' +
-            '<label>Rastreio<input class="rastreio-entrega-admin" maxlength="50" value="' + escapar(entrega.codigoRastreio || '') + '" placeholder="Opcional"></label>' +
-            '<label>Previsão<input class="previsao-entrega-admin" type="date" value="' + escapar(entrega.previsao || '') + '"></label>' +
-            '<button class="botao botao-primario botao-menor salvar-entrega" data-id="' + entrega.codEntrega + '" type="button">Salvar entrega</button></div></article>'
+            '<div class="form-entrega-admin"><label>Status<select id="statusEntrega' + entrega.codEntrega + '" class="status-entrega-admin">' + opcoesStatusEntrega(entrega.status) + '</select></label>' +
+            '<label>Rastreio<input id="rastreioEntrega' + entrega.codEntrega + '" class="rastreio-entrega-admin" maxlength="50" value="' + escapar(entrega.codigoRastreio || '') + '" placeholder="Opcional"></label>' +
+            '<label>Previsão<input id="previsaoEntrega' + entrega.codEntrega + '" class="previsao-entrega-admin" type="date" value="' + escapar(entrega.previsao || '') + '"></label>' +
+            '<button class="botao botao-primario botao-menor" onclick="salvarEntrega(' + entrega.codEntrega + ')" type="button">Salvar entrega</button></div></article>'
     }).join('')
 }
 
-async function carregarEntregas() {
-    const entregas = await requisicao('/entregas')
-    renderizarEntregas(entregas)
-    secoesCarregadas.add('entregas')
+function carregarEntregas() {
+    return requisicao('/entregas').then(function (entregas) {
+        renderizarEntregas(entregas)
+    })
 }
 
-async function acaoListaEntregas(evento) {
-    const botao = evento.target.closest('.salvar-entrega')
-    if (!botao) return
-    const linha = botao.closest('.form-entrega-admin')
+function salvarEntrega(id) {
     const dados = {
-        status: linha.querySelector('.status-entrega-admin').value,
-        codigoRastreio: linha.querySelector('.rastreio-entrega-admin').value.trim() || null,
-        previsao: linha.querySelector('.previsao-entrega-admin').value || null
+        status: document.getElementById('statusEntrega' + id).value,
+        codigoRastreio: document.getElementById('rastreioEntrega' + id).value.trim() || null,
+        previsao: document.getElementById('previsaoEntrega' + id).value || null
     }
-    try {
-        await requisicao('/entrega/' + botao.dataset.id, { method: 'PUT', body: JSON.stringify(dados) })
+    requisicao('/entrega/' + id, { method: 'PUT', body: JSON.stringify(dados) })
+    .then(function () {
         mostrarAviso('Entrega atualizada com sucesso.', 'sucesso')
-        await carregarEntregas()
-    } catch (erro) {
+        carregarEntregas()
+    })
+    .catch(function (erro) {
         mostrarAviso(erro.message, 'erro')
-    }
+    })
 }
 
 function renderizarUsuarios(usuarios) {
@@ -443,47 +556,61 @@ function renderizarUsuarios(usuarios) {
     }).join('')
 }
 
-async function carregarUsuarios() {
-    renderizarUsuarios(await requisicao('/usuarios'))
-    secoesCarregadas.add('usuarios')
+function carregarUsuarios() {
+    return requisicao('/usuarios').then(function (usuarios) {
+        renderizarUsuarios(usuarios)
+        usuariosCarregados = true
+    })
 }
 
-async function trocarSecao(nome) {
+function trocarSecao(nome) {
     const nomes = ['veiculos', 'categorias', 'pedidos', 'entregas', 'usuarios']
     if (!nomes.includes(nome)) nome = 'veiculos'
-    document.querySelectorAll('.aba-admin').forEach(function (aba) { aba.classList.toggle('ativo', aba.dataset.secao === nome) })
-    nomes.forEach(function (secao) { document.getElementById('secao-' + secao).hidden = secao !== nome })
-    history.replaceState(null, '', '#' + nome)
 
-    try {
-        if (nome === 'categorias' && !secoesCarregadas.has(nome)) await carregarCategorias()
-        if (nome === 'pedidos') await carregarPedidos()
-        if (nome === 'entregas') await carregarEntregas()
-        if (nome === 'usuarios' && !secoesCarregadas.has(nome)) await carregarUsuarios()
-    } catch (erro) {
-        mostrarAviso(erro.message, 'erro')
+    document.getElementById('abaVeiculos').classList.remove('ativo')
+    document.getElementById('abaCategorias').classList.remove('ativo')
+    document.getElementById('abaPedidos').classList.remove('ativo')
+    document.getElementById('abaEntregas').classList.remove('ativo')
+    document.getElementById('abaUsuarios').classList.remove('ativo')
+
+    const nomesAbas = {
+        veiculos: 'abaVeiculos',
+        categorias: 'abaCategorias',
+        pedidos: 'abaPedidos',
+        entregas: 'abaEntregas',
+        usuarios: 'abaUsuarios'
     }
+    document.getElementById(nomesAbas[nome]).classList.add('ativo')
+
+    nomes.forEach(function (secao) {
+        document.getElementById('secao-' + secao).hidden = secao !== nome
+    })
+    if (nome === 'categorias' && !categoriasCarregadas) carregarCategorias().catch(function (erro) { mostrarAviso(erro.message, 'erro') })
+    if (nome === 'pedidos') carregarPedidos().catch(function (erro) { mostrarAviso(erro.message, 'erro') })
+    if (nome === 'entregas') carregarEntregas().catch(function (erro) { mostrarAviso(erro.message, 'erro') })
+    if (nome === 'usuarios' && !usuariosCarregados) carregarUsuarios().catch(function (erro) { mostrarAviso(erro.message, 'erro') })
 }
 
 function configurarEventos() {
     document.getElementById('botaoSair').addEventListener('click', sairAdmin)
-    abas.addEventListener('click', (evento) => {
-        const aba = evento.target.closest('.aba-admin')
-        if (aba) trocarSecao(aba.dataset.secao)
-    })
-    cadastrar.addEventListener('click', () => { abrirFormularioProduto(null) })
+    document.getElementById('abaVeiculos').addEventListener('click', function () { trocarSecao('veiculos') })
+    document.getElementById('abaCategorias').addEventListener('click', function () { trocarSecao('categorias') })
+    document.getElementById('abaPedidos').addEventListener('click', function () { trocarSecao('pedidos') })
+    document.getElementById('abaEntregas').addEventListener('click', function () { trocarSecao('entregas') })
+    document.getElementById('abaUsuarios').addEventListener('click', function () { trocarSecao('usuarios') })
+    cadastrar.addEventListener('click', function () { abrirFormularioProduto(null) })
+    document.getElementById('abaCadastrarProduto').addEventListener('click', function () { abrirFormularioProduto(null) })
+    document.getElementById('abaListarProdutos').addEventListener('click', function () { trocarOperacaoProduto('listar') })
+    document.getElementById('abaConsultarProduto').addEventListener('click', function () { trocarOperacaoProduto('consultar') })
+    document.getElementById('formConsultarProduto').addEventListener('submit', consultarProduto)
     document.getElementById('botaoCancelarProduto').addEventListener('click', fecharFormularioProduto)
     formularioProduto.addEventListener('submit', salvarProduto)
-    document.getElementById('corpoTabelaProdutos').addEventListener('click', acaoTabelaProdutos)
     document.getElementById('formCategoria').addEventListener('submit', salvarCategoria)
     document.getElementById('botaoCancelarCategoria').addEventListener('click', limparFormularioCategoria)
-    document.getElementById('listaCategoriasAdmin').addEventListener('click', acaoListaCategorias)
     document.getElementById('filtroStatusPedido').addEventListener('change', carregarPedidos)
-    document.getElementById('listaPedidosAdmin').addEventListener('click', acaoListaPedidos)
-    document.getElementById('listaEntregasAdmin').addEventListener('click', acaoListaEntregas)
 }
 
-async function iniciarAdmin() {
+function iniciarAdmin() {
     usuarioAdmin = lerUsuarioAdmin()
     if (!tokenAdmin || !usuarioAdmin) {
         window.location.href = 'login.html?redirect=admin.html'
@@ -498,13 +625,12 @@ async function iniciarAdmin() {
     document.getElementById('bloqueioAdmin').hidden = true
     document.getElementById('conteudoAdmin').hidden = false
 
-    try {
-        await Promise.all([carregarResumo(), carregarCategorias(), carregarProdutos()])
-        const inicial = window.location.hash.replace('#', '') || 'veiculos'
-        await trocarSecao(inicial)
-    } catch (erro) {
-        mostrarAviso(erro.message, 'erro')
-    }
+    carregarResumo().catch(function (erro) { mostrarAviso(erro.message, 'erro') })
+    carregarCategorias().catch(function (erro) { mostrarAviso(erro.message, 'erro') })
+    carregarProdutos().catch(function (erro) { mostrarAviso(erro.message, 'erro') })
+
+    trocarSecao('veiculos')
+    trocarOperacaoProduto('listar')
 }
 
 iniciarAdmin()

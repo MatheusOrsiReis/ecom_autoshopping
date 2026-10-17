@@ -1239,6 +1239,13 @@ h3 {
     color: #ff4a50;
 }
 
+.resumo-compra > small {
+    display: block;
+    margin: -10px 0 20px;
+    color: #aab0b5;
+    line-height: 1.5;
+}
+
 .botao-texto {
     padding: 0;
     color: var(--cor-texto-suave);
@@ -1765,6 +1772,11 @@ h3 {
 
 .cartao-relatorio {
     padding: 27px;
+}
+
+.area-grafico-chart {
+    position: relative;
+    min-height: 320px;
 }
 
 .titulo-cartao-admin {

@@ -1,79 +1,58 @@
 const API_URL = 'http://localhost:3000'
+
 let resposta = document.getElementById('mensagemLogin')
 let entrar = document.getElementById('botaoEntrar')
-let formularioLogin = document.getElementById('formLogin')
+let carrinho = JSON.parse(localStorage.getItem('autoshopping_carrinho') || '[]')
+let usuario = JSON.parse(localStorage.getItem('autoshopping_usuario') || 'null')
 
-function atualizarContadorCarrinho() {
-    let carrinho = []
-    try {
-        carrinho = JSON.parse(localStorage.getItem('autoshopping_carrinho')) || []
-    } catch (erro) {
-        carrinho = []
-    }
-    document.getElementById('contadorCarrinho').textContent = carrinho.length
+document.getElementById('contadorCarrinho').textContent = carrinho.length
+
+if (localStorage.getItem('autoshopping_token')) {
+    window.location.href = usuario && usuario.tipo === 'ADMIN' ? 'admin.html' : 'perfil.html'
 }
 
-function mostrarMensagemLogin(texto, tipo) {
-    resposta.className = 'mensagem-formulario ' + tipo
-    resposta.textContent = texto
-}
+document.getElementById('formLogin').addEventListener('submit', function(e) {
+    e.preventDefault()
 
-function obterDestinoLogin(tipoUsuario) {
-    const destino = new URLSearchParams(window.location.search).get('redirect')
-    const destinosPermitidos = ['checkout.html', 'perfil.html', 'meusPedidos.html', 'admin.html', 'relatorios.html']
-    if (destinosPermitidos.includes(destino)) return destino
-    return tipoUsuario === 'ADMIN' ? 'admin.html' : '../index.html'
-}
-
-function realizarLogin(evento) {
-    evento.preventDefault()
-
-    const dados = {
-        email: document.getElementById('email').value.trim(),
+    const valores = {
+        email: document.getElementById('email').value,
         senha: document.getElementById('senha').value
     }
 
     entrar.disabled = true
     entrar.textContent = 'Entrando...'
-    mostrarMensagemLogin('', '')
+    resposta.textContent = ''
 
-    fetch(API_URL + '/login', {
+    fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dados)
+        body: JSON.stringify(valores)
     })
-    .then((res) => {
-        return res.json().then((conteudo) => {
-            if (!res.ok) {
-                throw new Error(conteudo.message || 'Não foi possível entrar.')
-            }
-            return conteudo
-        })
+    .then(function(res) {
+        return res.json()
     })
-    .then((conteudo) => {
-        localStorage.setItem('autoshopping_token', conteudo.token)
-        localStorage.setItem('autoshopping_usuario', JSON.stringify(conteudo.usuario))
-        mostrarMensagemLogin('Login realizado com sucesso!', 'sucesso')
-        setTimeout(function () {
-            window.location.href = obterDestinoLogin(conteudo.usuario.tipo)
-        }, 500)
+    .then(function(dados) {
+        if (!dados.token) {
+            resposta.textContent = dados.message || 'E-mail ou senha inválidos!'
+            entrar.disabled = false
+            entrar.textContent = 'Entrar'
+            return
+        }
+
+        localStorage.setItem('autoshopping_token', dados.token)
+        localStorage.setItem('autoshopping_usuario', JSON.stringify(dados.usuario))
+
+        let destino = dados.usuario.tipo === 'ADMIN' ? 'admin.html' : 'perfil.html'
+
+        if (window.location.search.includes('redirect=')) {
+            destino = window.location.search.split('redirect=')[1].split('&')[0]
+        }
+
+        window.location.href = destino
     })
-    .catch((erro) => {
-        mostrarMensagemLogin(erro.message === 'Failed to fetch'
-            ? 'Backend indisponível. Verifique se o servidor está ligado.'
-            : erro.message, 'erro')
+    .catch(function() {
+        resposta.textContent = 'Erro ao realizar login! Verifique se o backend está ligado.'
         entrar.disabled = false
         entrar.textContent = 'Entrar'
     })
-}
-
-if (localStorage.getItem('autoshopping_token')) {
-    let usuarioSalvo = null
-    try { usuarioSalvo = JSON.parse(localStorage.getItem('autoshopping_usuario')) } catch (erro) { usuarioSalvo = null }
-    window.location.href = usuarioSalvo && usuarioSalvo.tipo === 'ADMIN' ? 'admin.html' : 'perfil.html'
-} else {
-    const emailRecebido = new URLSearchParams(window.location.search).get('email')
-    if (emailRecebido) document.getElementById('email').value = emailRecebido
-    formularioLogin.addEventListener('submit', realizarLogin)
-    atualizarContadorCarrinho()
-}
+})

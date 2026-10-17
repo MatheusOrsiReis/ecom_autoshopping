@@ -1,306 +1,208 @@
 const API_URL = 'http://localhost:3000'
-const token = localStorage.getItem('autoshopping_token')
-let usuario = null
+
+let token = localStorage.getItem('autoshopping_token')
+let usuario = JSON.parse(localStorage.getItem('autoshopping_usuario') || 'null')
+let idsCarrinho = JSON.parse(localStorage.getItem('autoshopping_carrinho') || '[]')
 let produtosCheckout = []
-let ultimoCepConsultado = ''
 let resposta = document.getElementById('mensagemCheckout')
-let confirmar = document.getElementById('botaoConfirmarPedido')
-let formularioCheckout = document.getElementById('formCheckout')
 
-function lerUsuario() {
-    try {
-        return JSON.parse(localStorage.getItem('autoshopping_usuario'))
-    } catch (erro) {
-        return null
-    }
-}
-
-function lerCarrinho() {
-    try {
-        return (JSON.parse(localStorage.getItem('autoshopping_carrinho')) || []).map(Number)
-    } catch (erro) {
-        return []
-    }
-}
-
-function formatarPreco(valor) {
-    return Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-}
-
-function encerrarSessao() {
-    localStorage.removeItem('autoshopping_token')
-    localStorage.removeItem('autoshopping_usuario')
+if (!token || !usuario) {
     window.location.href = 'login.html?redirect=checkout.html'
 }
 
-function mostrarMensagem(texto, tipo) {
-    resposta.className = 'mensagem-formulario campo-largo ' + tipo
-    resposta.textContent = texto
+if (idsCarrinho.length === 0) {
+    window.location.href = 'carrinho.html'
 }
 
-function somenteNumeros(valor) {
-    return valor.replace(/\D/g, '')
+if (usuario && usuario.tipo === 'ADMIN') {
+    document.getElementById('linkAdmin').hidden = false
 }
+
+document.getElementById('contadorCarrinho').textContent = idsCarrinho.length
 
 function formatarCep(valor) {
-    return somenteNumeros(valor).slice(0, 8).replace(/^(\d{5})(\d)/, '$1-$2')
+    return valor.replace(/\D/g, '').slice(0, 8).replace(/^(\d{5})(\d)/, '$1-$2')
 }
 
-function mostrarEstadoCep(texto, tipo) {
-    const input = document.getElementById('cep')
-    const mensagem = document.getElementById('mensagemCepCheckout')
-    mensagem.className = 'mensagem-campo ' + (tipo || '')
-    mensagem.textContent = texto || ''
-    input.classList.toggle('invalido', tipo === 'erro')
-}
-
-function limparEnderecoConsultado() {
-    ;['logradouro', 'bairro', 'cidade', 'uf'].forEach(function (id) {
-        document.getElementById(id).value = ''
-    })
-}
-
-async function consultarCep() {
-    const input = document.getElementById('cep')
-    const cep = somenteNumeros(input.value)
-    input.value = formatarCep(input.value)
+function consultarCep() {
+    let cep = document.getElementById('cep').value.replace(/\D/g, '')
 
     if (cep.length !== 8) {
-        ultimoCepConsultado = ''
-        mostrarEstadoCep(cep ? 'O CEP deve possuir 8 dígitos.' : '', cep ? 'erro' : '')
-        input.setCustomValidity(cep ? 'Informe um CEP válido.' : '')
-        return false
+        return
     }
 
-    if (cep === ultimoCepConsultado) return !input.classList.contains('invalido')
-    ultimoCepConsultado = cep
-    mostrarEstadoCep('Consultando CEP...', 'carregando')
+    document.getElementById('mensagemCepCheckout').textContent = 'Consultando CEP...'
 
-    try {
-        const resposta = await fetch('https://viacep.com.br/ws/' + cep + '/json/')
-        if (!resposta.ok) throw new Error('CONSULTA_INDISPONIVEL')
-        const endereco = await resposta.json()
+    fetch(`https://viacep.com.br/ws/${cep}/json/`)
+    .then(function(res) {
+        return res.json()
+    })
+    .then(function(endereco) {
         if (endereco.erro) {
-            ultimoCepConsultado = ''
-            limparEnderecoConsultado()
-            mostrarEstadoCep('CEP não encontrado.', 'erro')
-            input.setCustomValidity('CEP não encontrado.')
-            return false
+            document.getElementById('mensagemCepCheckout').textContent = 'CEP não encontrado.'
+            return
         }
 
-        if (somenteNumeros(input.value) !== cep) return false
-        input.value = endereco.cep || formatarCep(cep)
         document.getElementById('logradouro').value = endereco.logradouro || ''
         document.getElementById('bairro').value = endereco.bairro || ''
         document.getElementById('cidade').value = endereco.localidade || ''
         document.getElementById('uf').value = endereco.uf || ''
-        if (endereco.complemento) document.getElementById('complemento').value = endereco.complemento
-        input.setCustomValidity('')
-        mostrarEstadoCep('Endereço preenchido automaticamente.', 'sucesso')
+        document.getElementById('mensagemCepCheckout').textContent = 'Endereço preenchido automaticamente.'
         document.getElementById('numero').focus()
-        return true
-    } catch (erro) {
-        ultimoCepConsultado = ''
-        mostrarEstadoCep('Não foi possível consultar o CEP. Preencha o endereço manualmente.', 'erro')
-        input.setCustomValidity('')
-        return false
-    }
-}
-
-function configurarTipoEntrega() {
-    const tipo = document.getElementById('tipoEntrega').value
-    const campos = document.getElementById('camposEndereco')
-    const idsObrigatorios = ['cep', 'logradouro', 'numero', 'bairro', 'cidade', 'uf']
-    const entrega = tipo === 'ENTREGA'
-
-    campos.hidden = !entrega
-    idsObrigatorios.forEach(function (id) {
-        document.getElementById(id).required = entrega
+    })
+    .catch(function() {
+        document.getElementById('mensagemCepCheckout').textContent = 'Não foi possível consultar o CEP.'
     })
 }
 
-function preencherEndereco(dados) {
-    document.getElementById('cep').value = formatarCep(dados.cep || '')
-    document.getElementById('logradouro').value = dados.rua || ''
-    document.getElementById('numero').value = dados.numero || ''
-    document.getElementById('bairro').value = dados.bairro || ''
-    document.getElementById('cidade').value = dados.cidade || ''
-    document.getElementById('uf').value = dados.uf || ''
+function mostrarTipoEntrega() {
+    let entrega = document.getElementById('tipoEntrega').value === 'ENTREGA'
+    document.getElementById('camposEndereco').hidden = !entrega
+    document.getElementById('cep').required = entrega
+    document.getElementById('logradouro').required = entrega
+    document.getElementById('numero').required = entrega
+    document.getElementById('bairro').required = entrega
+    document.getElementById('cidade').required = entrega
+    document.getElementById('uf').required = entrega
 }
 
-function carregarPerfil() {
-    return fetch(API_URL + '/usuario/' + usuario.codUsuario, {
-        headers: { Authorization: 'Bearer ' + token }
+function mostrarResumo() {
+    let subtotal = 0
+    document.getElementById('itensCheckout').innerHTML = ''
+
+    produtosCheckout.forEach(function(produto) {
+        let nome = `${produto.marca || ''} ${produto.modelo || ''}`.trim() || produto.nome
+        subtotal += Number(produto.preco)
+
+        document.getElementById('itensCheckout').innerHTML += `
+            <div class="item-checkout">
+                <span>${nome}</span>
+                <strong>${Number(produto.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>
+            </div>
+        `
     })
-    .then(function (resposta) {
-        if (resposta.status === 401) {
-            encerrarSessao()
-            throw new Error('SESSAO_EXPIRADA')
-        }
-        if (!resposta.ok) throw new Error('PERFIL_INDISPONIVEL')
-        return resposta.json()
-    })
-    .then(function (perfil) {
-        preencherEndereco(perfil)
-    })
+
+    let desconto = 0
+    if (subtotal >= 200000) desconto = subtotal * 0.05
+
+    document.getElementById('subtotalCheckout').textContent = subtotal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+    document.getElementById('descontoCheckout').textContent = '- ' + desconto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+    document.getElementById('linhaDescontoCheckout').hidden = desconto === 0
+    document.getElementById('totalCheckout').textContent = (subtotal - desconto).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
-function renderizarResumo() {
-    const area = document.getElementById('itensCheckout')
-    let total = 0
-    area.innerHTML = ''
-
-    produtosCheckout.forEach(function (produto) {
-        const item = document.createElement('div')
-        item.className = 'item-checkout'
-        const nome = document.createElement('span')
-        nome.textContent = [produto.marca, produto.modelo].filter(Boolean).join(' ') || produto.nome
-        const preco = document.createElement('strong')
-        preco.textContent = formatarPreco(produto.preco)
-        item.appendChild(nome)
-        item.appendChild(preco)
-        area.appendChild(item)
-        total += Number(produto.preco)
+fetch(`${API_URL}/produtos?ativo=true`)
+.then(function(res) {
+    return res.json()
+})
+.then(function(produtos) {
+    produtosCheckout = produtos.filter(function(produto) {
+        return idsCarrinho.includes(produto.codProduto) && produto.estoqueProduto && produto.estoqueProduto.quantidade > 0
     })
 
-    document.getElementById('totalCheckout').textContent = formatarPreco(total)
-    document.getElementById('contadorCarrinho').textContent = produtosCheckout.length
-}
-
-function carregarProdutosCheckout() {
-    const ids = lerCarrinho()
-    if (ids.length === 0) {
-        window.location.href = 'carrinho.html'
-        return Promise.reject(new Error('CARRINHO_VAZIO'))
-    }
-
-    return Promise.all(ids.map(function (id) {
-        return fetch(API_URL + '/produto/' + id).then(function (resposta) {
-            if (!resposta.ok) return null
-            return resposta.json()
-        })
-    }))
-    .then(function (produtos) {
-        produtosCheckout = produtos.filter(function (produto) {
-            return produto && produto.ativo && produto.estoqueProduto && Number(produto.estoqueProduto.quantidade) > 0
-        })
-
-        if (produtosCheckout.length !== ids.length) {
-            localStorage.setItem('autoshopping_carrinho', JSON.stringify(
-                produtosCheckout.map(function (produto) { return produto.codProduto })
-            ))
-            throw new Error('Um dos veículos não está mais disponível. Revise seu carrinho.')
-        }
-
-        renderizarResumo()
-    })
-}
-
-function montarEntrega() {
-    const tipo = document.getElementById('tipoEntrega').value
-
-    if (tipo === 'RETIRADA') {
-        return { tipo: 'RETIRADA', endereco: 'Retirada na loja AutoShopping' }
-    }
-
-    const logradouro = document.getElementById('logradouro').value.trim()
-    const numero = document.getElementById('numero').value.trim()
-    const bairro = document.getElementById('bairro').value.trim()
-    const cidade = document.getElementById('cidade').value.trim()
-    const uf = document.getElementById('uf').value.trim().toUpperCase()
-
-    return {
-        tipo: 'ENTREGA',
-        endereco: [logradouro + ', ' + numero, bairro, cidade + ' - ' + uf].join(', '),
-        cep: document.getElementById('cep').value.trim(),
-        logradouro,
-        numero,
-        bairro,
-        localidade: cidade,
-        uf,
-        complemento: document.getElementById('complemento').value.trim()
-    }
-}
-
-function confirmarPedido(evento) {
-    evento.preventDefault()
-
-    if (document.getElementById('tipoEntrega').value === 'ENTREGA' && somenteNumeros(document.getElementById('cep').value).length !== 8) {
-        mostrarEstadoCep('Informe um CEP válido.', 'erro')
-        document.getElementById('cep').focus()
+    if (produtosCheckout.length !== idsCarrinho.length) {
+        resposta.textContent = 'Um dos veículos não está mais disponível. Revise seu carrinho.'
+        document.getElementById('botaoConfirmarPedido').disabled = true
         return
     }
 
-    const corpo = {
-        itens: produtosCheckout.map(function (produto) {
-            return { produtoId: produto.codProduto, quantidade: 1 }
-        }),
-        entrega: montarEntrega()
+    mostrarResumo()
+})
+.catch(function() {
+    resposta.textContent = 'Erro ao carregar os veículos!'
+})
+
+fetch(`${API_URL}/usuario/${usuario ? usuario.codUsuario : ''}`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+})
+.then(function(res) {
+    return res.json()
+})
+.then(function(perfil) {
+    document.getElementById('cep').value = formatarCep(perfil.cep || '')
+    document.getElementById('logradouro').value = perfil.rua || ''
+    document.getElementById('numero').value = perfil.numero || ''
+    document.getElementById('bairro').value = perfil.bairro || ''
+    document.getElementById('cidade').value = perfil.cidade || ''
+    document.getElementById('uf').value = perfil.uf || ''
+})
+
+document.getElementById('tipoEntrega').addEventListener('change', mostrarTipoEntrega)
+
+document.getElementById('cep').addEventListener('input', function(e) {
+    e.target.value = formatarCep(e.target.value)
+
+    if (e.target.value.replace(/\D/g, '').length === 8) {
+        consultarCep()
+    }
+})
+
+document.getElementById('formCheckout').addEventListener('submit', function(e) {
+    e.preventDefault()
+
+    let tipo = document.getElementById('tipoEntrega').value
+    let entrega = {
+        tipo: 'RETIRADA',
+        endereco: 'Retirada na loja AutoShopping'
     }
 
-    confirmar.disabled = true
-    confirmar.textContent = 'Confirmando pedido...'
-    mostrarMensagem('', '')
+    if (tipo === 'ENTREGA') {
+        let rua = document.getElementById('logradouro').value
+        let numero = document.getElementById('numero').value
+        let bairro = document.getElementById('bairro').value
+        let cidade = document.getElementById('cidade').value
+        let uf = document.getElementById('uf').value
 
-    fetch(API_URL + '/pedido', {
+        entrega = {
+            tipo: 'ENTREGA',
+            endereco: `${rua}, ${numero}, ${bairro}, ${cidade} - ${uf}`,
+            cep: document.getElementById('cep').value,
+            logradouro: rua,
+            numero: numero,
+            bairro: bairro,
+            localidade: cidade,
+            uf: uf,
+            complemento: document.getElementById('complemento').value
+        }
+    }
+
+    let valores = {
+        itens: produtosCheckout.map(function(produto) {
+            return { produtoId: produto.codProduto, quantidade: 1 }
+        }),
+        entrega: entrega
+    }
+
+    document.getElementById('botaoConfirmarPedido').disabled = true
+
+    fetch(`${API_URL}/pedido`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            Authorization: 'Bearer ' + token
+            'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(corpo)
+        body: JSON.stringify(valores)
     })
-    .then((res) => {
-        return res.json().then((conteudo) => {
-            if (res.status === 401) {
-                encerrarSessao()
-                throw new Error('SESSAO_EXPIRADA')
-            }
-            if (!res.ok) throw new Error(conteudo.message || 'Não foi possível criar o pedido.')
-            return conteudo
-        })
+    .then(function(res) {
+        return res.json()
     })
-    .then((pedido) => {
+    .then(function(pedido) {
+        if (pedido.message && !pedido.codPedido) {
+            resposta.textContent = pedido.message
+            document.getElementById('botaoConfirmarPedido').disabled = false
+            return
+        }
+
         localStorage.removeItem('autoshopping_carrinho')
         document.getElementById('conteudoCheckout').hidden = true
         document.getElementById('pedidoConcluido').hidden = false
-        document.getElementById('numeroPedido').textContent = 'Pedido #' + pedido.codPedido + ' • Total ' + formatarPreco(pedido.valorTotal)
+        document.getElementById('numeroPedido').textContent = `Pedido #${pedido.codPedido} • Total ${Number(pedido.valorTotal).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`
         document.getElementById('contadorCarrinho').textContent = '0'
     })
-    .catch((erro) => {
-        if (erro.message !== 'SESSAO_EXPIRADA') {
-            mostrarMensagem(erro.message === 'Failed to fetch'
-                ? 'Backend indisponível. Verifique se o servidor está ligado.'
-                : erro.message, 'erro')
-            confirmar.disabled = false
-            confirmar.textContent = 'Confirmar pedido'
-        }
+    .catch(function() {
+        resposta.textContent = 'Erro ao confirmar o pedido!'
+        document.getElementById('botaoConfirmarPedido').disabled = false
     })
-}
+})
 
-if (!token || !lerUsuario()) {
-    window.location.href = 'login.html?redirect=checkout.html'
-} else {
-    usuario = lerUsuario()
-    if (usuario.tipo === 'ADMIN') document.getElementById('linkAdmin').hidden = false
-    document.getElementById('tipoEntrega').addEventListener('change', configurarTipoEntrega)
-    document.getElementById('cep').addEventListener('input', function (evento) {
-        evento.target.value = formatarCep(evento.target.value)
-        evento.target.setCustomValidity('')
-        if (somenteNumeros(evento.target.value).length === 8) consultarCep()
-        else mostrarEstadoCep('', '')
-    })
-    document.getElementById('cep').addEventListener('blur', consultarCep)
-    formularioCheckout.addEventListener('submit', confirmarPedido)
-    configurarTipoEntrega()
-
-    Promise.all([carregarProdutosCheckout(), carregarPerfil()])
-    .catch(function (erro) {
-        if (!['CARRINHO_VAZIO', 'SESSAO_EXPIRADA'].includes(erro.message)) {
-            mostrarMensagem(erro.message === 'Failed to fetch'
-                ? 'Backend indisponível. Verifique se o servidor está ligado.'
-                : erro.message, 'erro')
-            document.getElementById('botaoConfirmarPedido').disabled = true
-        }
-    })
-}
+mostrarTipoEntrega()
