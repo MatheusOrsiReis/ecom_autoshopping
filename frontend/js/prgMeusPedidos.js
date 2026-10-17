@@ -1,5 +1,7 @@
 const API_URL = 'http://localhost:3000'
 const token = localStorage.getItem('autoshopping_token')
+let resposta = document.getElementById('mensagemPedidos')
+let listar = document.getElementById('listaPedidos')
 
 function lerUsuario() {
     try {
@@ -154,38 +156,36 @@ function criarCardPedido(pedido) {
 }
 
 function carregarPedidos() {
-    const lista = document.getElementById('listaPedidos')
-    const mensagem = document.getElementById('mensagemPedidos')
-    mensagem.hidden = false
-    mensagem.className = 'mensagem carregando'
-    mensagem.textContent = 'Carregando pedidos...'
-    lista.innerHTML = ''
+    resposta.hidden = false
+    resposta.className = 'mensagem carregando'
+    resposta.textContent = 'Carregando pedidos...'
+    listar.innerHTML = ''
 
     fetch(API_URL + '/pedidos', { headers: { Authorization: 'Bearer ' + token } })
-    .then(function (resposta) {
-        if (resposta.status === 401) {
+    .then((res) => {
+        if (res.status === 401) {
             sair()
             throw new Error('SESSAO_EXPIRADA')
         }
-        if (!resposta.ok) throw new Error('Não foi possível carregar seus pedidos.')
-        return resposta.json()
+        if (!res.ok) throw new Error('Não foi possível carregar seus pedidos.')
+        return res.json()
     })
-    .then(function (pedidos) {
+    .then((pedidos) => {
         if (pedidos.length === 0) {
-            mensagem.className = 'mensagem mensagem-vazia'
-            mensagem.innerHTML = 'Você ainda não possui pedidos.<br><a class="link-destaque" href="listarProduto.html">Encontrar um veículo</a>'
+            resposta.className = 'mensagem mensagem-vazia'
+            resposta.innerHTML = 'Você ainda não possui pedidos.<br><a class="link-destaque" href="listarProduto.html">Encontrar um veículo</a>'
             return
         }
 
-        mensagem.hidden = true
+        resposta.hidden = true
         pedidos.forEach(function (pedido) {
-            lista.appendChild(criarCardPedido(pedido))
+            listar.appendChild(criarCardPedido(pedido))
         })
     })
-    .catch(function (erro) {
+    .catch((erro) => {
         if (erro.message !== 'SESSAO_EXPIRADA') {
-            mensagem.className = 'mensagem mensagem-erro'
-            mensagem.textContent = erro.message === 'Failed to fetch'
+            resposta.className = 'mensagem mensagem-erro'
+            resposta.textContent = erro.message === 'Failed to fetch'
                 ? 'Backend indisponível. Verifique se o servidor está ligado.'
                 : erro.message
         }

@@ -1,5 +1,7 @@
 const API_URL = 'http://localhost:3000'
 let produtoAtual = null
+let resposta = document.getElementById('mensagemDetalhe')
+let adicionar = document.getElementById('botaoAdicionarCarrinho')
 
 function atualizarNavegacao() {
     let carrinho = []
@@ -110,7 +112,6 @@ function renderizarImagem(produto) {
 function renderizarProduto(produto) {
     produtoAtual = produto
     const detalhe = document.getElementById('detalheProduto')
-    const mensagem = document.getElementById('mensagemDetalhe')
     const categoria = document.getElementById('categoriaDetalhe')
     const marcaModelo = [produto.marca, produto.modelo].filter(possuiValor).join(' ')
 
@@ -137,8 +138,8 @@ function renderizarProduto(produto) {
     const disponivel = produto.estoqueProduto && Number(produto.estoqueProduto.quantidade) > 0
     status.className = disponivel ? 'status-estoque disponivel' : 'status-estoque indisponivel'
     status.textContent = disponivel ? 'Veículo disponível' : 'Veículo indisponível'
-    document.getElementById('botaoAdicionarCarrinho').disabled = !disponivel
-    document.getElementById('botaoAdicionarCarrinho').textContent = disponivel
+    adicionar.disabled = !disponivel
+    adicionar.textContent = disponivel
         ? 'Adicionar ao carrinho'
         : 'Veículo indisponível'
 
@@ -158,15 +159,14 @@ function renderizarProduto(produto) {
     }
 
     document.title = (produto.nome || marcaModelo || 'Veículo') + ' | AutoShopping'
-    mensagem.hidden = true
+    resposta.hidden = true
     detalhe.hidden = false
 }
 
 function mostrarErro(mensagemTexto) {
-    const mensagem = document.getElementById('mensagemDetalhe')
-    mensagem.hidden = false
-    mensagem.className = 'mensagem mensagem-erro'
-    mensagem.textContent = mensagemTexto
+    resposta.hidden = false
+    resposta.className = 'mensagem mensagem-erro'
+    resposta.textContent = mensagemTexto
 }
 
 function consultarProduto() {
@@ -179,19 +179,19 @@ function consultarProduto() {
     }
 
     fetch(API_URL + '/produto/' + encodeURIComponent(idProduto))
-    .then(function (resposta) {
-        if (resposta.status === 404) {
+    .then((res) => {
+        if (res.status === 404) {
             throw new Error('PRODUTO_NAO_ENCONTRADO')
         }
-        if (!resposta.ok) {
+        if (!res.ok) {
             throw new Error('ERRO_HTTP')
         }
-        return resposta.json()
+        return res.json()
     })
-    .then(function (produto) {
+    .then((produto) => {
         renderizarProduto(produto)
     })
-    .catch(function (erro) {
+    .catch((erro) => {
         if (erro.message === 'PRODUTO_NAO_ENCONTRADO') {
             mostrarErro('Veículo não encontrado.')
         } else {
@@ -202,4 +202,4 @@ function consultarProduto() {
 
 consultarProduto()
 atualizarNavegacao()
-document.getElementById('botaoAdicionarCarrinho').addEventListener('click', adicionarAoCarrinho)
+adicionar.addEventListener('click', adicionarAoCarrinho)

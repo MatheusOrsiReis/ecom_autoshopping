@@ -1,5 +1,9 @@
 const API_URL = 'http://localhost:3000'
 let produtosCarrinho = []
+let resposta = document.getElementById('mensagemCarrinho')
+let listar = document.getElementById('itensCarrinho')
+let limpar = document.getElementById('botaoLimparCarrinho')
+let finalizar = document.getElementById('botaoCheckout')
 
 function lerCarrinho() {
     try {
@@ -81,36 +85,32 @@ function criarItemCarrinho(produto) {
 }
 
 function renderizarCarrinho() {
-    const lista = document.getElementById('itensCarrinho')
-    const mensagem = document.getElementById('mensagemCarrinho')
-    const botaoCheckout = document.getElementById('botaoCheckout')
-    const botaoLimpar = document.getElementById('botaoLimparCarrinho')
     const total = produtosCarrinho.reduce(function (soma, produto) {
         return soma + Number(produto.preco)
     }, 0)
 
-    lista.innerHTML = ''
+    listar.innerHTML = ''
     document.getElementById('quantidadeResumo').textContent = produtosCarrinho.length
     document.getElementById('totalCarrinho').textContent = formatarPreco(total)
 
     if (produtosCarrinho.length === 0) {
-        mensagem.hidden = false
-        mensagem.className = 'mensagem mensagem-vazia'
-        mensagem.innerHTML = 'Seu carrinho está vazio.<br><a class="link-destaque" href="listarProduto.html">Ver veículos disponíveis</a>'
-        botaoCheckout.classList.add('desabilitado')
-        botaoLimpar.hidden = true
+        resposta.hidden = false
+        resposta.className = 'mensagem mensagem-vazia'
+        resposta.innerHTML = 'Seu carrinho está vazio.<br><a class="link-destaque" href="listarProduto.html">Ver veículos disponíveis</a>'
+        finalizar.classList.add('desabilitado')
+        limpar.hidden = true
         return
     }
 
-    mensagem.hidden = true
-    botaoLimpar.hidden = false
-    botaoCheckout.classList.remove('desabilitado')
-    botaoCheckout.href = localStorage.getItem('autoshopping_token')
+    resposta.hidden = true
+    limpar.hidden = false
+    finalizar.classList.remove('desabilitado')
+    finalizar.href = localStorage.getItem('autoshopping_token')
         ? 'checkout.html'
         : 'login.html?redirect=checkout.html'
 
     produtosCarrinho.forEach(function (produto) {
-        lista.appendChild(criarItemCarrinho(produto))
+        listar.appendChild(criarItemCarrinho(produto))
     })
 }
 
@@ -124,24 +124,23 @@ function carregarCarrinho() {
         return
     }
 
-    document.getElementById('mensagemCarrinho').hidden = false
+    resposta.hidden = false
     Promise.all(ids.map(function (id) {
-        return fetch(API_URL + '/produto/' + id).then(function (resposta) {
-            if (!resposta.ok) return null
-            return resposta.json()
+        return fetch(API_URL + '/produto/' + id).then((res) => {
+            if (!res.ok) return null
+            return res.json()
         })
     }))
-    .then(function (produtos) {
+    .then((produtos) => {
         produtosCarrinho = produtos.filter(function (produto) {
             return produto && produto.ativo && produto.estoqueProduto && Number(produto.estoqueProduto.quantidade) > 0
         })
         salvarCarrinho(produtosCarrinho.map(function (produto) { return produto.codProduto }))
         renderizarCarrinho()
     })
-    .catch(function () {
-        const mensagem = document.getElementById('mensagemCarrinho')
-        mensagem.className = 'mensagem mensagem-erro'
-        mensagem.textContent = 'Não foi possível atualizar o carrinho. Verifique se o backend está ligado.'
+    .catch(() => {
+        resposta.className = 'mensagem mensagem-erro'
+        resposta.textContent = 'Não foi possível atualizar o carrinho. Verifique se o backend está ligado.'
     })
 }
 
@@ -156,7 +155,8 @@ function atualizarNavegacao() {
     if (usuario && usuario.tipo === 'ADMIN') document.getElementById('linkAdmin').hidden = false
 }
 
-document.getElementById('botaoLimparCarrinho').addEventListener('click', function () {
+limpar.addEventListener('click', (evento) => {
+    evento.preventDefault()
     salvarCarrinho([])
     produtosCarrinho = []
     renderizarCarrinho()

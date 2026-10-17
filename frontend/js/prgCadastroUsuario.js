@@ -1,5 +1,8 @@
 const API_URL = 'http://localhost:3000'
 let ultimoCepConsultado = ''
+let resposta = document.getElementById('mensagemCadastro')
+let cadastrar = document.getElementById('botaoCadastrar')
+let formularioCadastro = document.getElementById('formCadastro')
 
 function atualizarContadorCarrinho() {
     let carrinho = []
@@ -12,9 +15,8 @@ function atualizarContadorCarrinho() {
 }
 
 function mostrarMensagemCadastro(texto, tipo) {
-    const mensagem = document.getElementById('mensagemCadastro')
-    mensagem.className = 'mensagem-formulario ' + tipo
-    mensagem.textContent = texto
+    resposta.className = 'mensagem-formulario ' + tipo
+    resposta.textContent = texto
 }
 
 function somenteNumeros(valor) {
@@ -129,7 +131,6 @@ function cadastrarUsuario(evento) {
         return
     }
 
-    const botao = document.getElementById('botaoCadastrar')
     const dados = {
         nome: document.getElementById('nome').value.trim(),
         cpf: formatarCpf(document.getElementById('cpf').value),
@@ -144,8 +145,8 @@ function cadastrarUsuario(evento) {
         uf: document.getElementById('uf').value.trim().toUpperCase()
     }
 
-    botao.disabled = true
-    botao.textContent = 'Criando conta...'
+    cadastrar.disabled = true
+    cadastrar.textContent = 'Criando conta...'
     mostrarMensagemCadastro('', '')
 
     fetch(API_URL + '/usuario', {
@@ -153,26 +154,26 @@ function cadastrarUsuario(evento) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dados)
     })
-    .then(function (resposta) {
-        return resposta.json().then(function (conteudo) {
-            if (!resposta.ok) {
+    .then((res) => {
+        return res.json().then((conteudo) => {
+            if (!res.ok) {
                 throw new Error(conteudo.message || 'Não foi possível criar a conta.')
             }
             return conteudo
         })
     })
-    .then(function () {
+    .then(() => {
         mostrarMensagemCadastro('Conta criada com sucesso! Redirecionando para o login...', 'sucesso')
         setTimeout(function () {
             window.location.href = 'login.html?email=' + encodeURIComponent(dados.email)
         }, 900)
     })
-    .catch(function (erro) {
+    .catch((erro) => {
         mostrarMensagemCadastro(erro.message === 'Failed to fetch'
             ? 'Backend indisponível. Verifique se o servidor está ligado.'
             : erro.message, 'erro')
-        botao.disabled = false
-        botao.textContent = 'Criar minha conta'
+        cadastrar.disabled = false
+        cadastrar.textContent = 'Criar minha conta'
     })
 }
 
@@ -192,6 +193,6 @@ if (localStorage.getItem('autoshopping_token')) {
         else mostrarEstadoCampo('mensagemCep', evento.target, '', '')
     })
     document.getElementById('cep').addEventListener('blur', consultarCep)
-    document.getElementById('formCadastro').addEventListener('submit', cadastrarUsuario)
+    formularioCadastro.addEventListener('submit', cadastrarUsuario)
     atualizarContadorCarrinho()
 }

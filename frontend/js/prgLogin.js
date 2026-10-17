@@ -1,4 +1,7 @@
 const API_URL = 'http://localhost:3000'
+let resposta = document.getElementById('mensagemLogin')
+let entrar = document.getElementById('botaoEntrar')
+let formularioLogin = document.getElementById('formLogin')
 
 function atualizarContadorCarrinho() {
     let carrinho = []
@@ -11,9 +14,8 @@ function atualizarContadorCarrinho() {
 }
 
 function mostrarMensagemLogin(texto, tipo) {
-    const mensagem = document.getElementById('mensagemLogin')
-    mensagem.className = 'mensagem-formulario ' + tipo
-    mensagem.textContent = texto
+    resposta.className = 'mensagem-formulario ' + tipo
+    resposta.textContent = texto
 }
 
 function obterDestinoLogin(tipoUsuario) {
@@ -26,14 +28,13 @@ function obterDestinoLogin(tipoUsuario) {
 function realizarLogin(evento) {
     evento.preventDefault()
 
-    const botao = document.getElementById('botaoEntrar')
     const dados = {
         email: document.getElementById('email').value.trim(),
         senha: document.getElementById('senha').value
     }
 
-    botao.disabled = true
-    botao.textContent = 'Entrando...'
+    entrar.disabled = true
+    entrar.textContent = 'Entrando...'
     mostrarMensagemLogin('', '')
 
     fetch(API_URL + '/login', {
@@ -41,15 +42,15 @@ function realizarLogin(evento) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dados)
     })
-    .then(function (resposta) {
-        return resposta.json().then(function (conteudo) {
-            if (!resposta.ok) {
+    .then((res) => {
+        return res.json().then((conteudo) => {
+            if (!res.ok) {
                 throw new Error(conteudo.message || 'Não foi possível entrar.')
             }
             return conteudo
         })
     })
-    .then(function (conteudo) {
+    .then((conteudo) => {
         localStorage.setItem('autoshopping_token', conteudo.token)
         localStorage.setItem('autoshopping_usuario', JSON.stringify(conteudo.usuario))
         mostrarMensagemLogin('Login realizado com sucesso!', 'sucesso')
@@ -57,12 +58,12 @@ function realizarLogin(evento) {
             window.location.href = obterDestinoLogin(conteudo.usuario.tipo)
         }, 500)
     })
-    .catch(function (erro) {
+    .catch((erro) => {
         mostrarMensagemLogin(erro.message === 'Failed to fetch'
             ? 'Backend indisponível. Verifique se o servidor está ligado.'
             : erro.message, 'erro')
-        botao.disabled = false
-        botao.textContent = 'Entrar'
+        entrar.disabled = false
+        entrar.textContent = 'Entrar'
     })
 }
 
@@ -73,6 +74,6 @@ if (localStorage.getItem('autoshopping_token')) {
 } else {
     const emailRecebido = new URLSearchParams(window.location.search).get('email')
     if (emailRecebido) document.getElementById('email').value = emailRecebido
-    document.getElementById('formLogin').addEventListener('submit', realizarLogin)
+    formularioLogin.addEventListener('submit', realizarLogin)
     atualizarContadorCarrinho()
 }

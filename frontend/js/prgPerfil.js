@@ -2,6 +2,9 @@ const API_URL = 'http://localhost:3000'
 const token = localStorage.getItem('autoshopping_token')
 let usuario = null
 let ultimoCepConsultado = ''
+let resposta = document.getElementById('mensagemPerfil')
+let atualizar = document.getElementById('botaoSalvarPerfil')
+let formularioPerfil = document.getElementById('formPerfil')
 
 function lerUsuario() {
     try {
@@ -27,9 +30,8 @@ function sair() {
 }
 
 function mostrarMensagem(texto, tipo) {
-    const mensagem = document.getElementById('mensagemPerfil')
-    mensagem.className = 'mensagem-formulario campo-largo ' + tipo
-    mensagem.textContent = texto
+    resposta.className = 'mensagem-formulario campo-largo ' + tipo
+    resposta.textContent = texto
 }
 
 function somenteNumeros(valor) {
@@ -182,7 +184,6 @@ function salvarPerfil(evento) {
         document.getElementById('cep').focus()
         return
     }
-    const botao = document.getElementById('botaoSalvarPerfil')
     const dados = {}
     const campos = ['nome', 'cpf', 'telefone', 'email', 'cep', 'rua', 'numero', 'bairro', 'cidade']
 
@@ -196,8 +197,8 @@ function salvarPerfil(evento) {
     const senha = document.getElementById('senha').value
     if (senha) dados.senha = senha
 
-    botao.disabled = true
-    botao.textContent = 'Salvando...'
+    atualizar.disabled = true
+    atualizar.textContent = 'Salvando...'
     mostrarMensagem('', '')
 
     fetch(API_URL + '/usuario/' + usuario.codUsuario, {
@@ -205,30 +206,30 @@ function salvarPerfil(evento) {
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
         body: JSON.stringify(dados)
     })
-    .then(function (resposta) {
-        tratarNaoAutorizado(resposta)
-        return resposta.json().then(function (conteudo) {
-            if (!resposta.ok) throw new Error(conteudo.message || 'Não foi possível atualizar o perfil.')
+    .then((res) => {
+        tratarNaoAutorizado(res)
+        return res.json().then((conteudo) => {
+            if (!res.ok) throw new Error(conteudo.message || 'Não foi possível atualizar o perfil.')
             return conteudo
         })
     })
-    .then(function (perfil) {
+    .then((perfil) => {
         usuario.nome = perfil.nome
         usuario.email = perfil.email
         localStorage.setItem('autoshopping_usuario', JSON.stringify(usuario))
         document.getElementById('senha').value = ''
         mostrarMensagem('Perfil atualizado com sucesso!', 'sucesso')
     })
-    .catch(function (erro) {
+    .catch((erro) => {
         if (erro.message !== 'SESSAO_EXPIRADA') {
             mostrarMensagem(erro.message === 'Failed to fetch'
                 ? 'Backend indisponível. Verifique se o servidor está ligado.'
                 : erro.message, 'erro')
         }
     })
-    .finally(function () {
-        botao.disabled = false
-        botao.textContent = 'Salvar alterações'
+    .finally(() => {
+        atualizar.disabled = false
+        atualizar.textContent = 'Salvar alterações'
     })
 }
 
@@ -254,7 +255,7 @@ if (!token || !lerUsuario()) {
         else mostrarEstadoCampo('mensagemCep', evento.target, '', '')
     })
     document.getElementById('cep').addEventListener('blur', consultarCep)
-    document.getElementById('formPerfil').addEventListener('submit', salvarPerfil)
+    formularioPerfil.addEventListener('submit', salvarPerfil)
     atualizarContadorCarrinho()
     carregarPerfil()
 }

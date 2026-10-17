@@ -1,4 +1,8 @@
 const API_URL = 'http://localhost:3000'
+let resposta = document.getElementById('mensagemHome')
+let listar = document.getElementById('listaDestaques')
+let formularioBusca = document.getElementById('formBuscaHome')
+let campoBusca = document.getElementById('buscaHome')
 
 function atualizarNavegacao() {
     let carrinho = []
@@ -122,48 +126,42 @@ function criarCardProduto(produto) {
 }
 
 function carregarDestaques() {
-    const lista = document.getElementById('listaDestaques')
-    const mensagem = document.getElementById('mensagemHome')
-
     fetch(API_URL + '/produtos?ativo=true')
-    .then(function (resposta) {
-        if (!resposta.ok) {
-            throw new Error('Erro HTTP ' + resposta.status)
+    .then((res) => {
+        if (!res.ok) {
+            throw new Error('Erro HTTP ' + res.status)
         }
-        return resposta.json()
+        return res.json()
     })
-    .then(function (produtos) {
+    .then((produtos) => {
         const disponiveis = produtos.filter(function (produto) {
             return produto.estoqueProduto && Number(produto.estoqueProduto.quantidade) > 0
         }).slice(0, 4)
 
-        lista.innerHTML = ''
+        listar.innerHTML = ''
 
         if (disponiveis.length === 0) {
-            mensagem.className = 'mensagem mensagem-vazia'
-            mensagem.textContent = 'Nenhum veículo disponível no momento.'
+            resposta.className = 'mensagem mensagem-vazia'
+            resposta.textContent = 'Nenhum veículo disponível no momento.'
             return
         }
 
-        mensagem.hidden = true
+        resposta.hidden = true
         disponiveis.forEach(function (produto) {
-            lista.appendChild(criarCardProduto(produto))
+            listar.appendChild(criarCardProduto(produto))
         })
     })
-    .catch(function () {
-        mensagem.hidden = false
-        mensagem.className = 'mensagem mensagem-erro'
-        mensagem.textContent = 'Não foi possível carregar os veículos. Verifique se o backend está ligado.'
+    .catch(() => {
+        resposta.hidden = false
+        resposta.className = 'mensagem mensagem-erro'
+        resposta.textContent = 'Não foi possível carregar os veículos. Verifique se o backend está ligado.'
     })
 }
 
 function configurarBuscaHome() {
-    const formulario = document.getElementById('formBuscaHome')
-    const campo = document.getElementById('buscaHome')
-
-    formulario.addEventListener('submit', function (evento) {
+    formularioBusca.addEventListener('submit', (evento) => {
         evento.preventDefault()
-        const busca = campo.value.trim()
+        const busca = campoBusca.value.trim()
         let destino = 'html/listarProduto.html'
 
         if (busca) {

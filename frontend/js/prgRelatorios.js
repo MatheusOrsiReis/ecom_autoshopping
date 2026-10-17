@@ -1,5 +1,8 @@
 const API_URL = 'http://localhost:3000'
 const tokenRelatorio = localStorage.getItem('autoshopping_token')
+let resposta = document.getElementById('mensagemRelatorio')
+let atualizar = document.getElementById('botaoAtualizarRelatorio')
+let imprimir = document.getElementById('botaoImprimirRelatorio')
 
 function lerUsuarioRelatorio() {
     try { return JSON.parse(localStorage.getItem('autoshopping_usuario')) } catch (erro) { return null }
@@ -45,10 +48,9 @@ async function requisicao(caminho) {
 }
 
 function mostrarAviso(texto, tipo) {
-    const aviso = document.getElementById('mensagemRelatorio')
-    aviso.hidden = !texto
-    aviso.className = 'aviso-admin ' + (tipo || '')
-    aviso.textContent = texto || ''
+    resposta.hidden = !texto
+    resposta.className = 'aviso-admin ' + (tipo || '')
+    resposta.textContent = texto || ''
 }
 
 function renderizarIndicadores(resumo) {
@@ -103,9 +105,8 @@ function renderizarPedidosRecentes(pedidos) {
 }
 
 async function carregarRelatorios() {
-    const botao = document.getElementById('botaoAtualizarRelatorio')
-    botao.disabled = true
-    botao.textContent = 'Atualizando...'
+    atualizar.disabled = true
+    atualizar.textContent = 'Atualizando...'
     mostrarAviso('', '')
     try {
         const dados = await Promise.all([requisicao('/relatorio/resumo'), requisicao('/produtos'), requisicao('/pedidos')])
@@ -116,8 +117,8 @@ async function carregarRelatorios() {
     } catch (erro) {
         mostrarAviso(erro.message, 'erro')
     } finally {
-        botao.disabled = false
-        botao.textContent = 'Atualizar'
+        atualizar.disabled = false
+        atualizar.textContent = 'Atualizar'
     }
 }
 
@@ -132,8 +133,8 @@ async function iniciarRelatorios() {
         return
     }
     document.getElementById('botaoSair').addEventListener('click', sairRelatorio)
-    document.getElementById('botaoAtualizarRelatorio').addEventListener('click', carregarRelatorios)
-    document.getElementById('botaoImprimirRelatorio').addEventListener('click', function () { window.print() })
+    atualizar.addEventListener('click', carregarRelatorios)
+    imprimir.addEventListener('click', () => { window.print() })
     document.getElementById('bloqueioRelatorios').hidden = true
     document.getElementById('conteudoRelatorios').hidden = false
     await carregarRelatorios()

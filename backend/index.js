@@ -86,12 +86,13 @@ app.use((req, res) => {
 })
 
 // -------------------------
-conn.sync()
+conn.authenticate()
 .then(() => {
     app.listen(PORT, hostname, () => {
+        console.log('Conexão com o banco de dados realizada com sucesso!')
         console.log(`Servidor rodando em http://${hostname}:${PORT}`)
     })
 })
 .catch((err) => {
-    console.error('Erro ao sincronizar com o BD!', err)
+    console.error('Erro ao conectar com o banco de dados!', err.message)
 })

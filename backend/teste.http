@@ -1,56 +1,126 @@
 @baseUrl = http://localhost:3000
-@categoriaId = 1
-@produtoId = 1
-@estoqueId = 1
-@usuarioId = 1
-@pedidoId = 1
-@entregaId = 1
+@adminEmail = admin@autoshopping.com
+@adminSenha = Admin@123
+@clienteEmail = cliente@autoshopping.com
+@clienteSenha = Cliente@123
 
-### Verificar se o servidor está funcionando
-GET {{baseUrl}}/
+# AUTO SHOPPING - TESTE DA API
+#
+# Execute as requisições na ordem em que aparecem neste arquivo.
+# Use a extensão REST Client do VS Code e clique em "Send Request".
+# Para repetir todos os cadastros desde o início, utilize um banco vazio.
 
-### Login do administrador - execute primeiro
+###############################################################################
+# 1. CADASTRAR O PRIMEIRO ADMINISTRADOR
+###############################################################################
+
+### 1.1 Cadastrar administrador
+# @name cadastrarAdmin
+POST {{baseUrl}}/usuario
+Content-Type: application/json
+
+{
+    "nome": "Administrador AutoShopping",
+    "cpf": "529.982.247-25",
+    "email": "matheusorsirei540@gmail.com",
+    "senha": "123456",
+    "telefone": "48999999999",
+    "cep": "88010-400",
+    "rua": "Rua Felipe Schmidt",
+    "numero": "100",
+    "bairro": "Centro",
+    "cidade": "Florianópolis",
+    "uf": "SC",
+    "tipo": "ADMIN"
+}
+
+###############################################################################
+# 2. CADASTRAR UM USUÁRIO NORMAL
+###############################################################################
+
+### 2.1 Cadastrar cliente
+# @name cadastrarCliente
+POST {{baseUrl}}/usuario
+Content-Type: application/json
+
+{
+    "nome": "Cliente AutoShopping",
+    "cpf": "111.444.777-35",
+    "email": "{{clienteEmail}}",
+    "senha": "{{clienteSenha}}",
+    "telefone": "48988887777",
+    "cep": "88015-300",
+    "rua": "Avenida Rio Branco",
+    "numero": "250",
+    "bairro": "Centro",
+    "cidade": "Florianópolis",
+    "uf": "SC",
+    "tipo": "CLIENTE"
+}
+
+###############################################################################
+# 3. LOGIN DO ADMINISTRADOR
+###############################################################################
+
+### 3.1 Entrar como administrador
 # @name loginAdmin
 POST {{baseUrl}}/login
 Content-Type: application/json
 
 {
-    "email": "admin@autoshopping.com",
-    "senha": "Admin@123"
+    "email": "{{adminEmail}}",
+    "senha": "{{adminSenha}}"
 }
 
-### Listar categorias
-GET {{baseUrl}}/categorias
+###############################################################################
+# 4. CRIAR AS CATEGORIAS DOS VEÍCULOS
+###############################################################################
 
-### Consultar categoria por ID
-GET {{baseUrl}}/categoria/{{categoriaId}}
-
-### Cadastrar categoria - ADMIN
+### 4.1 Cadastrar categoria SUV
+# @name criarCategoriaSuv
 POST {{baseUrl}}/categoria
 Content-Type: application/json
 Authorization: Bearer {{loginAdmin.response.body.token}}
 
 {
-    "nome": "Conversível",
-    "descricao": "Veículos com teto retrátil"
+    "nome": "SUV",
+    "descricao": "Utilitários esportivos com conforto e espaço interno."
 }
 
-### Listar veículos
-GET {{baseUrl}}/produtos
+### 4.2 Cadastrar categoria Sedã
+# @name criarCategoriaSeda
+POST {{baseUrl}}/categoria
+Content-Type: application/json
+Authorization: Bearer {{loginAdmin.response.body.token}}
 
-### Buscar veículos
-GET {{baseUrl}}/produtos?busca=Jeep&ativo=true
+{
+    "nome": "Sedã",
+    "descricao": "Veículos de passeio com porta-malas separado."
+}
 
-### Consultar veículo por ID
-GET {{baseUrl}}/produto/{{produtoId}}
+### 4.3 Cadastrar categoria Picape
+# @name criarCategoriaPicape
+POST {{baseUrl}}/categoria
+Content-Type: application/json
+Authorization: Bearer {{loginAdmin.response.body.token}}
 
-### Cadastrar veículo com estoque - ADMIN
+{
+    "nome": "Picape",
+    "descricao": "Veículos com caçamba para trabalho, viagem e lazer."
+}
+
+###############################################################################
+# 5. CADASTRAR TRÊS VEÍCULOS
+###############################################################################
+
+### 5.1 Cadastrar Jeep Compass
+# @name criarProduto1
 POST {{baseUrl}}/produto
 Content-Type: application/json
 Authorization: Bearer {{loginAdmin.response.body.token}}
 
 {
-    "idCategoria": {{categoriaId}},
+    "idCategoria": {{criarCategoriaSuv.response.body.codCategoria}},
     "nome": "Jeep Compass Limited",
     "marca": "Jeep",
     "modelo": "Compass",
@@ -61,58 +131,176 @@ Authorization: Bearer {{loginAdmin.response.body.token}}
     "combustivel": "Flex",
     "cambio": "Automático",
     "cor": "Preto",
-    "descricao": "Veículo revisado e em excelente estado.",
-    "imagem": "https://exemplo.com/jeep-compass.jpg",
+    "descricao": "SUV revisado, completo e em excelente estado.",
+    "imagem": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80",
     "ativo": true,
-    "quantidadeEstoque": 1
+    "quantidadeEstoque": 2
 }
 
-### Atualizar veículo - ADMIN
-PUT {{baseUrl}}/produto/{{produtoId}}
+### 5.2 Cadastrar Toyota Corolla
+# @name criarProduto2
+POST {{baseUrl}}/produto
 Content-Type: application/json
 Authorization: Bearer {{loginAdmin.response.body.token}}
 
 {
-    "preco": 184900.00,
-    "cor": "Vermelho",
-    "ativo": true
+    "idCategoria": {{criarCategoriaSeda.response.body.codCategoria}},
+    "nome": "Toyota Corolla Altis Hybrid",
+    "marca": "Toyota",
+    "modelo": "Corolla",
+    "versao": "Altis Hybrid Premium",
+    "ano": 2024,
+    "preco": 179990.00,
+    "quilometragem": 22000,
+    "combustivel": "Híbrido",
+    "cambio": "CVT",
+    "cor": "Branco",
+    "descricao": "Sedã híbrido econômico, confortável e bem conservado.",
+    "imagem": "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=80",
+    "ativo": true,
+    "quantidadeEstoque": 1
 }
 
-### Consultar estoque do veículo
-GET {{baseUrl}}/estoque/produto/{{produtoId}}
+### 5.3 Cadastrar Ford Ranger
+# @name criarProduto3
+POST {{baseUrl}}/produto
+Content-Type: application/json
+Authorization: Bearer {{loginAdmin.response.body.token}}
 
-### Listar estoques - ADMIN
+{
+    "idCategoria": {{criarCategoriaPicape.response.body.codCategoria}},
+    "nome": "Ford Ranger Limited",
+    "marca": "Ford",
+    "modelo": "Ranger",
+    "versao": "Limited 3.0 V6 4x4",
+    "ano": 2025,
+    "preco": 329900.00,
+    "quilometragem": 8000,
+    "combustivel": "Diesel",
+    "cambio": "Automático",
+    "cor": "Vermelho",
+    "descricao": "Picape 4x4 com baixa quilometragem e alto desempenho.",
+    "imagem": "https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&w=1200&q=80",
+    "ativo": true,
+    "quantidadeEstoque": 1
+}
+
+###############################################################################
+# 6. CONSULTAS PÚBLICAS
+###############################################################################
+
+### 6.1 Verificar servidor
+GET {{baseUrl}}/
+
+### 6.2 Listar categorias
+GET {{baseUrl}}/categorias
+
+### 6.3 Consultar categoria SUV criada acima
+GET {{baseUrl}}/categoria/{{criarCategoriaSuv.response.body.codCategoria}}
+
+### 6.4 Listar os veículos
+GET {{baseUrl}}/produtos
+
+### 6.5 Buscar veículos da marca Jeep
+GET {{baseUrl}}/produtos?busca=Jeep&ativo=true
+
+### 6.6 Consultar o Jeep Compass
+GET {{baseUrl}}/produto/{{criarProduto1.response.body.codProduto}}
+
+### 6.7 Consultar o estoque do Jeep Compass
+GET {{baseUrl}}/estoque/produto/{{criarProduto1.response.body.codProduto}}
+
+###############################################################################
+# 7. LOGIN E OPERAÇÕES DO CLIENTE
+###############################################################################
+
+### 7.1 Entrar como cliente
+# @name loginCliente
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+    "email": "{{clienteEmail}}",
+    "senha": "{{clienteSenha}}"
+}
+
+### 7.2 Consultar o perfil do cliente
+GET {{baseUrl}}/usuario/{{loginCliente.response.body.usuario.codUsuario}}
+Authorization: Bearer {{loginCliente.response.body.token}}
+
+### 7.3 Criar pedido do cliente
+# @name criarPedido
+POST {{baseUrl}}/pedido
+Content-Type: application/json
+Authorization: Bearer {{loginCliente.response.body.token}}
+
+{
+    "itens": [
+        {
+            "produtoId": {{criarProduto1.response.body.codProduto}},
+            "quantidade": 1
+        }
+    ],
+    "valorFrete": 750.00,
+    "entrega": {
+        "tipo": "ENTREGA",
+        "cep": "88015-300",
+        "logradouro": "Avenida Rio Branco",
+        "numero": "250",
+        "complemento": "Apartamento 301",
+        "bairro": "Centro",
+        "localidade": "Florianópolis",
+        "uf": "SC",
+        "previsao": "2026-10-30"
+    }
+}
+
+### 7.4 Listar os pedidos do cliente
+GET {{baseUrl}}/pedidos
+Authorization: Bearer {{loginCliente.response.body.token}}
+
+### 7.5 Consultar o pedido criado
+GET {{baseUrl}}/pedido/{{criarPedido.response.body.codPedido}}
+Authorization: Bearer {{loginCliente.response.body.token}}
+
+###############################################################################
+# 8. OPERAÇÕES ADMINISTRATIVAS
+###############################################################################
+
+### 8.1 Listar usuários
+GET {{baseUrl}}/usuarios
+Authorization: Bearer {{loginAdmin.response.body.token}}
+
+### 8.2 Listar estoques
 GET {{baseUrl}}/estoques
 Authorization: Bearer {{loginAdmin.response.body.token}}
 
-### Atualizar estoque - ADMIN
-PUT {{baseUrl}}/estoque/{{estoqueId}}
+### 8.3 Atualizar o estoque do Toyota Corolla
+PUT {{baseUrl}}/estoque/{{criarProduto2.response.body.estoqueProduto.codEstoque}}
 Content-Type: application/json
 Authorization: Bearer {{loginAdmin.response.body.token}}
 
 {
     "quantidade": 2,
-    "quantidade_minima": 0
+    "quantidade_minima": 1
 }
 
-### Listar usuários - ADMIN
-GET {{baseUrl}}/usuarios
+### 8.4 Atualizar o preço do Ford Ranger
+PUT {{baseUrl}}/produto/{{criarProduto3.response.body.codProduto}}
+Content-Type: application/json
 Authorization: Bearer {{loginAdmin.response.body.token}}
 
-### Consultar usuário
-GET {{baseUrl}}/usuario/{{usuarioId}}
-Authorization: Bearer {{loginAdmin.response.body.token}}
+{
+    "preco": 319900.00,
+    "ativo": true
+}
 
-### Listar todos os pedidos - ADMIN
+### 8.5 Listar todos os pedidos
 GET {{baseUrl}}/pedidos
 Authorization: Bearer {{loginAdmin.response.body.token}}
 
-### Consultar pedido
-GET {{baseUrl}}/pedido/{{pedidoId}}
-Authorization: Bearer {{loginAdmin.response.body.token}}
-
-### Atualizar status do pedido - ADMIN
-PUT {{baseUrl}}/pedido/{{pedidoId}}
+### 8.6 Marcar o pedido como pago
+PUT {{baseUrl}}/pedido/{{criarPedido.response.body.codPedido}}
 Content-Type: application/json
 Authorization: Bearer {{loginAdmin.response.body.token}}
 
@@ -120,29 +308,46 @@ Authorization: Bearer {{loginAdmin.response.body.token}}
     "status": "PAGO"
 }
 
-### Listar entregas - ADMIN
+### 8.7 Marcar o pedido como enviado
+PUT {{baseUrl}}/pedido/{{criarPedido.response.body.codPedido}}
+Content-Type: application/json
+Authorization: Bearer {{loginAdmin.response.body.token}}
+
+{
+    "status": "ENVIADO"
+}
+
+### 8.8 Listar entregas
 GET {{baseUrl}}/entregas
 Authorization: Bearer {{loginAdmin.response.body.token}}
 
-### Atualizar entrega - ADMIN
-PUT {{baseUrl}}/entrega/{{entregaId}}
+### 8.9 Atualizar a entrega do pedido
+PUT {{baseUrl}}/entrega/{{criarPedido.response.body.entregaPedido.codEntrega}}
 Content-Type: application/json
 Authorization: Bearer {{loginAdmin.response.body.token}}
 
 {
     "status": "EM_TRANSITO",
     "codigoRastreio": "AS123456BR",
-    "previsao": "2026-09-15"
+    "previsao": "2026-10-30"
 }
 
-### Relatório geral - ADMIN
+### 8.10 Consultar o relatório geral
 GET {{baseUrl}}/relatorio/resumo
 Authorization: Bearer {{loginAdmin.response.body.token}}
 
-### ATENÇÃO: excluir veículo definitivamente - ADMIN
-DELETE {{baseUrl}}/produto/{{produtoId}}
+###############################################################################
+# 9. EXCLUSÕES - EXECUTE SOMENTE SE QUISER APAGAR OS DADOS DE TESTE
+###############################################################################
+
+### 9.1 Excluir pedido e restaurar seu estoque
+DELETE {{baseUrl}}/pedido/{{criarPedido.response.body.codPedido}}
 Authorization: Bearer {{loginAdmin.response.body.token}}
 
-### ATENÇÃO: excluir categoria definitivamente - ADMIN
-DELETE {{baseUrl}}/categoria/{{categoriaId}}
+### 9.2 Excluir Ford Ranger
+DELETE {{baseUrl}}/produto/{{criarProduto3.response.body.codProduto}}
+Authorization: Bearer {{loginAdmin.response.body.token}}
+
+### 9.3 Excluir categoria Picape depois de excluir o veículo
+DELETE {{baseUrl}}/categoria/{{criarCategoriaPicape.response.body.codCategoria}}
 Authorization: Bearer {{loginAdmin.response.body.token}}

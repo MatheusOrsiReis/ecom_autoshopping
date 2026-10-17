@@ -1,5 +1,11 @@
 const API_URL = 'http://localhost:3000'
 let categoriaSelecionada = ''
+let resposta = document.getElementById('mensagemLista')
+let listar = document.getElementById('listaProdutos')
+let contador = document.getElementById('contadorResultados')
+let campoBusca = document.getElementById('campoBusca')
+let formularioBusca = document.getElementById('formBusca')
+let filtros = document.getElementById('filtroCategorias')
 
 function atualizarNavegacao() {
     let carrinho = []
@@ -132,31 +138,28 @@ function atualizarEnderecoPagina(busca) {
 }
 
 function carregarProdutos() {
-    const lista = document.getElementById('listaProdutos')
-    const mensagem = document.getElementById('mensagemLista')
-    const contador = document.getElementById('contadorResultados')
-    const busca = document.getElementById('campoBusca').value.trim()
+    const busca = campoBusca.value.trim()
     const parametros = new URLSearchParams()
 
     parametros.set('ativo', 'true')
     if (busca) parametros.set('busca', busca)
     if (categoriaSelecionada) parametros.set('categoriaId', categoriaSelecionada)
 
-    mensagem.hidden = false
-    mensagem.className = 'mensagem carregando'
-    mensagem.textContent = 'Carregando veículos...'
-    lista.innerHTML = ''
+    resposta.hidden = false
+    resposta.className = 'mensagem carregando'
+    resposta.textContent = 'Carregando veículos...'
+    listar.innerHTML = ''
     contador.textContent = 'Carregando...'
     atualizarEnderecoPagina(busca)
 
     fetch(API_URL + '/produtos?' + parametros.toString())
-    .then(function (resposta) {
-        if (!resposta.ok) {
-            throw new Error('Erro HTTP ' + resposta.status)
+    .then((res) => {
+        if (!res.ok) {
+            throw new Error('Erro HTTP ' + res.status)
         }
-        return resposta.json()
+        return res.json()
     })
-    .then(function (produtos) {
+    .then((produtos) => {
         const disponiveis = produtos.filter(function (produto) {
             return produto.estoqueProduto && Number(produto.estoqueProduto.quantidade) > 0
         })
@@ -166,23 +169,23 @@ function carregarProdutos() {
             : disponiveis.length + ' veículos encontrados'
 
         if (disponiveis.length === 0) {
-            mensagem.className = 'mensagem mensagem-vazia'
-            mensagem.textContent = busca || categoriaSelecionada
+            resposta.className = 'mensagem mensagem-vazia'
+            resposta.textContent = busca || categoriaSelecionada
                 ? 'Nenhum veículo encontrado para os filtros selecionados.'
                 : 'Nenhum veículo disponível no momento.'
             return
         }
 
-        mensagem.hidden = true
+        resposta.hidden = true
         disponiveis.forEach(function (produto) {
-            lista.appendChild(criarCardProduto(produto))
+            listar.appendChild(criarCardProduto(produto))
         })
     })
-    .catch(function () {
+    .catch(() => {
         contador.textContent = 'Não foi possível obter os resultados'
-        mensagem.hidden = false
-        mensagem.className = 'mensagem mensagem-erro'
-        mensagem.textContent = 'Não foi possível carregar os veículos. Verifique se o backend está ligado.'
+        resposta.hidden = false
+        resposta.className = 'mensagem mensagem-erro'
+        resposta.textContent = 'Não foi possível carregar os veículos. Verifique se o backend está ligado.'
     })
 }
 
@@ -199,28 +202,27 @@ function selecionarCategoria(idCategoria, botaoSelecionado) {
 }
 
 function carregarCategorias() {
-    const filtros = document.getElementById('filtroCategorias')
     const botaoTodos = filtros.getElementsByTagName('button')[0]
 
-    botaoTodos.addEventListener('click', function () {
+    botaoTodos.addEventListener('click', () => {
         selecionarCategoria('', botaoTodos)
     })
 
     fetch(API_URL + '/categorias')
-    .then(function (resposta) {
-        if (!resposta.ok) {
-            throw new Error('Erro HTTP ' + resposta.status)
+    .then((res) => {
+        if (!res.ok) {
+            throw new Error('Erro HTTP ' + res.status)
         }
-        return resposta.json()
+        return res.json()
     })
-    .then(function (categorias) {
+    .then((categorias) => {
         categorias.forEach(function (categoria) {
             const botao = document.createElement('button')
             botao.className = 'filtro-categoria'
             botao.type = 'button'
             botao.dataset.categoria = categoria.codCategoria
             botao.textContent = categoria.nome
-            botao.addEventListener('click', function () {
+            botao.addEventListener('click', () => {
                 selecionarCategoria(String(categoria.codCategoria), botao)
             })
             filtros.appendChild(botao)
@@ -231,7 +233,7 @@ function carregarCategorias() {
             }
         })
     })
-    .catch(function () {
+    .catch(() => {
         const aviso = document.createElement('span')
         aviso.className = 'aviso-categorias'
         aviso.textContent = 'Categorias indisponíveis.'
@@ -243,9 +245,9 @@ function configurarListagem() {
     const parametros = new URLSearchParams(window.location.search)
     const buscaInicial = parametros.get('busca') || ''
     categoriaSelecionada = parametros.get('categoriaId') || ''
-    document.getElementById('campoBusca').value = buscaInicial
+    campoBusca.value = buscaInicial
 
-    document.getElementById('formBusca').addEventListener('submit', function (evento) {
+    formularioBusca.addEventListener('submit', (evento) => {
         evento.preventDefault()
         carregarProdutos()
     })

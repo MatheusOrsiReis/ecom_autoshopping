@@ -3,6 +3,9 @@ const token = localStorage.getItem('autoshopping_token')
 let usuario = null
 let produtosCheckout = []
 let ultimoCepConsultado = ''
+let resposta = document.getElementById('mensagemCheckout')
+let confirmar = document.getElementById('botaoConfirmarPedido')
+let formularioCheckout = document.getElementById('formCheckout')
 
 function lerUsuario() {
     try {
@@ -31,9 +34,8 @@ function encerrarSessao() {
 }
 
 function mostrarMensagem(texto, tipo) {
-    const mensagem = document.getElementById('mensagemCheckout')
-    mensagem.className = 'mensagem-formulario campo-largo ' + tipo
-    mensagem.textContent = texto
+    resposta.className = 'mensagem-formulario campo-largo ' + tipo
+    resposta.textContent = texto
 }
 
 function somenteNumeros(valor) {
@@ -229,7 +231,6 @@ function confirmarPedido(evento) {
         return
     }
 
-    const botao = document.getElementById('botaoConfirmarPedido')
     const corpo = {
         itens: produtosCheckout.map(function (produto) {
             return { produtoId: produto.codProduto, quantidade: 1 }
@@ -237,8 +238,8 @@ function confirmarPedido(evento) {
         entrega: montarEntrega()
     }
 
-    botao.disabled = true
-    botao.textContent = 'Confirmando pedido...'
+    confirmar.disabled = true
+    confirmar.textContent = 'Confirmando pedido...'
     mostrarMensagem('', '')
 
     fetch(API_URL + '/pedido', {
@@ -249,30 +250,30 @@ function confirmarPedido(evento) {
         },
         body: JSON.stringify(corpo)
     })
-    .then(function (resposta) {
-        return resposta.json().then(function (conteudo) {
-            if (resposta.status === 401) {
+    .then((res) => {
+        return res.json().then((conteudo) => {
+            if (res.status === 401) {
                 encerrarSessao()
                 throw new Error('SESSAO_EXPIRADA')
             }
-            if (!resposta.ok) throw new Error(conteudo.message || 'Não foi possível criar o pedido.')
+            if (!res.ok) throw new Error(conteudo.message || 'Não foi possível criar o pedido.')
             return conteudo
         })
     })
-    .then(function (pedido) {
+    .then((pedido) => {
         localStorage.removeItem('autoshopping_carrinho')
         document.getElementById('conteudoCheckout').hidden = true
         document.getElementById('pedidoConcluido').hidden = false
         document.getElementById('numeroPedido').textContent = 'Pedido #' + pedido.codPedido + ' • Total ' + formatarPreco(pedido.valorTotal)
         document.getElementById('contadorCarrinho').textContent = '0'
     })
-    .catch(function (erro) {
+    .catch((erro) => {
         if (erro.message !== 'SESSAO_EXPIRADA') {
             mostrarMensagem(erro.message === 'Failed to fetch'
                 ? 'Backend indisponível. Verifique se o servidor está ligado.'
                 : erro.message, 'erro')
-            botao.disabled = false
-            botao.textContent = 'Confirmar pedido'
+            confirmar.disabled = false
+            confirmar.textContent = 'Confirmar pedido'
         }
     })
 }
@@ -290,7 +291,7 @@ if (!token || !lerUsuario()) {
         else mostrarEstadoCep('', '')
     })
     document.getElementById('cep').addEventListener('blur', consultarCep)
-    document.getElementById('formCheckout').addEventListener('submit', confirmarPedido)
+    formularioCheckout.addEventListener('submit', confirmarPedido)
     configurarTipoEntrega()
 
     Promise.all([carregarProdutosCheckout(), carregarPerfil()])

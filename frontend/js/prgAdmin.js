@@ -6,6 +6,10 @@ let categoriasAdmin = []
 let produtoEmEdicao = null
 let categoriaEmEdicao = null
 const secoesCarregadas = new Set()
+let resposta = document.getElementById('mensagemAdmin')
+let cadastrar = document.getElementById('botaoNovoProduto')
+let formularioProduto = document.getElementById('formProduto')
+let abas = document.getElementById('abasAdmin')
 
 function lerUsuarioAdmin() {
     try {
@@ -75,10 +79,9 @@ async function requisicao(caminho, opcoes) {
 }
 
 function mostrarAviso(texto, tipo) {
-    const aviso = document.getElementById('mensagemAdmin')
-    aviso.hidden = !texto
-    aviso.className = 'aviso-admin ' + (tipo || '')
-    aviso.textContent = texto || ''
+    resposta.hidden = !texto
+    resposta.className = 'aviso-admin ' + (tipo || '')
+    resposta.textContent = texto || ''
 }
 
 function mostrarMensagemFormulario(id, texto, tipo) {
@@ -464,13 +467,13 @@ async function trocarSecao(nome) {
 
 function configurarEventos() {
     document.getElementById('botaoSair').addEventListener('click', sairAdmin)
-    document.querySelector('.abas-admin').addEventListener('click', function (evento) {
+    abas.addEventListener('click', (evento) => {
         const aba = evento.target.closest('.aba-admin')
         if (aba) trocarSecao(aba.dataset.secao)
     })
-    document.getElementById('botaoNovoProduto').addEventListener('click', function () { abrirFormularioProduto(null) })
+    cadastrar.addEventListener('click', () => { abrirFormularioProduto(null) })
     document.getElementById('botaoCancelarProduto').addEventListener('click', fecharFormularioProduto)
-    document.getElementById('formProduto').addEventListener('submit', salvarProduto)
+    formularioProduto.addEventListener('submit', salvarProduto)
     document.getElementById('corpoTabelaProdutos').addEventListener('click', acaoTabelaProdutos)
     document.getElementById('formCategoria').addEventListener('submit', salvarCategoria)
     document.getElementById('botaoCancelarCategoria').addEventListener('click', limparFormularioCategoria)

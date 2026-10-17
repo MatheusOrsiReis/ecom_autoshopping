@@ -1,7 +1,7 @@
 require('dotenv').config() // Carrega as variáveis de ambiente
 const { Sequelize } = require('sequelize')
 
-const db = new Sequelize(
+const conn = new Sequelize(
     process.env.DB_NAME,
     process.env.DB_USER,
     process.env.DB_PASS,
@@ -12,4 +12,4 @@ const db = new Sequelize(
     }
 )
 
-module.exports = db
+module.exports = conn
