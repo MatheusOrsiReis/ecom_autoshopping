@@ -1,0 +1,390 @@
+%PDF-1.4
+%âãÏÓ
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 4 /Kids [6 0 R 8 0 R 10 0 R 12 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Length 2457 >>
+stream
+0.12 0.15 0.19 rg 0 774 595 68 re f
+1 1 1 rg
+BT /F2 15 Tf 42 806 Td (Roteiro integrado e alinhamento) Tj ET
+0.75 0.1 0.12 rg 42 748 511 3 re f
+0.12 0.15 0.19 rg
+BT /F2 13 Tf 42 720 Td (1. Preparação e roteiros de prática) Tj ET
+BT /F1 10.5 Tf 14 TL 42 693 Td
+(Objetivo: manter a mesma orientação entre manual, treinamento e rotina dos turnos. Base:) Tj
+T*
+(requisitos_do_sistema.pdf e especificacoes_infraestrutura.pdf; comandos conferidos no) Tj
+T*
+(frontend. Tempo previsto de elaboração desta entrega: 25 min, distinto da duração das) Tj
+T*
+(turmas.) Tj
+T*
+() Tj
+T*
+(Antes da prática: confirmar endereço, estação autorizada, serviços e contas CLIENTE/ADMIN.) Tj
+T*
+(TI valida acesso em rede, pois o projeto descreve configuração local. Liderança define) Tj
+T*
+(horários e participantes por turno.) Tj
+T*
+() Tj
+T*
+(Preparar categoria, veículo com saldo, contas e pedido de exercício autorizados. Não usar) Tj
+T*
+(dados pessoais reais nem operações reais como ensaio. Ambiente separado não foi) Tj
+T*
+(comprovado; sem autorização/condições para prática, fazer leitura guiada e registrar) Tj
+T*
+(execução como pendente.) Tj
+T*
+() Tj
+T*
+(R1 - Cliente: entrar, buscar veículo, conferir detalhes, adicionar e revisar carrinho,) Tj
+T*
+(escolher recebimento, conferir valores, confirmar pedido de exercício, consultar número em) Tj
+T*
+("Meus pedidos" e sair. Manual M01-M05 e M10; trilha A.) Tj
+T*
+() Tj
+T*
+(R2 - Catálogo: entrar como ADMIN, cadastrar categoria e veículo de exercício, conferir) Tj
+T*
+(lista, consultar código, editar saldo, verificar disponibilidade e sair. M06-M07 e M10;) Tj
+T*
+(trilha B.) Tj
+T*
+() Tj
+T*
+(R3 - Logística: entrar como ADMIN, localizar pedido por número e filtro, conferir cliente) Tj
+T*
+(e itens, atualizar situação autorizada no exercício, localizar entrega associada, informar) Tj
+T*
+(situação, previsão e rastreio de exercício, salvar, conferir ambos os registros e sair.) Tj
+T*
+(M08 e M10; trilha C.) Tj
+T*
+() Tj
+T*
+(R4 - Supervisão: entrar como ADMIN, consultar usuários, abrir e atualizar relatórios,) Tj
+T*
+(identificar indicadores e gráficos, explicar exclusão de cancelados e sair. M09 e M10;) Tj
+T*
+(trilha D.) Tj
+T*
+() Tj
+T*
+(Em todas as turmas, o usuário deve reconhecer início, ação, conferência do resultado e) Tj
+T*
+(seção do manual para consulta. Cada pessoa executa sua tentativa, inclusive em duplas.) Tj
+T*
+() Tj
+T*
+ET
+0.4 0.4 0.4 rg
+BT /F1 8 Tf 42 39 Td (AutoShopping | Versao 1.0 | 21/10/2026 | 1/4) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 2384 >>
+stream
+0.12 0.15 0.19 rg 0 774 595 68 re f
+1 1 1 rg
+BT /F2 15 Tf 42 806 Td (Roteiro integrado e alinhamento) Tj ET
+0.75 0.1 0.12 rg 42 748 511 3 re f
+0.12 0.15 0.19 rg
+BT /F2 13 Tf 42 720 Td (2. Matriz manual x treinamento x requisito) Tj ET
+BT /F1 10.5 Tf 14 TL 42 693 Td
+(A01 | M01 | Bloco comum | RF01-RF07; RN01-RN05; RNF08 | Evidência: entrar com perfil) Tj
+T*
+(correto, revisar próprios dados e sair.) Tj
+T*
+() Tj
+T*
+(A02 | M02 | Trilha A / R1 | RF13-RF16; RN14 | Evidência: localizar veículo e conferir) Tj
+T*
+(detalhes.) Tj
+T*
+() Tj
+T*
+(A03 | M03 | Trilha A / R1 | RF17-RF18; RN15 | Evidência: revisar/remover itens sem) Tj
+T*
+(duplicação e explicar limite por navegador.) Tj
+T*
+() Tj
+T*
+(A04 | M04 | Trilha A / R1 | RF19-RF20; RN16-RN24 | Evidência: conferir valores e) Tj
+T*
+(recebimento e localizar pedido criado.) Tj
+T*
+() Tj
+T*
+(A05 | M05 | Trilha A / R1 | RF21-RF22; RN27-RN33 | Evidência: consultar pedido próprio e) Tj
+T*
+(cancelar somente exercício pendente.) Tj
+T*
+() Tj
+T*
+(A06 | M06 | Trilha B / R2 | RF08-RF09; RN07-RN08 | Evidência: salvar categoria e explicar) Tj
+T*
+(restrição de exclusão com vínculo.) Tj
+T*
+() Tj
+T*
+(A07 | M06 | Trilha B / R2 | RF10-RF11; RN09-RN11; RN14 | Evidência: cadastrar, consultar e) Tj
+T*
+(corrigir veículo com dados válidos.) Tj
+T*
+() Tj
+T*
+(A08 | M07 | Trilha B / R2 | RF12; RN12-RN18; RN28 | Evidência: conferir saldo e explicar) Tj
+T*
+(movimentação automática.) Tj
+T*
+() Tj
+T*
+(A09 | M08 | Trilha C / R3 | RF23; RN28-RN32; RN35 | Evidência: filtrar e atualizar pedido) Tj
+T*
+(correto respeitando bloqueios.) Tj
+T*
+() Tj
+T*
+(A10 | M08 | Trilha C / R3 | RF24; RN24-RN25; RN31-RN33 | Evidência: conferir situação,) Tj
+T*
+(previsão e rastreio sem repetição.) Tj
+T*
+() Tj
+T*
+(A11 | M09 | Trilha D / R4 | RF25-RF28; RN34 | Evidência: consultar e explicar faturamento) Tj
+T*
+(sem cancelados.) Tj
+T*
+() Tj
+T*
+(A12 | M10 e seção 3 do plano | Todas | Infraestrutura: navegador, rede, serviços externos,) Tj
+T*
+(sessão e segurança | Evidência: reconhecer limite de internet, relatar falha e sair.) Tj
+T*
+() Tj
+T*
+(Cobertura: todos os 28 requisitos funcionais estão relacionados. Regras sem tela) Tj
+T*
+(documentada não foram convertidas em procedimentos de telas inexistentes. Os grupos de) Tj
+T*
+(aprendizagem não criam novas permissões.) Tj
+T*
+() Tj
+T*
+ET
+0.4 0.4 0.4 rg
+BT /F1 8 Tf 42 39 Td (AutoShopping | Versao 1.0 | 21/10/2026 | 2/4) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Length 2462 >>
+stream
+0.12 0.15 0.19 rg 0 774 595 68 re f
+1 1 1 rg
+BT /F2 15 Tf 42 806 Td (Roteiro integrado e alinhamento) Tj ET
+0.75 0.1 0.12 rg 42 748 511 3 re f
+0.12 0.15 0.19 rg
+BT /F2 13 Tf 42 720 Td (3. Avaliação, reforço e ficha de aplicação) Tj ET
+BT /F1 10.5 Tf 14 TL 42 693 Td
+(Exercício 1 - Entrada: acessar conta correta, identificar perfil e sair. Conferir: acesso) Tj
+T*
+(permitido, credenciais preservadas e localização de M01.) Tj
+T*
+() Tj
+T*
+(Exercício 2 - Pedido: revisar carrinho de exercício, escolher recebimento, confirmar e) Tj
+T*
+(localizar número nos próprios pedidos. Conferir: veículo e endereço corretos, sem) Tj
+T*
+(repetição indevida.) Tj
+T*
+() Tj
+T*
+(Exercício 3 - Valores: perguntar o total para retirada com subtotal de R$ 200.000,00.) Tj
+T*
+(Esperado: 5% de desconto, R$ 10.000,00, total R$ 190.000,00, sem frete. Não é preciso) Tj
+T*
+(realizar compra real para avaliar a regra.) Tj
+T*
+() Tj
+T*
+(Exercício 4 - Catálogo: salvar categoria e veículo de exercício, consultar código e) Tj
+T*
+(atualizar saldo inteiro não negativo. Conferir lista após salvar e explicar por que) Tj
+T*
+(veículo inativo ou sem saldo não aparece disponível.) Tj
+T*
+() Tj
+T*
+(Exercício 5 - Logística: localizar pedido e entrega de exercício, atualizar campos) Tj
+T*
+(definidos para a prática e conferir retorno. Explicar diferença entre as situações e) Tj
+T*
+(proibição de rastreio repetido.) Tj
+T*
+() Tj
+T*
+(Exercício 6 - Supervisão: consultar indicadores e explicar exclusão de cancelados. Diante) Tj
+T*
+(de gráficos ausentes, reconhecer dependência da internet sem concluir que os dados são) Tj
+T*
+(zero.) Tj
+T*
+() Tj
+T*
+(Avaliar os cinco itens do plano: executar, conferir, explicar restrição, localizar manual) Tj
+T*
+(e sair. Aprovação proposta: cinco itens concluídos sem alterar registro indevido ou expor) Tj
+T*
+(dados. Dificuldade gera demonstração e nova tentativa individual. Indisponibilidade não) Tj
+T*
+(equivale a aprovação prática.) Tj
+T*
+() Tj
+T*
+(Ficha: participante ______; turno ______; data ______; trilha ______; exercício ______;) Tj
+T*
+(execução ______; conferência ______; restrição ______; consulta ao manual ______; saída) Tj
+T*
+(______; dúvida/reforço ______; avaliador ______.) Tj
+T*
+() Tj
+T*
+(Repetir objetivos e critérios nos turnos. Ajustar ritmo ao diagnóstico e reunir dúvidas) Tj
+T*
+(recorrentes para revisar o trecho correspondente.) Tj
+T*
+() Tj
+T*
+ET
+0.4 0.4 0.4 rg
+BT /F1 8 Tf 42 39 Td (AutoShopping | Versao 1.0 | 21/10/2026 | 3/4) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 9 0 R >>
+endobj
+11 0 obj
+<< /Length 2383 >>
+stream
+0.12 0.15 0.19 rg 0 774 595 68 re f
+1 1 1 rg
+BT /F2 15 Tf 42 806 Td (Roteiro integrado e alinhamento) Tj ET
+0.75 0.1 0.12 rg 42 748 511 3 re f
+0.12 0.15 0.19 rg
+BT /F2 13 Tf 42 720 Td (4. Fontes, revisão e pendências) Tj ET
+BT /F1 10.5 Tf 14 TL 42 693 Td
+(Conjunto: 01_Plano_de_Treinamento_e_Matriz.pdf; 02_Manual_do_Usuario_Operacional.pdf;) Tj
+T*
+(03_Roteiro_Integrado_e_Alinhamento.pdf. Versão 1.0 de 21/10/2026. Responsável pela) Tj
+T*
+(revisão: a designar pela empresa.) Tj
+T*
+() Tj
+T*
+(Fontes principais: Documentacao/requisitos_do_sistema.pdf \(RF01-RF28, RNF01-RNF18 e) Tj
+T*
+(RN01-RN35\); Documentacao/especificacoes_infraestrutura.pdf \(ambiente, rede, serviços) Tj
+T*
+(externos, sessão e segurança\).) Tj
+T*
+() Tj
+T*
+(Conferência complementar: telas/scripts de login, cadastro, perfil, catálogo, carrinho,) Tj
+T*
+(checkout, meus pedidos, painel e relatórios da pasta frontend. Conferência documental não) Tj
+T*
+(substitui teste do sistema ou homologação do ambiente.) Tj
+T*
+() Tj
+T*
+(Não foram criados procedimentos de Pix, boleto, recuperação de senha, emissão de) Tj
+T*
+(etiquetas, coletores, operação sem conexão ou tela de passagem de turno. Os anexos não os) Tj
+T*
+(descrevem.) Tj
+T*
+() Tj
+T*
+(Pendências antes de aplicar: empresa define endereço, participantes, turnos, estações,) Tj
+T*
+(contas e dados de exercício, canal de suporte e políticas internas. TI valida implantação) Tj
+T*
+(em rede e serviços externos. Esses pontos são de organização, não funções já fornecidas) Tj
+T*
+(pelo sistema.) Tj
+T*
+() Tj
+T*
+(Atualização proposta: ao mudar uma função, conferir especificação e tela, atualizar a) Tj
+T*
+(seção M do manual, ajustar atividade e evidência desta matriz, alterar versão e comunicar) Tj
+T*
+(pelo canal aprovado. Não há canal específico definido nos anexos.) Tj
+T*
+() Tj
+T*
+(Qualidade: verificar se a instrução corresponde à função disponível, se o usuário encontra) Tj
+T*
+(o comando e reconhece a conclusão e se há condições para praticar. Usar dúvidas repetidas) Tj
+T*
+(para reforço e revisão.) Tj
+T*
+() Tj
+T*
+(Prazos de elaboração preservados: plano e matriz, 45 min; manual, 50 min; roteiro) Tj
+T*
+(integrado, 25 min; total previsto, 120 min. São prazos do desafio, não alegação de tempo) Tj
+T*
+(efetivamente gasto para produzir os arquivos.) Tj
+T*
+() Tj
+T*
+ET
+0.4 0.4 0.4 rg
+BT /F1 8 Tf 42 39 Td (AutoShopping | Versao 1.0 | 21/10/2026 | 4/4) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 11 0 R >>
+endobj
+xref
+0 13
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000141 00000 n 
+0000000238 00000 n 
+0000000340 00000 n 
+0000002849 00000 n 
+0000002985 00000 n 
+0000005421 00000 n 
+0000005557 00000 n 
+0000008071 00000 n 
+0000008208 00000 n 
+0000010644 00000 n 
+trailer
+<< /Size 13 /Root 1 0 R >>
+startxref
+10782
+%%EOF

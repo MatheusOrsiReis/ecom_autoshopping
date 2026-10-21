@@ -1,0 +1,560 @@
+%PDF-1.4
+%âãÏÓ
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 7 /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Length 2108 >>
+stream
+0.12 0.15 0.19 rg 0 774 595 68 re f
+1 1 1 rg
+BT /F2 15 Tf 42 806 Td (Manual do usuario - operacional) Tj ET
+0.75 0.1 0.12 rg 42 748 511 3 re f
+0.12 0.15 0.19 rg
+BT /F2 13 Tf 42 720 Td (M01. Entrar, cadastrar e atualizar a conta) Tj ET
+BT /F1 10.5 Tf 14 TL 42 693 Td
+(Use a seção da tarefa que deseja executar. Base: requisitos_do_sistema.pdf,) Tj
+T*
+(especificacoes_infraestrutura.pdf e telas/scripts em frontend. As regras internas da) Tj
+T*
+(empresa continuam aplicáveis.) Tj
+T*
+() Tj
+T*
+(1. Abra no navegador o endereço informado pela TI. Os anexos descrevem execução local e) Tj
+T*
+(não fornecem endereço de produção da indústria. A preparação do sistema cabe ao) Tj
+T*
+(responsável técnico.) Tj
+T*
+() Tj
+T*
+(2. Escolha "Entrar", preencha e-mail e senha e pressione "Entrar". O catálogo público pode) Tj
+T*
+(ser consultado sem login; pedidos e dados pessoais exigem conta conectada.) Tj
+T*
+() Tj
+T*
+(3. Para criar conta de cliente, use "Cadastre-se". Preencha nome completo, CPF, telefone,) Tj
+T*
+(e-mail, senha, CEP, UF, rua, número, bairro e cidade. Revise e use "Criar minha conta".) Tj
+T*
+(CPF deve ser válido; CPF e e-mail não podem se repetir.) Tj
+T*
+() Tj
+T*
+(4. A consulta de CEP preenche rua, bairro, cidade e UF com internet disponível. Confira os) Tj
+T*
+(campos e complete o número. O preenchimento automático não confirma o endereço completo.) Tj
+T*
+() Tj
+T*
+(5. Em "Meu perfil" / "Dados pessoais", corrija seus dados e use "Salvar alterações".) Tj
+T*
+(Preencha "Nova senha" apenas para alterá-la. Confira o retorno da gravação.) Tj
+T*
+() Tj
+T*
+(O CLIENTE acessa somente sua conta e seus pedidos. O painel e os relatórios exigem ADMIN.) Tj
+T*
+(O cadastro comum não é orientação para criar administradores; trate essa necessidade com o) Tj
+T*
+(responsável autorizado.) Tj
+T*
+() Tj
+T*
+(Ao concluir, use "Sair" no perfil ou painel. Fechar a página não equivale a sair, pois a) Tj
+T*
+(sessão fica armazenada no navegador.) Tj
+T*
+() Tj
+T*
+(Referências: RF01-RF07; RN01-RN05; RNF08 e RNF17.) Tj
+T*
+() Tj
+T*
+ET
+0.4 0.4 0.4 rg
+BT /F1 8 Tf 42 39 Td (AutoShopping | Versao 1.0 | 21/10/2026 | 1/7) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 1749 >>
+stream
+0.12 0.15 0.19 rg 0 774 595 68 re f
+1 1 1 rg
+BT /F2 15 Tf 42 806 Td (Manual do usuario - operacional) Tj ET
+0.75 0.1 0.12 rg 42 748 511 3 re f
+0.12 0.15 0.19 rg
+BT /F2 13 Tf 42 720 Td (M02. Localizar veículo / M03. Carrinho) Tj ET
+BT /F1 10.5 Tf 14 TL 42 693 Td
+(M02 - Consulta: abra "Veículos". Use a busca por nome, marca ou modelo e o filtro por) Tj
+T*
+(categoria quando necessário. Abra "Ver detalhes" e confira identificação, preço e) Tj
+T*
+(características antes de escolher o veículo.) Tj
+T*
+() Tj
+T*
+(Se não encontrar o anúncio, revise busca e categoria. Somente veículos ativos e com) Tj
+T*
+(estoque maior que zero devem aparecer disponíveis. O cliente não altera cadastro ou saldo.) Tj
+T*
+() Tj
+T*
+(Resultado esperado: veículo correto identificado. A consulta não reserva o estoque até a) Tj
+T*
+(finalização. Referências: RF13-RF16; RN14 e RN17.) Tj
+T*
+() Tj
+T*
+(M03 - Carrinho: adicione o veículo pela opção disponível na página de detalhes e abra) Tj
+T*
+("Carrinho". Confira os veículos e valores; remova o que não desejar antes de finalizar.) Tj
+T*
+() Tj
+T*
+(O mesmo veículo não pode ser adicionado mais de uma vez. Não use repetições para) Tj
+T*
+(representar quantidades. O pedido precisa ter pelo menos um veículo disponível.) Tj
+T*
+() Tj
+T*
+(O carrinho fica no navegador usado. Não há garantia de aparecer em outra estação ou) Tj
+T*
+(navegador. Limpar os dados do navegador remove carrinho e sessão, mas não apaga pedidos já) Tj
+T*
+(gravados no sistema.) Tj
+T*
+() Tj
+T*
+(Resultado esperado: carrinho contendo apenas os veículos desejados. Referências:) Tj
+T*
+(RF17-RF18; RN15-RN18; infraestrutura, armazenamento no navegador.) Tj
+T*
+() Tj
+T*
+ET
+0.4 0.4 0.4 rg
+BT /F1 8 Tf 42 39 Td (AutoShopping | Versao 1.0 | 21/10/2026 | 2/7) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Length 2067 >>
+stream
+0.12 0.15 0.19 rg 0 774 595 68 re f
+1 1 1 rg
+BT /F2 15 Tf 42 806 Td (Manual do usuario - operacional) Tj ET
+0.75 0.1 0.12 rg 42 748 511 3 re f
+0.12 0.15 0.19 rg
+BT /F2 13 Tf 42 720 Td (M04. Finalizar pedido) Tj ET
+BT /F1 10.5 Tf 14 TL 42 693 Td
+(1. Prossiga do carrinho revisado para "Finalizar pedido". Entre com sua conta se) Tj
+T*
+(solicitado.) Tj
+T*
+() Tj
+T*
+(2. Em "Como deseja receber?", escolha "Retirar na loja" ou "Receber no endereço".) Tj
+T*
+() Tj
+T*
+(3. Para entrega, preencha e confira CEP, rua, número, bairro, cidade e UF; complete) Tj
+T*
+(complemento quando necessário. Entrega exige endereço. Retirada na loja não tem cobrança) Tj
+T*
+(de frete.) Tj
+T*
+() Tj
+T*
+(4. Confira itens, subtotal, desconto e total. Regra: total = subtotal + frete - desconto.) Tj
+T*
+(Os anexos não apresentam tabela de frete; não estime valores ou condições de cobrança.) Tj
+T*
+() Tj
+T*
+(5. Subtotal a partir de R$ 200.000,00 recebe desconto de 5%. Exemplo didático para) Tj
+T*
+(retirada: subtotal R$ 200.000,00, desconto R$ 10.000,00 e total R$ 190.000,00.) Tj
+T*
+() Tj
+T*
+(6. Pressione "Confirmar pedido" e aguarde o retorno. Confira o número e o total) Tj
+T*
+(apresentados. Use "Acompanhar meus pedidos" para localizar o registro criado.) Tj
+T*
+() Tj
+T*
+(Se um veículo deixar de estar disponível, revise o carrinho. Todos os itens precisam estar) Tj
+T*
+(ativos e com estoque; criar pedido reduz o saldo correspondente pelo próprio sistema.) Tj
+T*
+() Tj
+T*
+(Se o retorno for incerto, consulte "Meus pedidos" antes de repetir a confirmação. Se) Tj
+T*
+(persistir a dúvida, procure o responsável indicado pela empresa.) Tj
+T*
+() Tj
+T*
+(Confirmar pedido não comprova pagamento. Os anexos não descrevem tela de pagamento, Pix,) Tj
+T*
+(boleto ou integração bancária; não há procedimentos desses recursos neste manual.) Tj
+T*
+() Tj
+T*
+(Resultado esperado: pedido identificado na conta correta e recebimento e valores) Tj
+T*
+(conferidos. Referências: RF19-RF20; RN16-RN24.) Tj
+T*
+() Tj
+T*
+ET
+0.4 0.4 0.4 rg
+BT /F1 8 Tf 42 39 Td (AutoShopping | Versao 1.0 | 21/10/2026 | 3/7) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 9 0 R >>
+endobj
+11 0 obj
+<< /Length 1736 >>
+stream
+0.12 0.15 0.19 rg 0 774 595 68 re f
+1 1 1 rg
+BT /F2 15 Tf 42 806 Td (Manual do usuario - operacional) Tj ET
+0.75 0.1 0.12 rg 42 748 511 3 re f
+0.12 0.15 0.19 rg
+BT /F2 13 Tf 42 720 Td (M05. Acompanhar e cancelar pedido) Tj ET
+BT /F1 10.5 Tf 14 TL 42 693 Td
+(1. Entre na conta e abra "Meus pedidos" pela navegação ou área de dados pessoais. Localize) Tj
+T*
+(o número e confira itens, total e situação. Consulte a entrega associada quando) Tj
+T*
+(disponível.) Tj
+T*
+() Tj
+T*
+(2. Pedido pode estar pendente de pagamento, pago, enviado, entregue ou cancelado. A) Tj
+T*
+(entrega possui situação própria: aguardando, em trânsito, saiu para entrega, entregue ou) Tj
+T*
+(extraviado. Confira qual registro está consultando.) Tj
+T*
+() Tj
+T*
+(3. Para desistir de pedido próprio pendente de pagamento, use "Cancelar pedido" e confirme) Tj
+T*
+(após conferir o número. O botão é apresentado para pedidos pendentes. Confira a situação) Tj
+T*
+(após concluir.) Tj
+T*
+() Tj
+T*
+(O cliente só pode cancelar pedido próprio pendente de pagamento. Pedido entregue não pode) Tj
+T*
+(ser cancelado. Pedido cancelado não pode ser reaberto. O sistema restaura o estoque no) Tj
+T*
+(cancelamento; não faça ajuste manual para repetir essa devolução.) Tj
+T*
+() Tj
+T*
+(Resultado esperado: situação consultada ou cancelamento conferido no pedido correto.) Tj
+T*
+(Referências: RF21-RF22; RN27-RN33.) Tj
+T*
+() Tj
+T*
+(Ao assumir uma estação de outro turno, confira a conta conectada. Consulte os registros no) Tj
+T*
+(sistema; o carrinho do navegador não representa passagem de turno. Não há tela de passagem) Tj
+T*
+(de turno documentada. Ao terminar, saia da conta.) Tj
+T*
+() Tj
+T*
+ET
+0.4 0.4 0.4 rg
+BT /F1 8 Tf 42 39 Td (AutoShopping | Versao 1.0 | 21/10/2026 | 4/7) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 11 0 R >>
+endobj
+13 0 obj
+<< /Length 2114 >>
+stream
+0.12 0.15 0.19 rg 0 774 595 68 re f
+1 1 1 rg
+BT /F2 15 Tf 42 806 Td (Manual do usuario - operacional) Tj ET
+0.75 0.1 0.12 rg 42 748 511 3 re f
+0.12 0.15 0.19 rg
+BT /F2 13 Tf 42 720 Td (M06. Categorias e veículos - ADMIN) Tj ET
+BT /F1 10.5 Tf 14 TL 42 693 Td
+(Abra "Painel administrativo". As áreas são "Veículos", "Categorias", "Pedidos", "Entregas") Tj
+T*
+(e "Usuários".) Tj
+T*
+() Tj
+T*
+(Categorias: abra "Categorias", preencha "Nome" e, quando necessário, "Descrição". Use) Tj
+T*
+("Salvar categoria" e confira a lista. Para corrigir, use "Editar" e salve. Para apagar,) Tj
+T*
+(confira o registro, use "Excluir" e leia a confirmação. Categoria com veículos vinculados) Tj
+T*
+(não pode ser apagada.) Tj
+T*
+() Tj
+T*
+(Veículos: abra "Veículos" e "Cadastrar veículo" ou "Cadastrar". Cadastre uma categoria) Tj
+T*
+(antes, se ainda não houver. Preencha categoria, nome do anúncio, marca, modelo, ano,) Tj
+T*
+(preço, quilometragem, combustível, câmbio, cor e quantidade em estoque. Complete versão,) Tj
+T*
+(descrição e URL da imagem quando aplicável.) Tj
+T*
+() Tj
+T*
+(Preço deve ser maior que zero; quilometragem não pode ser negativa; estoque deve ser) Tj
+T*
+(inteiro igual ou maior que zero. O veículo precisa de categoria existente.) Tj
+T*
+() Tj
+T*
+(Confira "Veículo ativo e visível na loja", use "Salvar veículo" e verifique o retorno e a) Tj
+T*
+(opção "Listar". Disponibilidade também depende de saldo maior que zero.) Tj
+T*
+() Tj
+T*
+(Para corrigir, localize o veículo em "Listar", use "Editar", altere e salve. Para) Tj
+T*
+(consultar pelo código, abra "Consultar", informe "Código" e pressione "Consultar".) Tj
+T*
+() Tj
+T*
+(Ativar/desativar muda a disponibilidade do anúncio e não equivale a excluir. Para apagar,) Tj
+T*
+(confira o veículo e a confirmação de exclusão. O sistema deve preservar a integridade dos) Tj
+T*
+(registros e pode bloquear operações incompatíveis.) Tj
+T*
+() Tj
+T*
+(Resultado esperado: registro correto salvo e conferido. Referências: RF08-RF11; RN07-RN11,) Tj
+T*
+(RN14 e RN35; RNF14.) Tj
+T*
+() Tj
+T*
+ET
+0.4 0.4 0.4 rg
+BT /F1 8 Tf 42 39 Td (AutoShopping | Versao 1.0 | 21/10/2026 | 5/7) Tj ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 13 0 R >>
+endobj
+15 0 obj
+<< /Length 2342 >>
+stream
+0.12 0.15 0.19 rg 0 774 595 68 re f
+1 1 1 rg
+BT /F2 15 Tf 42 806 Td (Manual do usuario - operacional) Tj ET
+0.75 0.1 0.12 rg 42 748 511 3 re f
+0.12 0.15 0.19 rg
+BT /F2 13 Tf 42 720 Td (M07. Estoque / M08. Pedidos e entregas) Tj ET
+BT /F1 10.5 Tf 14 TL 42 693 Td
+(M07 - ADMIN: em "Painel" > "Veículos" > "Listar", identifique o veículo e confira) Tj
+T*
+("Estoque". Use "Editar", informe em "Quantidade em estoque" o saldo total correto e use) Tj
+T*
+("Salvar veículo". Confira novamente a lista. Não digite somente o acréscimo ou retirada no) Tj
+T*
+(campo de saldo.) Tj
+T*
+() Tj
+T*
+(Estoque deve ser inteiro e não negativo. Cada veículo tem um registro de estoque. Pedido) Tj
+T*
+(reduz saldo; cancelamento/exclusão restaura quando aplicável. Não duplique manualmente) Tj
+T*
+(essas movimentações. Se houver falha ao salvar, confira o saldo antes de repetir. RF12;) Tj
+T*
+(RN12-RN18 e RN28.) Tj
+T*
+() Tj
+T*
+(M08 - ADMIN: em "Pedidos", filtre por status, localize o número e confira cliente, itens e) Tj
+T*
+(total. Selecione "Status", use "Atualizar status" e confira a lista. Opções: pendente de) Tj
+T*
+(pagamento, pago, enviado, entregue e cancelado. Entregue não pode ser cancelado; cancelado) Tj
+T*
+(não pode reabrir.) Tj
+T*
+() Tj
+T*
+(Para apagar, use "Excluir pedido" somente após conferir necessidade e confirmação) Tj
+T*
+(definitiva. Excluir e cancelar são ações diferentes. A restauração de estoque cabe ao) Tj
+T*
+(sistema; não a duplique.) Tj
+T*
+() Tj
+T*
+(Em "Entregas", localize a entrega pelo pedido associado e confira endereço ou retirada.) Tj
+T*
+(Selecione "Status": aguardando, em trânsito, saiu para entrega, entregue ou extraviado.) Tj
+T*
+(Preencha "Rastreio" e "Previsão" quando houver informações confirmadas. Use "Salvar) Tj
+T*
+(entrega" e confira os dados.) Tj
+T*
+() Tj
+T*
+(Não reutilize o mesmo rastreio em entregas diferentes. Cada pedido possui uma entrega. Não) Tj
+T*
+(invente código para contornar bloqueio. Pedido e entrega têm situações distintas; não) Tj
+T*
+(presuma atualização automática entre ambos. Confira os dois registros.) Tj
+T*
+() Tj
+T*
+(Resultado esperado: atualização conferida no registro correto. Não há procedimento) Tj
+T*
+(documentado de etiquetas ou coletores. RF23-RF24; RN24-RN25 e RN28-RN35.) Tj
+T*
+() Tj
+T*
+ET
+0.4 0.4 0.4 rg
+BT /F1 8 Tf 42 39 Td (AutoShopping | Versao 1.0 | 21/10/2026 | 6/7) Tj ET
+endstream
+endobj
+16 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 15 0 R >>
+endobj
+17 0 obj
+<< /Length 2345 >>
+stream
+0.12 0.15 0.19 rg 0 774 595 68 re f
+1 1 1 rg
+BT /F2 15 Tf 42 806 Td (Manual do usuario - operacional) Tj ET
+0.75 0.1 0.12 rg 42 748 511 3 re f
+0.12 0.15 0.19 rg
+BT /F2 13 Tf 42 720 Td (M09. Consultas / M10. Dúvidas e acesso) Tj ET
+BT /F1 10.5 Tf 14 TL 42 693 Td
+(M09 - ADMIN: em "Usuários", consulte nome, contato, CPF, cidade e tipo. Não se trata aqui) Tj
+T*
+(de tela de edição ou concessão de acesso.) Tj
+T*
+() Tj
+T*
+(Abra "Relatórios" e confira usuários, veículos, veículos disponíveis, pedidos e) Tj
+T*
+(faturamento sem cancelados. Use "Atualizar" para nova consulta e "Imprimir" quando) Tj
+T*
+(necessário e permitido pelas regras internas.) Tj
+T*
+() Tj
+T*
+(Consulte "Faturamento mensal", "Unidades por categoria" e "Pedidos recentes". Gráficos) Tj
+T*
+(dependem de internet; sua ausência não prova ausência de vendas ou estoque. Cancelados não) Tj
+T*
+(entram no faturamento. O indicador não comprova recebimento bancário, pois não há) Tj
+T*
+(conciliação descrita. RF25-RF28; RN34.) Tj
+T*
+() Tj
+T*
+(M10 - Se não conseguir entrar, confira os dados e a conta correta. Se a sessão expirar,) Tj
+T*
+(entre novamente. Não compartilhe senha nem use conta de colega para obter permissão.) Tj
+T*
+() Tj
+T*
+(Se o CEP não preencher, confira o CEP e os campos de endereço; a consulta depende de) Tj
+T*
+(internet. Se o sistema não carregar ou não concluir ação, comunique horário, tela, ação,) Tj
+T*
+(número do registro quando aplicável e texto do retorno ao responsável definido pela) Tj
+T*
+(empresa. Não envie senha, token ou dados pessoais desnecessários.) Tj
+T*
+() Tj
+T*
+(Não altere rede ou instalação para contornar falhas. Não há registro sem conexão) Tj
+T*
+(documentado. Antes de repetir gravação incerta, consulte o registro. Limpar dados do) Tj
+T*
+(navegador remove sessão e carrinho; não é recuperação de pedidos, que permanecem no banco.) Tj
+T*
+() Tj
+T*
+(Ao concluir, use "Sair". Não divulgue dados pessoais reais ou impressões fora das regras) Tj
+T*
+(internas. Contato e canal de suporte não foram informados nos anexos; a empresa deve) Tj
+T*
+(comunicá-los antes do uso operacional.) Tj
+T*
+() Tj
+T*
+(Referências de ambiente: especificacoes_infraestrutura.pdf, navegador, rede, serviços) Tj
+T*
+(externos, armazenamento local e segurança.) Tj
+T*
+() Tj
+T*
+ET
+0.4 0.4 0.4 rg
+BT /F1 8 Tf 42 39 Td (AutoShopping | Versao 1.0 | 21/10/2026 | 7/7) Tj ET
+endstream
+endobj
+18 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 17 0 R >>
+endobj
+xref
+0 19
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000162 00000 n 
+0000000259 00000 n 
+0000000361 00000 n 
+0000002521 00000 n 
+0000002657 00000 n 
+0000004458 00000 n 
+0000004594 00000 n 
+0000006713 00000 n 
+0000006850 00000 n 
+0000008639 00000 n 
+0000008777 00000 n 
+0000010944 00000 n 
+0000011082 00000 n 
+0000013477 00000 n 
+0000013615 00000 n 
+0000016013 00000 n 
+trailer
+<< /Size 19 /Root 1 0 R >>
+startxref
+16151
+%%EOF

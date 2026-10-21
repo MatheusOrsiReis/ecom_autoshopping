@@ -1,0 +1,330 @@
+%PDF-1.4
+%âãÏÓ
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 4 /Kids [6 0 R 8 0 R 10 0 R 12 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Length 1756 >>
+stream
+0.12 0.15 0.19 rg 0 774 595 68 re f
+1 1 1 rg
+BT /F2 15 Tf 42 806 Td (Plano de treinamento e matriz) Tj ET
+0.75 0.1 0.12 rg 42 748 511 3 re f
+0.12 0.15 0.19 rg
+BT /F2 13 Tf 42 720 Td (1. Objetivo e base documental) Tj ET
+BT /F1 10.5 Tf 14 TL 42 693 Td
+(Preparar usuários do AutoShopping para executar suas rotinas, conferir resultados e) Tj
+T*
+(reduzir dúvidas, retrabalho e atrasos no ambiente de e-commerce e logística interna de) Tj
+T*
+(Santa Catarina descrito no desafio.) Tj
+T*
+() Tj
+T*
+(Fontes: Documentacao/requisitos_do_sistema.pdf e) Tj
+T*
+(Documentacao/especificacoes_infraestrutura.pdf. Nomes de comandos conferidos nas telas e) Tj
+T*
+(scripts da pasta frontend. As orientações não representam teste de funcionamento ou) Tj
+T*
+(homologação da implantação.) Tj
+T*
+() Tj
+T*
+(Há dois perfis no sistema: CLIENTE e ADMIN. Os grupos por atividade apresentados a seguir) Tj
+T*
+(são uma organização pedagógica; não representam novas permissões.) Tj
+T*
+() Tj
+T*
+(Os prazos de 45, 50 e 25 minutos do desafio são de elaboração das entregas, total de 120) Tj
+T*
+(minutos. A duração do treinamento abaixo é proposta de aplicação, distinta desses prazos.) Tj
+T*
+() Tj
+T*
+(Não foram informados turnos, quantidade de usuários ou estações, endereço de produção,) Tj
+T*
+(contato de suporte e políticas internas detalhadas. A empresa deve defini-los antes da) Tj
+T*
+(aplicação. As recomendações de organização são propostas, não fatos sobre o ambiente.) Tj
+T*
+() Tj
+T*
+(Objetivo observável: cada participante executa uma tarefa de sua responsabilidade, confere) Tj
+T*
+(o registro, explica uma restrição, encontra a orientação no manual e encerra sua sessão.) Tj
+T*
+() Tj
+T*
+ET
+0.4 0.4 0.4 rg
+BT /F1 8 Tf 42 39 Td (AutoShopping | Versao 1.0 | 21/10/2026 | 1/4) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 2498 >>
+stream
+0.12 0.15 0.19 rg 0 774 595 68 re f
+1 1 1 rg
+BT /F2 15 Tf 42 806 Td (Plano de treinamento e matriz) Tj ET
+0.75 0.1 0.12 rg 42 748 511 3 re f
+0.12 0.15 0.19 rg
+BT /F2 13 Tf 42 720 Td (2. Matriz de necessidades por grupo) Tj ET
+BT /F1 10.5 Tf 14 TL 42 693 Td
+(A - Cliente / atendimento em simulação. Perfil: CLIENTE. Prioridade alta. Necessidades:) Tj
+T*
+(entrar, revisar dados, localizar veículo, usar carrinho, finalizar e acompanhar pedido.) Tj
+T*
+(Riscos: CPF inválido, endereço incompleto, confirmação repetida. Prática: criar pedido de) Tj
+T*
+(exercício e consultá-lo. Manual M01-M05. RF01-RF07 e RF13-RF22.) Tj
+T*
+() Tj
+T*
+(B - Catálogo e estoque. Perfil: ADMIN. Prioridade alta. Necessidades: categorias,) Tj
+T*
+(cadastro, consulta e edição de veículo, saldo e disponibilidade. Riscos: preço ou saldo) Tj
+T*
+(incorreto e exclusão de categoria vinculada. Prática: cadastrar categoria e veículo de) Tj
+T*
+(exercício, consultar e ajustar saldo. Manual M06-M07. RF08-RF12.) Tj
+T*
+() Tj
+T*
+(C - Pedidos e logística. Perfil: ADMIN. Prioridade alta. Necessidades: filtro e situação) Tj
+T*
+(de pedidos; situação, rastreio e previsão de entrega. Riscos: alterar pedido errado,) Tj
+T*
+(repetir rastreio e confundir situação do pedido com a da entrega. Prática: localizar) Tj
+T*
+(pedido de exercício e atualizar entrega associada. Manual M08. RF23-RF24.) Tj
+T*
+() Tj
+T*
+(D - Supervisão / consulta administrativa. Perfil: ADMIN. Prioridade média. Necessidades:) Tj
+T*
+(consultar usuários, indicadores e gráficos. Riscos: exposição de dados pessoais e) Tj
+T*
+(interpretação incorreta de faturamento. Prática: consultar indicadores e explicar a) Tj
+T*
+(exclusão de cancelados. Manual M09. RF25-RF28 e RN34.) Tj
+T*
+() Tj
+T*
+(Todos: acesso correto, limites de conexão e saída da conta. Prioridade alta. Manual M01 e) Tj
+T*
+(M10; infraestrutura e RNF08.) Tj
+T*
+() Tj
+T*
+(Diagnóstico antes da turma: perguntar se a pessoa consegue entrar, localizar um veículo e) Tj
+T*
+(identificar seu acesso; observar uma tarefa simples. Iniciantes recebem demonstração de) Tj
+T*
+(uma ação por vez, prática guiada e nova tentativa. Experientes priorizam exceções e) Tj
+T*
+(conferência. Não presumir familiaridade pelo cargo.) Tj
+T*
+() Tj
+T*
+(Usuários com várias responsabilidades cursam as trilhas correspondentes. A divisão) Tj
+T*
+(pedagógica não limita tecnicamente o ADMIN nem cria acesso exclusivo para logística.) Tj
+T*
+() Tj
+T*
+ET
+0.4 0.4 0.4 rg
+BT /F1 8 Tf 42 39 Td (AutoShopping | Versao 1.0 | 21/10/2026 | 2/4) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Length 2177 >>
+stream
+0.12 0.15 0.19 rg 0 774 595 68 re f
+1 1 1 rg
+BT /F2 15 Tf 42 806 Td (Plano de treinamento e matriz) Tj ET
+0.75 0.1 0.12 rg 42 748 511 3 re f
+0.12 0.15 0.19 rg
+BT /F2 13 Tf 42 720 Td (3. Condições e organização por turnos) Tj ET
+BT /F1 10.5 Tf 14 TL 42 693 Td
+(O técnico verifica estação autorizada, navegador, conta adequada e serviços disponíveis. O) Tj
+T*
+(anexo recomenda Chrome, Edge ou Firefox 120 ou superior; Chrome foi testado no projeto. A) Tj
+T*
+(TI deve validar a adequação do ambiente corporativo.) Tj
+T*
+() Tj
+T*
+(Infraestrutura mínima documentada: processador de 64 bits com 2 núcleos, 4 GB de memória,) Tj
+T*
+(2 GB livres e rede local. Recomendada: 4 núcleos, 8 GB e 5 GB livres. Instalação e) Tj
+T*
+(manutenção ficam com o responsável técnico, fora da rotina do usuário.) Tj
+T*
+() Tj
+T*
+(O ambiente documentado é local e o frontend aponta para localhost:3000. Isso não comprova) Tj
+T*
+(acesso por outras estações. A TI deve validar a implantação em rede e comunicar o endereço) Tj
+T*
+(antes das práticas.) Tj
+T*
+() Tj
+T*
+(Internet é necessária para consulta de CEP e carregamento dos gráficos. Rede local) Tj
+T*
+(disponível não garante esses serviços. Sem condições para execução, realizar leitura) Tj
+T*
+(guiada e reagendar a prática, sem registrar aprovação prática.) Tj
+T*
+() Tj
+T*
+(Proposta: repetir a mesma turma em cada turno, com os mesmos exercícios e critérios. A) Tj
+T*
+(liderança define horários e libera participantes conforme a operação. Com poucas estações,) Tj
+T*
+(usar duplas alternando executor e observador; cada pessoa faz sua tentativa individual.) Tj
+T*
+() Tj
+T*
+(Usar somente ambiente, contas e dados de exercício autorizados. Os anexos não comprovam) Tj
+T*
+(ambiente separado de treinamento. Não executar compras, cancelamentos ou exclusões reais) Tj
+T*
+(como exercício.) Tj
+T*
+() Tj
+T*
+(Disponibilizar o PDF no local aprovado pela TI para consulta. A leitura sem rede não) Tj
+T*
+(significa que o sistema grave operações sem conexão. O canal de suporte e as regras) Tj
+T*
+(internas devem ser comunicados pela empresa antes do uso.) Tj
+T*
+() Tj
+T*
+ET
+0.4 0.4 0.4 rg
+BT /F1 8 Tf 42 39 Td (AutoShopping | Versao 1.0 | 21/10/2026 | 3/4) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 9 0 R >>
+endobj
+11 0 obj
+<< /Length 2262 >>
+stream
+0.12 0.15 0.19 rg 0 774 595 68 re f
+1 1 1 rg
+BT /F2 15 Tf 42 806 Td (Plano de treinamento e matriz) Tj ET
+0.75 0.1 0.12 rg 42 748 511 3 re f
+0.12 0.15 0.19 rg
+BT /F2 13 Tf 42 720 Td (4. Programa e avaliação propostos) Tj ET
+BT /F1 10.5 Tf 14 TL 42 693 Td
+(Bloco comum - 20 min: diagnóstico \(5\), demonstração de entrada e limites \(5\), prática de) Tj
+T*
+(acesso, perfil e saída \(10\). Manual M01 e M10.) Tj
+T*
+() Tj
+T*
+(Trilha A - 35 min: catálogo/carrinho \(10\), prática de pedido e recebimento \(15\), consulta) Tj
+T*
+(e cancelamento de exercício pendente \(10\). M02-M05. Com bloco comum e avaliação: 65 min.) Tj
+T*
+() Tj
+T*
+(Trilha B - 35 min: categorias \(10\), cadastro/edição de veículo \(15\), consulta e estoque) Tj
+T*
+(\(10\). M06-M07. Total com bloco comum e avaliação: 65 min.) Tj
+T*
+() Tj
+T*
+(Trilha C - 25 min: filtro e conferência de pedido \(10\), atualização de entrega \(15\). M08.) Tj
+T*
+(Total com bloco comum e avaliação: 55 min.) Tj
+T*
+() Tj
+T*
+(Trilha D - 15 min: consulta de usuários \(5\), indicadores e limites dos gráficos \(10\). M09.) Tj
+T*
+(Total com bloco comum e avaliação: 45 min.) Tj
+T*
+() Tj
+T*
+(Avaliação individual - 10 min por trilha: executar uma tarefa sem orientação, conferir) Tj
+T*
+(resultado, explicar restrição, localizar o trecho no manual e sair. Critério proposto:) Tj
+T*
+(concluir os cinco itens sem alterar registro indevido ou expor dados. Se houver) Tj
+T*
+(dificuldade, demonstrar novamente e repetir a avaliação do item.) Tj
+T*
+() Tj
+T*
+(Registro: participante, turno, data, perfil/trilha, tarefa, resultado dos cinco itens,) Tj
+T*
+(dúvidas, reforço e avaliador. Não registrar senhas ou tokens.) Tj
+T*
+() Tj
+T*
+(Responsabilidades propostas: técnico conduz e revisa material; liderança organiza turmas;) Tj
+T*
+(TI confirma infraestrutura e acessos. Reunir dúvidas ao final de cada turma e nas) Tj
+T*
+(primeiras rotinas acompanhadas para orientar reforço.) Tj
+T*
+() Tj
+T*
+(Acompanhamento proposto: comparar dúvidas por rotina, tarefas refeitas e conclusão da) Tj
+T*
+(avaliação antes e depois, em períodos equivalentes definidos pelo setor. Os anexos não) Tj
+T*
+(fornecem metas ou resultados medidos.) Tj
+T*
+() Tj
+T*
+ET
+0.4 0.4 0.4 rg
+BT /F1 8 Tf 42 39 Td (AutoShopping | Versao 1.0 | 21/10/2026 | 4/4) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 11 0 R >>
+endobj
+xref
+0 13
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000141 00000 n 
+0000000238 00000 n 
+0000000340 00000 n 
+0000002148 00000 n 
+0000002284 00000 n 
+0000004834 00000 n 
+0000004970 00000 n 
+0000007199 00000 n 
+0000007336 00000 n 
+0000009651 00000 n 
+trailer
+<< /Size 13 /Root 1 0 R >>
+startxref
+9789
+%%EOF
