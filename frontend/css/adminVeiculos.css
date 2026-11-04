@@ -1,0 +1,7 @@
+.navegacao-areas .aba-admin { display: flex; align-items: center; justify-content: center; text-decoration: none; }
+.pagina-admin-veiculos #resultadoConsultaProduto { margin-top: 20px; }
+.pagina-admin-veiculos .formulario-uma-coluna { max-width: 620px; }
+
+@media (max-width: 700px) {
+    .pagina-admin-veiculos .tabela-admin { min-width: 760px; }
+}

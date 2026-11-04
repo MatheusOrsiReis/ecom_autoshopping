@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../imagens/favicon.png">
+    <title>Administrar categorias | AutoShopping</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/adminCategorias.css">
+    <script src="../js/prgAdminCategorias.js" defer></script>
+</head>
+
+<body class="fundo-admin pagina-admin-categorias">
+    <header class="navbar">
+        <div class="container navbar-conteudo"><a class="logo" href="../index.html"><img
+                    src="../imagens/autoshopping_logo.png" alt="AutoShopping"></a>
+            <nav class="menu menu-admin"><a href="../index.html">Ver loja</a><a class="ativo"
+                    href="admin.html">Admin</a><a href="relatorios.html">Relatórios</a><a
+                    href="perfil.html">Perfil</a><button id="botaoSair" class="botao botao-contorno botao-menor"
+                    type="button">Sair</button></nav>
+        </div>
+    </header>
+    <main id="conteudoAdmin" hidden>
+        <section class="topo-pagina topo-admin">
+            <div class="container"><span class="sobretitulo">Organização</span>
+                <h1>Gerenciar categorias</h1>
+                <p>Organize os veículos cadastrados.</p>
+            </div>
+        </section>
+        <section class="secao secao-admin">
+            <div class="container">
+                <nav class="abas-admin navegacao-areas"><a class="aba-admin" href="adminVeiculos.html">Veículos</a><a
+                        class="aba-admin ativo" href="adminCategorias.html">Categorias</a><a class="aba-admin"
+                        href="adminPedidos.html">Pedidos</a><a class="aba-admin"
+                        href="adminEntregas.html">Entregas</a><a class="aba-admin"
+                        href="adminUsuarios.html">Usuários</a></nav>
+                <p id="mensagemAdmin" class="aviso-admin" hidden></p>
+                <nav class="abas-admin"><button id="botaoCadastrarCategoria" class="aba-admin"
+                        type="button">Cadastrar</button><button id="botaoListarCategoria" class="aba-admin ativo"
+                        type="button">Listar</button><button id="botaoConsultarCategoria" class="aba-admin"
+                        type="button">Consultar</button><button id="botaoAtualizarCategoria" class="aba-admin"
+                        type="button">Atualizar</button><button id="botaoApagarCategoria" class="aba-admin"
+                        type="button">Apagar</button></nav>
+
+                <section id="painelCadastrarCategoria" hidden>
+                    <form id="formCategoria" class="cartao-formulario formulario formulario-uma-coluna">
+                        <div class="cabecalho-formulario">
+                            <h2 id="tituloFormCategoria">Cadastrar categoria</h2>
+                            <p>Crie um grupo para os veículos.</p>
+                        </div>
+                        <div class="campo"><label for="categoriaNome">Nome</label><input id="categoriaNome"
+                                maxlength="60" required></div>
+                        <div class="campo"><label for="categoriaDescricao">Descrição</label><textarea
+                                id="categoriaDescricao" rows="4" maxlength="500"></textarea></div>
+                        <p id="mensagemCategoria" class="mensagem-formulario"></p>
+                        <div class="acoes-formulario"><button class="botao botao-primario" type="submit">Salvar
+                                categoria</button><button id="botaoCancelarCategoria" class="botao botao-secundario"
+                                type="button">Cancelar</button></div>
+                    </form>
+                </section>
+                <section id="painelListarCategoria">
+                    <div id="listaCategoriasAdmin" class="lista-admin">
+                        <div class="mensagem carregando">Carregando categorias...</div>
+                    </div>
+                </section>
+                <section id="painelConsultarCategoria" hidden>
+                    <form id="formConsultarCategoria" class="cartao-formulario formulario formulario-uma-coluna">
+                        <div class="cabecalho-formulario">
+                            <h2>Consultar categoria</h2>
+                            <p>Digite o código.</p>
+                        </div>
+                        <div class="campo"><label for="codigoConsultarCategoria">Código</label><input
+                                id="codigoConsultarCategoria" type="number" min="1" required></div><button
+                            class="botao botao-primario" type="submit">Consultar</button>
+                    </form>
+                    <div id="resultadoConsultaCategoria" class="lista-admin"></div>
+                </section>
+                <section id="painelAtualizarCategoria" hidden>
+                    <form id="formAtualizarCategoria" class="cartao-formulario formulario formulario-uma-coluna">
+                        <div class="cabecalho-formulario">
+                            <h2>Atualizar categoria</h2>
+                            <p>Digite o código para carregar os dados.</p>
+                        </div>
+                        <div class="campo"><label for="codigoAtualizarCategoria">Código</label><input
+                                id="codigoAtualizarCategoria" type="number" min="1" required></div><button
+                            class="botao botao-primario" type="submit">Carregar categoria</button>
+                    </form>
+                </section>
+                <section id="painelApagarCategoria" hidden>
+                    <form id="formApagarCategoria" class="cartao-formulario formulario formulario-uma-coluna">
+                        <div class="cabecalho-formulario">
+                            <h2>Apagar categoria</h2>
+                            <p>Digite o código.</p>
+                        </div>
+                        <div class="campo"><label for="codigoApagarCategoria">Código</label><input
+                                id="codigoApagarCategoria" type="number" min="1" required></div><button
+                            class="botao botao-primario" type="submit">Apagar categoria</button>
+                    </form>
+                </section>
+            </div>
+        </section>
+    </main>
+    <div id="bloqueioAdmin" class="pagina-bloqueio">
+        <div class="mensagem carregando">Verificando acesso administrativo...</div>
+    </div>
+    <footer class="rodape rodape-simples">
+        <div class="container rodape-conteudo">
+            <p class="selo-copyright">Desenvolvido por <strong>Matheus Orsi Reis</strong></p>
+        </div>
+    </footer>
+</body>
+
+</html>

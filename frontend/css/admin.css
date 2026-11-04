@@ -1,0 +1,36 @@
+.grade-areas-admin {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.area-admin {
+    min-height: 190px;
+    padding: 28px;
+    color: #222222;
+    background: #ffffff;
+    border: 1px solid var(--cor-borda);
+    border-top: 4px solid var(--cor-primaria);
+    border-radius: 12px;
+    text-decoration: none;
+    transition: transform 150ms ease, border-color 150ms ease;
+}
+
+.area-admin:hover {
+    transform: translateY(-4px);
+    border-color: var(--cor-primaria);
+}
+
+.area-admin span {
+    color: var(--cor-primaria);
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.area-admin h2 { margin: 9px 0; }
+.area-admin p { margin: 0; color: #687078; }
+
+@media (max-width: 800px) {
+    .grade-areas-admin { grid-template-columns: 1fr; }
+}

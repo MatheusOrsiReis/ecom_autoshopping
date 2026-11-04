@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../imagens/favicon.png">
+    <title>Administrar pedidos | AutoShopping</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/adminPedidos.css">
+    <script src="../js/prgAdminPedidos.js" defer></script>
+</head>
+
+<body class="fundo-admin pagina-admin-pedidos">
+    <header class="navbar">
+        <div class="container navbar-conteudo"><a class="logo" href="../index.html"><img
+                    src="../imagens/autoshopping_logo.png" alt="AutoShopping"></a>
+            <nav class="menu menu-admin"><a href="../index.html">Ver loja</a><a class="ativo"
+                    href="admin.html">Admin</a><a href="relatorios.html">Relatórios</a><a
+                    href="perfil.html">Perfil</a><button id="botaoSair" class="botao botao-contorno botao-menor"
+                    type="button">Sair</button></nav>
+        </div>
+    </header>
+    <main id="conteudoAdmin" hidden>
+        <section class="topo-pagina topo-admin">
+            <div class="container"><span class="sobretitulo">Vendas</span>
+                <h1>Gerenciar pedidos</h1>
+                <p>Acompanhe as compras realizadas na loja.</p>
+            </div>
+        </section>
+        <section class="secao secao-admin">
+            <div class="container">
+                <nav class="abas-admin navegacao-areas"><a class="aba-admin" href="adminVeiculos.html">Veículos</a><a
+                        class="aba-admin" href="adminCategorias.html">Categorias</a><a class="aba-admin ativo"
+                        href="adminPedidos.html">Pedidos</a><a class="aba-admin"
+                        href="adminEntregas.html">Entregas</a><a class="aba-admin"
+                        href="adminUsuarios.html">Usuários</a></nav>
+                <p id="mensagemAdmin" class="aviso-admin" hidden></p>
+                <nav class="abas-admin"><button id="botaoCadastrarPedido" class="aba-admin"
+                        type="button">Cadastrar</button><button id="botaoListarPedido" class="aba-admin ativo"
+                        type="button">Listar</button><button id="botaoConsultarPedido" class="aba-admin"
+                        type="button">Consultar</button><button id="botaoAtualizarPedido" class="aba-admin"
+                        type="button">Atualizar</button><button id="botaoApagarPedido" class="aba-admin"
+                        type="button">Apagar</button></nav>
+
+                <section id="painelCadastrarPedido" hidden>
+                    <form id="formCadastrarPedido" class="cartao-formulario formulario formulario-admin">
+                        <div class="cabecalho-formulario campo-largo">
+                            <h2>Cadastrar pedido</h2>
+                            <p>Informe o cliente, o veículo e o recebimento.</p>
+                        </div>
+                        <div class="campo"><label for="pedidoUsuario">Código do usuário</label><input id="pedidoUsuario"
+                                type="number" min="1" required></div>
+                        <div class="campo"><label for="pedidoProduto">Código do veículo</label><input id="pedidoProduto"
+                                type="number" min="1" required></div>
+                        <div class="campo"><label for="pedidoQuantidade">Quantidade</label><input id="pedidoQuantidade"
+                                type="number" min="1" value="1" required></div>
+                        <div class="campo"><label for="pedidoTipoEntrega">Recebimento</label><select
+                                id="pedidoTipoEntrega">
+                                <option value="RETIRADA">Retirada</option>
+                                <option value="ENTREGA">Entrega</option>
+                            </select></div>
+                        <div class="campo campo-largo"><label for="pedidoEndereco">Endereço da entrega</label><input
+                                id="pedidoEndereco"></div>
+                        <div class="campo"><label for="pedidoFrete">Frete (R$)</label><input id="pedidoFrete"
+                                type="number" min="0" step="0.01" value="0"></div><button
+                            class="botao botao-primario campo-largo" type="submit">Cadastrar pedido</button>
+                    </form>
+                </section>
+                <section id="painelListarPedido">
+                    <div class="cabecalho-lista-pedidos">
+                        <h2>Pedidos cadastrados</h2><select id="filtroStatusPedido" class="seletor-admin">
+                            <option value="">Todos os status</option>
+                            <option value="PENDENTE_PAGAMENTO">Pendente de pagamento</option>
+                            <option value="PAGO">Pago</option>
+                            <option value="ENVIADO">Enviado</option>
+                            <option value="ENTREGUE">Entregue</option>
+                            <option value="CANCELADO">Cancelado</option>
+                        </select>
+                    </div>
+                    <div id="listaPedidosAdmin" class="lista-admin">
+                        <div class="mensagem carregando">Carregando pedidos...</div>
+                    </div>
+                </section>
+                <section id="painelConsultarPedido" hidden>
+                    <form id="formConsultarPedido" class="cartao-formulario formulario formulario-uma-coluna">
+                        <div class="cabecalho-formulario">
+                            <h2>Consultar pedido</h2>
+                            <p>Digite o código.</p>
+                        </div>
+                        <div class="campo"><label for="codigoConsultarPedido">Código</label><input
+                                id="codigoConsultarPedido" type="number" min="1" required></div><button
+                            class="botao botao-primario" type="submit">Consultar</button>
+                    </form>
+                    <div id="resultadoConsultaPedido" class="lista-admin"></div>
+                </section>
+                <section id="painelAtualizarPedido" hidden>
+                    <form id="formAtualizarPedido" class="cartao-formulario formulario formulario-uma-coluna">
+                        <div class="cabecalho-formulario">
+                            <h2>Atualizar pedido</h2>
+                            <p>Informe o código e o novo status.</p>
+                        </div>
+                        <div class="campo"><label for="codigoAtualizarPedido">Código</label><input
+                                id="codigoAtualizarPedido" type="number" min="1" required></div>
+                        <div class="campo"><label for="statusAtualizarPedido">Status</label><select
+                                id="statusAtualizarPedido">
+                                <option value="PENDENTE_PAGAMENTO">Pendente de pagamento</option>
+                                <option value="PAGO">Pago</option>
+                                <option value="ENVIADO">Enviado</option>
+                                <option value="ENTREGUE">Entregue</option>
+                                <option value="CANCELADO">Cancelado</option>
+                            </select></div><button class="botao botao-primario" type="submit">Atualizar pedido</button>
+                    </form>
+                </section>
+                <section id="painelApagarPedido" hidden>
+                    <form id="formApagarPedido" class="cartao-formulario formulario formulario-uma-coluna">
+                        <div class="cabecalho-formulario">
+                            <h2>Apagar pedido</h2>
+                            <p>Digite o código.</p>
+                        </div>
+                        <div class="campo"><label for="codigoApagarPedido">Código</label><input id="codigoApagarPedido"
+                                type="number" min="1" required></div><button class="botao botao-primario"
+                            type="submit">Apagar pedido</button>
+                    </form>
+                </section>
+            </div>
+        </section>
+    </main>
+    <div id="bloqueioAdmin" class="pagina-bloqueio">
+        <div class="mensagem carregando">Verificando acesso administrativo...</div>
+    </div>
+    <footer class="rodape rodape-simples">
+        <div class="container rodape-conteudo">
+            <p class="selo-copyright">Desenvolvido por <strong>Matheus Orsi Reis</strong></p>
+        </div>
+    </footer>
+</body>
+
+</html>

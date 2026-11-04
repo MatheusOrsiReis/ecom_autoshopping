@@ -1,0 +1,12 @@
+.navegacao-areas .aba-admin { display: flex; align-items: center; justify-content: center; text-decoration: none; }
+.pagina-admin-pedidos .formulario-uma-coluna { max-width: 620px; }
+.cabecalho-lista-pedidos { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 20px; }
+.cabecalho-lista-pedidos h2 {
+    margin: 0;
+    color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+}
+
+@media (max-width: 600px) {
+    .cabecalho-lista-pedidos { align-items: stretch; flex-direction: column; }
+}

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../imagens/favicon.png">
+    <title>Administrar usuários | AutoShopping</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/adminUsuarios.css">
+    <script src="../js/prgAdminUsuarios.js" defer></script>
+</head>
+
+<body class="fundo-admin pagina-admin-usuarios">
+    <header class="navbar">
+        <div class="container navbar-conteudo"><a class="logo" href="../index.html"><img
+                    src="../imagens/autoshopping_logo.png" alt="AutoShopping"></a>
+            <nav class="menu menu-admin"><a href="../index.html">Ver loja</a><a class="ativo"
+                    href="admin.html">Admin</a><a href="relatorios.html">Relatórios</a><a
+                    href="perfil.html">Perfil</a><button id="botaoSair" class="botao botao-contorno botao-menor"
+                    type="button">Sair</button></nav>
+        </div>
+    </header>
+    <main id="conteudoAdmin" hidden>
+        <section class="topo-pagina topo-admin">
+            <div class="container"><span class="sobretitulo">Cadastros</span>
+                <h1>Gerenciar usuários</h1>
+                <p>Administre clientes e administradores.</p>
+            </div>
+        </section>
+        <section class="secao secao-admin">
+            <div class="container">
+                <nav class="abas-admin navegacao-areas"><a class="aba-admin" href="adminVeiculos.html">Veículos</a><a
+                        class="aba-admin" href="adminCategorias.html">Categorias</a><a class="aba-admin"
+                        href="adminPedidos.html">Pedidos</a><a class="aba-admin"
+                        href="adminEntregas.html">Entregas</a><a class="aba-admin ativo"
+                        href="adminUsuarios.html">Usuários</a></nav>
+                <p id="mensagemAdmin" class="aviso-admin" hidden></p>
+                <nav class="abas-admin"><button id="botaoCadastrarUsuario" class="aba-admin"
+                        type="button">Cadastrar</button><button id="botaoListarUsuario" class="aba-admin ativo"
+                        type="button">Listar</button><button id="botaoConsultarUsuario" class="aba-admin"
+                        type="button">Consultar</button><button id="botaoAtualizarUsuario" class="aba-admin"
+                        type="button">Atualizar</button><button id="botaoApagarUsuario" class="aba-admin"
+                        type="button">Apagar</button></nav>
+
+                <section id="painelFormularioUsuario" hidden>
+                    <form id="formUsuario" class="cartao-formulario formulario formulario-admin">
+                        <div class="cabecalho-formulario campo-largo">
+                            <h2 id="tituloFormUsuario">Cadastrar usuário</h2>
+                            <p>Preencha os dados da conta.</p>
+                        </div>
+                        <div class="campo"><label for="usuarioNome">Nome</label><input id="usuarioNome" maxlength="80"
+                                required></div>
+                        <div class="campo"><label for="usuarioCpf">CPF</label><input id="usuarioCpf" maxlength="14"
+                                required></div>
+                        <div class="campo"><label for="usuarioEmail">E-mail</label><input id="usuarioEmail" type="email"
+                                maxlength="100" required></div>
+                        <div class="campo"><label for="usuarioSenha">Senha</label><input id="usuarioSenha"
+                                type="password" minlength="6"></div>
+                        <div class="campo"><label for="usuarioTelefone">Telefone</label><input id="usuarioTelefone"
+                                maxlength="20" required></div>
+                        <div class="campo"><label for="usuarioIdentidade">Identidade</label><input
+                                id="usuarioIdentidade" maxlength="20"></div>
+                        <div class="campo"><label for="usuarioCep">CEP</label><input id="usuarioCep" maxlength="9"
+                                required></div>
+                        <div class="campo"><label for="usuarioRua">Rua</label><input id="usuarioRua" maxlength="100"
+                                required></div>
+                        <div class="campo"><label for="usuarioNumero">Número</label><input id="usuarioNumero"
+                                maxlength="12" required></div>
+                        <div class="campo"><label for="usuarioBairro">Bairro</label><input id="usuarioBairro"
+                                maxlength="70" required></div>
+                        <div class="campo"><label for="usuarioCidade">Cidade</label><input id="usuarioCidade"
+                                maxlength="70" required></div>
+                        <div class="campo"><label for="usuarioUf">UF</label><input id="usuarioUf" maxlength="2"
+                                required></div>
+                        <div class="campo"><label for="usuarioTipo">Tipo</label><select id="usuarioTipo">
+                                <option value="CLIENTE">Cliente</option>
+                                <option value="ADMIN">Administrador</option>
+                            </select></div>
+                        <p id="mensagemUsuario" class="mensagem-formulario campo-largo"></p>
+                        <div class="acoes-formulario campo-largo"><button class="botao botao-primario"
+                                type="submit">Salvar usuário</button><button id="botaoCancelarUsuario"
+                                class="botao botao-secundario" type="button">Cancelar</button></div>
+                    </form>
+                </section>
+                <section id="painelListarUsuario" class="tabela-responsiva cartao-admin">
+                    <table class="tabela-admin">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nome</th>
+                                <th>Contato</th>
+                                <th>CPF</th>
+                                <th>Cidade</th>
+                                <th>Tipo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabelaUsuarios">
+                            <tr>
+                                <td colspan="6" class="estado-tabela">Carregando usuários...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+                <section id="painelConsultarUsuario" hidden>
+                    <form id="formConsultarUsuario" class="cartao-formulario formulario formulario-uma-coluna">
+                        <div class="cabecalho-formulario">
+                            <h2>Consultar usuário</h2>
+                            <p>Digite o código.</p>
+                        </div>
+                        <div class="campo"><label for="codigoConsultarUsuario">Código</label><input
+                                id="codigoConsultarUsuario" type="number" min="1" required></div><button
+                            class="botao botao-primario" type="submit">Consultar</button>
+                    </form>
+                    <div class="tabela-responsiva cartao-admin">
+                        <table class="tabela-admin">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nome</th>
+                                    <th>Contato</th>
+                                    <th>CPF</th>
+                                    <th>Cidade</th>
+                                    <th>Tipo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultadoConsultaUsuario"></tbody>
+                        </table>
+                    </div>
+                </section>
+                <section id="painelAtualizarUsuario" hidden>
+                    <form id="formAtualizarUsuario" class="cartao-formulario formulario formulario-uma-coluna">
+                        <div class="cabecalho-formulario">
+                            <h2>Atualizar usuário</h2>
+                            <p>Digite o código para carregar os dados.</p>
+                        </div>
+                        <div class="campo"><label for="codigoAtualizarUsuario">Código</label><input
+                                id="codigoAtualizarUsuario" type="number" min="1" required></div><button
+                            class="botao botao-primario" type="submit">Carregar usuário</button>
+                    </form>
+                </section>
+                <section id="painelApagarUsuario" hidden>
+                    <form id="formApagarUsuario" class="cartao-formulario formulario formulario-uma-coluna">
+                        <div class="cabecalho-formulario">
+                            <h2>Apagar usuário</h2>
+                            <p>Digite o código.</p>
+                        </div>
+                        <div class="campo"><label for="codigoApagarUsuario">Código</label><input
+                                id="codigoApagarUsuario" type="number" min="1" required></div><button
+                            class="botao botao-primario" type="submit">Apagar usuário</button>
+                    </form>
+                </section>
+            </div>
+        </section>
+    </main>
+    <div id="bloqueioAdmin" class="pagina-bloqueio">
+        <div class="mensagem carregando">Verificando acesso administrativo...</div>
+    </div>
+    <footer class="rodape rodape-simples">
+        <div class="container rodape-conteudo">
+            <p class="selo-copyright">Desenvolvido por <strong>Matheus Orsi Reis</strong></p>
+        </div>
+    </footer>
+</body>
+
+</html>

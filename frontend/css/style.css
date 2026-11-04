@@ -150,6 +150,7 @@ h3 {
 .botao-contorno {
     min-height: 38px;
     color: var(--cor-secundaria);
+    background: transparent;
     border-color: #cbd2d8;
 }
 
@@ -248,11 +249,13 @@ h3 {
 
 .menu .botao-contorno {
     color: #ffffff;
-    border-color: #555555;
+    background: #181818;
+    border-color: #666666;
 }
 
 .menu .botao-contorno:hover {
     color: #ffffff;
+    background: var(--cor-primaria);
     border-color: var(--cor-primaria);
 }
 

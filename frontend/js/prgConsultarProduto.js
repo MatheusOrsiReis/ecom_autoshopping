@@ -16,17 +16,13 @@ if (usuario) {
     document.getElementById('linkPedidos').hidden = false
 
     if (usuario.tipo === 'ADMIN') {
-        document.getElementById('linkAdmin').hidden = false
+        document.getElementById('linkAdmin').href = 'admin.html'
     }
 }
 
 let idProduto = window.location.search.replace('?id=', '')
 
-fetch(`${API_URL}/produto/${idProduto}`)
-.then(function(res) {
-    return res.json()
-})
-.then(function(produto) {
+function mostrarProduto(produto) {
     if (produto.message) {
         detalheProduto.hidden = true
         resposta.textContent = produto.message
@@ -43,7 +39,8 @@ fetch(`${API_URL}/produto/${idProduto}`)
     detalheProduto.hidden = false
 
     if (produto.imagem) {
-        document.getElementById('imagemDetalhe').innerHTML = `<img id="fotoProduto" src="${produto.imagem}" alt="${nomeVeiculo}">`
+        let caminhoImagem = produto.imagem.startsWith('http') ? produto.imagem : `../imagens/${produto.imagem}`
+        document.getElementById('imagemDetalhe').innerHTML = `<img id="fotoProduto" src="${caminhoImagem}" alt="${nomeVeiculo}">`
 
         document.getElementById('fotoProduto').addEventListener('error', function() {
             document.getElementById('imagemDetalhe').innerHTML = '<div class="imagem-placeholder">Sem imagem</div>'
@@ -81,11 +78,27 @@ fetch(`${API_URL}/produto/${idProduto}`)
         document.getElementById('statusEstoque').textContent = 'Veículo indisponível'
         botaoAdicionar.disabled = true
     }
+}
+
+let produtoFixo = VEICULOS_FIXOS.find(function(produto) {
+    return String(produto.codProduto) === String(idProduto)
 })
-.catch(function() {
-    detalheProduto.hidden = true
-    resposta.textContent = 'Erro ao consultar o veículo!'
-})
+
+if (produtoFixo) {
+    mostrarProduto(produtoFixo)
+} else {
+    fetch(`${API_URL}/produto/${idProduto}`)
+    .then(function(res) {
+        return res.json()
+    })
+    .then(function(produto) {
+        mostrarProduto(produto)
+    })
+    .catch(function() {
+        detalheProduto.hidden = true
+        resposta.textContent = 'Erro ao consultar o veículo!'
+    })
+}
 
 botaoAdicionar.addEventListener('click', function() {
     let carrinho = JSON.parse(localStorage.getItem('autoshopping_carrinho') || '[]')

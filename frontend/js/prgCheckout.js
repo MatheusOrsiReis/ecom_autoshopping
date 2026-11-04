@@ -15,7 +15,7 @@ if (idsCarrinho.length === 0) {
 }
 
 if (usuario && usuario.tipo === 'ADMIN') {
-    document.getElementById('linkAdmin').hidden = false
+    document.getElementById('linkAdmin').href = 'admin.html'
 }
 
 document.getElementById('contadorCarrinho').textContent = idsCarrinho.length

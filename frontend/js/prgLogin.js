@@ -7,6 +7,12 @@ let usuario = JSON.parse(localStorage.getItem('autoshopping_usuario') || 'null')
 
 document.getElementById('contadorCarrinho').textContent = carrinho.length
 
+if (window.location.search.includes('trocar=admin')) {
+    localStorage.removeItem('autoshopping_token')
+    localStorage.removeItem('autoshopping_usuario')
+    usuario = null
+}
+
 if (localStorage.getItem('autoshopping_token')) {
     window.location.href = usuario && usuario.tipo === 'ADMIN' ? 'admin.html' : 'perfil.html'
 }

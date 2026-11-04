@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../imagens/favicon.png">
+    <title>Administrar entregas | AutoShopping</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/adminEntregas.css">
+    <script src="../js/prgAdminEntregas.js" defer></script>
+</head>
+
+<body class="fundo-admin pagina-admin-entregas">
+    <header class="navbar">
+        <div class="container navbar-conteudo"><a class="logo" href="../index.html"><img
+                    src="../imagens/autoshopping_logo.png" alt="AutoShopping"></a>
+            <nav class="menu menu-admin"><a href="../index.html">Ver loja</a><a class="ativo"
+                    href="admin.html">Admin</a><a href="relatorios.html">Relatórios</a><a
+                    href="perfil.html">Perfil</a><button id="botaoSair" class="botao botao-contorno botao-menor"
+                    type="button">Sair</button></nav>
+        </div>
+    </header>
+    <main id="conteudoAdmin" hidden>
+        <section class="topo-pagina topo-admin">
+            <div class="container"><span class="sobretitulo">Logística</span>
+                <h1>Gerenciar entregas</h1>
+                <p>Controle o envio e a retirada dos pedidos.</p>
+            </div>
+        </section>
+        <section class="secao secao-admin">
+            <div class="container">
+                <nav class="abas-admin navegacao-areas"><a class="aba-admin" href="adminVeiculos.html">Veículos</a><a
+                        class="aba-admin" href="adminCategorias.html">Categorias</a><a class="aba-admin"
+                        href="adminPedidos.html">Pedidos</a><a class="aba-admin ativo"
+                        href="adminEntregas.html">Entregas</a><a class="aba-admin"
+                        href="adminUsuarios.html">Usuários</a></nav>
+                <p id="mensagemAdmin" class="aviso-admin" hidden></p>
+                <nav class="abas-admin"><button id="botaoCadastrarEntrega" class="aba-admin"
+                        type="button">Cadastrar</button><button id="botaoListarEntrega" class="aba-admin ativo"
+                        type="button">Listar</button><button id="botaoConsultarEntrega" class="aba-admin"
+                        type="button">Consultar</button><button id="botaoAtualizarEntrega" class="aba-admin"
+                        type="button">Atualizar</button><button id="botaoApagarEntrega" class="aba-admin"
+                        type="button">Apagar</button></nav>
+
+                <section id="painelCadastrarEntrega" hidden>
+                    <form id="formCadastrarEntrega" class="cartao-formulario formulario formulario-admin">
+                        <div class="cabecalho-formulario campo-largo">
+                            <h2>Cadastrar entrega</h2>
+                            <p>Use quando o pedido ainda não possuir entrega.</p>
+                        </div>
+                        <div class="campo"><label for="entregaPedido">Código do pedido</label><input id="entregaPedido"
+                                type="number" min="1" required></div>
+                        <div class="campo"><label for="entregaTipo">Tipo</label><select id="entregaTipo">
+                                <option value="RETIRADA">Retirada</option>
+                                <option value="ENTREGA">Entrega</option>
+                            </select></div>
+                        <div class="campo campo-largo"><label for="entregaEndereco">Endereço</label><input
+                                id="entregaEndereco"></div><button class="botao botao-primario campo-largo"
+                            type="submit">Cadastrar entrega</button>
+                    </form>
+                </section>
+                <section id="painelListarEntrega">
+                    <div id="listaEntregasAdmin" class="lista-admin">
+                        <div class="mensagem carregando">Carregando entregas...</div>
+                    </div>
+                </section>
+                <section id="painelConsultarEntrega" hidden>
+                    <form id="formConsultarEntrega" class="cartao-formulario formulario formulario-uma-coluna">
+                        <div class="cabecalho-formulario">
+                            <h2>Consultar entrega</h2>
+                            <p>Digite o código.</p>
+                        </div>
+                        <div class="campo"><label for="codigoConsultarEntrega">Código</label><input
+                                id="codigoConsultarEntrega" type="number" min="1" required></div><button
+                            class="botao botao-primario" type="submit">Consultar</button>
+                    </form>
+                    <div id="resultadoConsultaEntrega" class="lista-admin"></div>
+                </section>
+                <section id="painelAtualizarEntrega" hidden>
+                    <form id="formAtualizarEntrega" class="cartao-formulario formulario formulario-admin">
+                        <div class="cabecalho-formulario campo-largo">
+                            <h2>Atualizar entrega</h2>
+                            <p>Informe o código e os dados.</p>
+                        </div>
+                        <div class="campo"><label for="codigoAtualizarEntrega">Código</label><input
+                                id="codigoAtualizarEntrega" type="number" min="1" required></div>
+                        <div class="campo"><label for="statusAtualizarEntrega">Status</label><select
+                                id="statusAtualizarEntrega">
+                                <option value="AGUARDANDO">Aguardando</option>
+                                <option value="EM_TRANSITO">Em trânsito</option>
+                                <option value="SAIU_PARA_ENTREGA">Saiu para entrega</option>
+                                <option value="ENTREGUE">Entregue</option>
+                                <option value="EXTRAVIADO">Extraviado</option>
+                            </select></div>
+                        <div class="campo"><label for="rastreioAtualizarEntrega">Código de rastreio</label><input
+                                id="rastreioAtualizarEntrega" maxlength="50"></div>
+                        <div class="campo"><label for="previsaoAtualizarEntrega">Previsão</label><input
+                                id="previsaoAtualizarEntrega" type="date"></div><button
+                            class="botao botao-primario campo-largo" type="submit">Atualizar entrega</button>
+                    </form>
+                </section>
+                <section id="painelApagarEntrega" hidden>
+                    <form id="formApagarEntrega" class="cartao-formulario formulario formulario-uma-coluna">
+                        <div class="cabecalho-formulario">
+                            <h2>Apagar entrega</h2>
+                            <p>Digite o código.</p>
+                        </div>
+                        <div class="campo"><label for="codigoApagarEntrega">Código</label><input
+                                id="codigoApagarEntrega" type="number" min="1" required></div><button
+                            class="botao botao-primario" type="submit">Apagar entrega</button>
+                    </form>
+                </section>
+            </div>
+        </section>
+    </main>
+    <div id="bloqueioAdmin" class="pagina-bloqueio">
+        <div class="mensagem carregando">Verificando acesso administrativo...</div>
+    </div>
+    <footer class="rodape rodape-simples">
+        <div class="container rodape-conteudo">
+            <p class="selo-copyright">Desenvolvido por <strong>Matheus Orsi Reis</strong></p>
+        </div>
+    </footer>
+</body>
+
+</html>

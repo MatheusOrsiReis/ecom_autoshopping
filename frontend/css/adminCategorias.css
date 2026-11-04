@@ -1,0 +1,3 @@
+.navegacao-areas .aba-admin { display: flex; align-items: center; justify-content: center; text-decoration: none; }
+.pagina-admin-categorias .formulario-uma-coluna { max-width: 620px; }
+.pagina-admin-categorias #resultadoConsultaCategoria { margin-top: 20px; }

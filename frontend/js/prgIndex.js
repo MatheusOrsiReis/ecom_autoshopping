@@ -15,7 +15,7 @@ if (usuario) {
     document.getElementById('linkConta').href = 'html/perfil.html'
 
     if (usuario.tipo === 'ADMIN') {
-        document.getElementById('linkAdmin').hidden = false
+        document.getElementById('linkAdmin').href = 'html/admin.html'
     }
 }
 
@@ -25,7 +25,8 @@ function criarCard(produto) {
     let imagem = '<div class="imagem-placeholder">Imagem não disponível</div>'
 
     if (produto.imagem) {
-        imagem = `<img src="${produto.imagem}" alt="${titulo}" loading="lazy">`
+        let caminhoImagem = produto.imagem.startsWith('http') ? produto.imagem : `imagens/${produto.imagem}`
+        imagem = `<img src="${caminhoImagem}" alt="${titulo}" loading="lazy">`
     }
 
     return `
@@ -48,11 +49,7 @@ function criarCard(produto) {
     `
 }
 
-fetch(`${API_URL}/produtos?ativo=true`)
-.then(function(res) {
-    return res.json()
-})
-.then(function(produtos) {
+function mostrarDestaques(produtos) {
     listar.innerHTML = ''
     let quantidade = 0
 
@@ -68,9 +65,18 @@ fetch(`${API_URL}/produtos?ativo=true`)
     } else {
         resposta.hidden = true
     }
+}
+
+fetch(`${API_URL}/produtos?ativo=true`)
+.then(function(res) {
+    return res.json()
+})
+.then(function(produtos) {
+    if (!Array.isArray(produtos) || produtos.length === 0) produtos = VEICULOS_FIXOS
+    mostrarDestaques(produtos)
 })
 .catch(function() {
-    resposta.textContent = 'Não foi possível carregar os veículos. Verifique se o backend está ligado.'
+    mostrarDestaques(VEICULOS_FIXOS)
 })
 
 formularioBusca.addEventListener('submit', function(e) {

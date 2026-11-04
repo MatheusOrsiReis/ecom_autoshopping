@@ -16,7 +16,7 @@ if (usuario) {
     document.getElementById('linkConta').href = 'perfil.html'
 
     if (usuario.tipo === 'ADMIN') {
-        document.getElementById('linkAdmin').hidden = false
+        document.getElementById('linkAdmin').href = 'admin.html'
     }
 }
 
@@ -34,7 +34,8 @@ function criarCard(produto) {
     let imagem = '<div class="imagem-placeholder">Imagem não disponível</div>'
 
     if (produto.imagem) {
-        imagem = `<img src="${produto.imagem}" alt="${titulo}" loading="lazy">`
+        let caminhoImagem = produto.imagem.startsWith('http') ? produto.imagem : `../imagens/${produto.imagem}`
+        imagem = `<img src="${caminhoImagem}" alt="${titulo}" loading="lazy">`
     }
 
     return `
@@ -55,6 +56,38 @@ function criarCard(produto) {
             </div>
         </article>
     `
+}
+
+function filtrarVeiculosFixos() {
+    let busca = document.getElementById('campoBusca').value.toLowerCase()
+
+    return VEICULOS_FIXOS.filter(function(produto) {
+        let texto = `${produto.nome} ${produto.marca} ${produto.modelo}`.toLowerCase()
+        let correspondeBusca = !busca || texto.includes(busca)
+        let correspondeCategoria = !categoriaSelecionada || String(produto.idCategoria) === String(categoriaSelecionada)
+        return correspondeBusca && correspondeCategoria
+    })
+}
+
+function mostrarProdutos(produtos) {
+    listar.innerHTML = ''
+    let quantidade = 0
+
+    produtos.forEach(function(produto) {
+        if (produto.estoqueProduto && produto.estoqueProduto.quantidade > 0) {
+            listar.innerHTML += criarCard(produto)
+            quantidade++
+        }
+    })
+
+    contador.textContent = `${quantidade} veículo(s) encontrado(s)`
+
+    if (quantidade === 0) {
+        resposta.hidden = false
+        resposta.textContent = 'Nenhum veículo encontrado.'
+    } else {
+        resposta.hidden = true
+    }
 }
 
 function carregarProdutos() {
@@ -78,25 +111,14 @@ function carregarProdutos() {
         return res.json()
     })
     .then(function(produtos) {
-        let quantidade = 0
-
-        produtos.forEach(function(produto) {
-            if (produto.estoqueProduto && produto.estoqueProduto.quantidade > 0) {
-                listar.innerHTML += criarCard(produto)
-                quantidade++
-            }
-        })
-
-        contador.textContent = `${quantidade} veículo(s) encontrado(s)`
-
-        if (quantidade === 0) {
-            resposta.textContent = 'Nenhum veículo encontrado.'
+        if (!Array.isArray(produtos) || produtos.length === 0) {
+            mostrarProdutos(filtrarVeiculosFixos())
         } else {
-            resposta.hidden = true
+            mostrarProdutos(produtos)
         }
     })
     .catch(function() {
-        resposta.textContent = 'Não foi possível carregar os veículos. Verifique se o backend está ligado.'
+        mostrarProdutos(filtrarVeiculosFixos())
     })
 }
 
@@ -112,11 +134,21 @@ function selecionarCategoria(idCategoria, botao) {
     carregarProdutos()
 }
 
-fetch(`${API_URL}/categorias`)
-.then(function(res) {
-    return res.json()
-})
-.then(function(categorias) {
+function mostrarCategorias(categoriasBanco) {
+    let categorias = []
+
+    if (categoriasBanco.length > 0) {
+        categorias = categoriasBanco
+    } else {
+        VEICULOS_FIXOS.forEach(function(produto) {
+            let categoria = produto.categoriaProduto
+            let repetida = categorias.find(function(item) {
+                return String(item.codCategoria) === String(categoria.codCategoria)
+            })
+            if (!repetida) categorias.push(categoria)
+        })
+    }
+
     let botoes = `<button class="filtro-categoria ${categoriaSelecionada ? '' : 'ativo'}" type="button" onclick="selecionarCategoria('', this)">Todos</button>`
 
     categorias.forEach(function(categoria) {
@@ -125,6 +157,19 @@ fetch(`${API_URL}/categorias`)
     })
 
     document.getElementById('filtroCategorias').innerHTML = botoes
+}
+
+mostrarCategorias([])
+
+fetch(`${API_URL}/categorias`)
+.then(function(res) {
+    return res.json()
+})
+.then(function(categorias) {
+    if (Array.isArray(categorias)) mostrarCategorias(categorias)
+})
+.catch(function() {
+    mostrarCategorias([])
 })
 
 document.getElementById('formBusca').addEventListener('submit', function(e) {

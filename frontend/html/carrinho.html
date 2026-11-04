@@ -6,6 +6,7 @@
     <link rel="icon" type="image/png" href="../imagens/favicon.png">
     <title>Carrinho | AutoShopping</title>
     <link rel="stylesheet" href="../css/style.css">
+    <script src="../js/veiculosFixos.js" defer></script>
     <script src="../js/prgCarrinho.js" defer></script>
 </head>
 <body>
@@ -15,7 +16,7 @@
             <nav class="menu" aria-label="Navegação principal">
                 <a href="../index.html">Início</a>
                 <a href="listarProduto.html">Veículos</a>
-                <a href="admin.html" id="linkAdmin" hidden>Painel</a>
+                <a href="login.html?redirect=admin.html&amp;trocar=admin" id="linkAdmin">Admin</a>
                 <a href="meusPedidos.html" id="linkPedidos" hidden>Pedidos</a>
                 <a class="ativo" href="carrinho.html">Carrinho <span id="contadorCarrinho" class="contador-carrinho">0</span></a>
                 <a id="linkConta" class="botao botao-contorno botao-menor" href="login.html">Entrar</a>

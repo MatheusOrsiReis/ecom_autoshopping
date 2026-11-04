@@ -12,7 +12,7 @@ if (usuario) {
     document.getElementById('linkConta').href = 'perfil.html'
 
     if (usuario.tipo === 'ADMIN') {
-        document.getElementById('linkAdmin').hidden = false
+        document.getElementById('linkAdmin').href = 'admin.html'
     }
 }
 
@@ -27,7 +27,7 @@ function salvarCarrinho(carrinho) {
 
 function removerProduto(idProduto) {
     let carrinho = lerCarrinho().filter(function(id) {
-        return id !== idProduto
+        return String(id) !== String(idProduto)
     })
 
     salvarCarrinho(carrinho)
@@ -43,7 +43,8 @@ function mostrarCarrinho() {
 
         let categoria = produto.categoriaProduto ? produto.categoriaProduto.nome : ''
         let titulo = `${produto.marca || ''} ${produto.modelo || ''}`.trim() || produto.nome
-        let imagem = produto.imagem ? `<img src="${produto.imagem}" alt="${titulo}">` : '<span>A</span>'
+        let caminhoImagem = produto.imagem.startsWith('http') ? produto.imagem : `../imagens/${produto.imagem}`
+        let imagem = produto.imagem ? `<img src="${caminhoImagem}" alt="${titulo}">` : '<span>A</span>'
 
         listar.innerHTML += `
             <article class="item-carrinho">
@@ -55,7 +56,7 @@ function mostrarCarrinho() {
                 </div>
                 <div class="item-carrinho-acoes">
                     <strong>${Number(produto.preco).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>
-                    <button type="button" class="botao-texto perigo" onclick="removerProduto(${produto.codProduto})">Remover</button>
+                    <button type="button" class="botao-texto perigo" onclick="removerProduto('${produto.codProduto}')">Remover</button>
                 </div>
             </article>
         `
@@ -96,13 +97,33 @@ function carregarCarrinho() {
         return
     }
 
+    let produtosFixosCarrinho = VEICULOS_FIXOS.filter(function(produto) {
+        return ids.find(function(id) {
+            return String(id) === String(produto.codProduto)
+        })
+    })
+
     fetch(`${API_URL}/produtos?ativo=true`)
     .then(function(res) {
         return res.json()
     })
     .then(function(produtos) {
-        produtosCarrinho = produtos.filter(function(produto) {
-            return ids.includes(produto.codProduto) && produto.estoqueProduto && produto.estoqueProduto.quantidade > 0
+        if (!Array.isArray(produtos)) produtos = []
+
+        let produtosBanco = produtos.filter(function(produto) {
+            return ids.find(function(id) {
+                return String(id) === String(produto.codProduto)
+            }) && produto.estoqueProduto && produto.estoqueProduto.quantidade > 0
+        })
+
+        let todosProdutos = produtosFixosCarrinho.concat(produtosBanco)
+        produtosCarrinho = []
+
+        ids.forEach(function(id) {
+            let produto = todosProdutos.find(function(item) {
+                return String(item.codProduto) === String(id)
+            })
+            if (produto) produtosCarrinho.push(produto)
         })
 
         salvarCarrinho(produtosCarrinho.map(function(produto) {
@@ -112,7 +133,13 @@ function carregarCarrinho() {
         mostrarCarrinho()
     })
     .catch(function() {
-        resposta.textContent = 'Não foi possível atualizar o carrinho. Verifique se o backend está ligado.'
+        produtosCarrinho = produtosFixosCarrinho
+        mostrarCarrinho()
+
+        if (produtosFixosCarrinho.length !== ids.length) {
+            resposta.hidden = false
+            resposta.textContent = 'Os veículos fixos continuam disponíveis. Ligue o backend para carregar os demais.'
+        }
     })
 }
 

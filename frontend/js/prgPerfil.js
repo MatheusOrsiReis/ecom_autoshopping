@@ -13,7 +13,7 @@ if (!token || !usuario) {
 document.getElementById('contadorCarrinho').textContent = carrinho.length
 
 if (usuario && usuario.tipo === 'ADMIN') {
-    document.getElementById('linkAdmin').hidden = false
+    document.getElementById('linkAdmin').href = 'admin.html'
     document.getElementById('linkAdminConta').hidden = false
 }
 
