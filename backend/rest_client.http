@@ -22,8 +22,8 @@ Content-Type: application/json
 {
     "nome": "Administrador AutoShopping",
     "cpf": "529.982.247-25",
-    "email": "{{adminEmail}}",
-    "senha": "{{adminSenha}}",
+    "email": "admin@gmail.com",
+    "senha": "123456",
     "telefone": "48999999999",
     "cep": "88010-400",
     "rua": "Rua Felipe Schmidt",
@@ -46,8 +46,8 @@ Content-Type: application/json
 {
     "nome": "Cliente AutoShopping",
     "cpf": "111.444.777-35",
-    "email": "{{clienteEmail}}",
-    "senha": "{{clienteSenha}}",
+    "email": "cliente@gmail.com",
+    "senha": "123456",
     "telefone": "48988887777",
     "cep": "88015-300",
     "rua": "Avenida Rio Branco",
